@@ -1,6 +1,10 @@
 import { CARD_DIMENSIONS } from "./deck";
 
 /**
+ * @fileoverview Defines the constants and positions for the card piles used in the Freecell game.
+ */
+
+/**
  * Define the constants for the table.
  */
 export enum PileId {
@@ -66,9 +70,6 @@ const PILE_OFFSET = CARD_DIMENSIONS.width + 10;
  * Positions of piles on screen
  */
 export const PILE_POSITIONS: Record<PileId, Phaser.Math.Vector2> = {
-  //[PileId.Stock]: new Phaser.Math.Vector2(110, 120),
-  //[PileId.Discard]: new Phaser.Math.Vector2(110 + PILE_OFFSET + 20, 120),
-
   [PileId.Cell1]: new Phaser.Math.Vector2(80, 120),
   [PileId.Cell2]: new Phaser.Math.Vector2(80 + PILE_OFFSET, 120),
   [PileId.Cell3]: new Phaser.Math.Vector2(80 + 2 * PILE_OFFSET, 120),

@@ -4,19 +4,9 @@ A web Freecell game built with Phasor.
 
 ## Prerequisites
 
-- Ubuntu OS
-- Curl installed
+- Node.js
 
 ## Installation Steps
-
-1. **Install Node.js**
-
-   Open your terminal and run the following commands to install Node.js:
-   
-   ```bash
-   curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-   sudo apt-get install nodejs -y
-   ```
 
 1. **Install Project Dependencies**
 

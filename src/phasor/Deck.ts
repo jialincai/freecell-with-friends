@@ -51,14 +51,20 @@ export default class Deck {
     return deck;
   }
 
-  public cardChildren(card: Card): Card[] {
-    return this.cards
-      .filter(
-        (curr: Card) =>
-          curr.pile === card.pile && curr.position >= card.position
-      )
-      .sort((a: Card, b: Card) => a.position - b.position);
-  }
+/**
+ * Returns the given card and all following cards in the same pile.
+ *
+ * @param {Card} card - The reference card.
+ * @returns {Card[]} Cards in the same pile, sorted by ascending position.
+ */
+public cardChildren(card: Card): Card[] {
+  return this.cards
+    .filter(
+      (curr: Card) =>
+        curr.pile === card.pile && curr.position >= card.position
+    )
+    .sort((a: Card, b: Card) => a.position - b.position);
+}
 
   public validDraggableCard(card: Card, maxCards: number): boolean {
     const children: Card[] = this.cardChildren(card);

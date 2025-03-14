@@ -1,10 +1,6 @@
 import { CARD_DIMENSIONS } from "./deck";
 
 /**
- * @fileoverview Defines the constants and positions for the card piles used in the Freecell game.
- */
-
-/**
  * Define the constants for the table.
  */
 export enum PileId {

@@ -1,11 +1,12 @@
 import * as Phaser from "phaser";
 
-import Deck from "./Deck";
 import Card from "./Card";
-import { CELL_PILES, FOUNDATION_PILES, PileId, TABLEAU_PILES } from "./constants/table";
-import { STACK_DRAG_OFFSET, SUIT_COLOR } from "./constants/deck";
+import Deck from "./Deck";
 import { Pile } from "./Pile";
+import { getUpdatedCardPlacements, getValidDropPiles } from "./Rules";
+import { STACK_DRAG_OFFSET } from "./constants/deck";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "./constants/screen";
+import { CELL_PILES, FOUNDATION_PILES, PileId, TABLEAU_PILES } from "./constants/table";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -28,7 +29,7 @@ export default class GameState extends Phaser.Scene {
 
   private winText!: Phaser.GameObjects.Text;
 
-  private isDragging : boolean = false;
+  private isDragging: boolean = false;
 
   public constructor() {
     super(sceneConfig);
@@ -107,7 +108,7 @@ export default class GameState extends Phaser.Scene {
         gameObject: Phaser.GameObjects.GameObject,
         dropZone: Phaser.GameObjects.GameObject
       ) => {
-        if (gameObject instanceof Card) {
+        if (gameObject instanceof Card && dropZone instanceof Pile) {
           this.dropCard(gameObject, dropZone);
         }
       },
@@ -130,19 +131,18 @@ export default class GameState extends Phaser.Scene {
       this
     );
 
-
-    this.input.on(
-      "gameobjectup",
-      (
-        _pointer: Phaser.Input.Pointer,
-        gameObject: Phaser.GameObjects.GameObject
-      ) => {
-        if (gameObject instanceof Card) {
-          this.pointerUpCard(gameObject);
-        }
-      },
-      this  
-    );
+    // this.input.on(
+    //   "gameobjectup",
+    //   (
+    //     _pointer: Phaser.Input.Pointer,
+    //     gameObject: Phaser.GameObjects.GameObject
+    //   ) => {
+    //     if (gameObject instanceof Card) {
+    //       this.pointerUpCard(gameObject);
+    //     }
+    //   },
+    //   this
+    // );
   }
 
   public createButtons(): void {
@@ -249,97 +249,48 @@ export default class GameState extends Phaser.Scene {
     }
   }
 
-  // eslint-disable-next-line
-  public dropCard(card: Card, dropZone: Phaser.GameObjects.GameObject): boolean {
-    
-    
-    let dropped = false;
-    
-    // Potentially unsafe!
+  public dropCard(card: Card, dropZone: Phaser.GameObjects.GameObject): void {
+    // Get pile id of drop zone
     const pileId = dropZone.name as PileId;
-    
-    console.log(pileId);
-    // Get top card on current stack
-    const topCard = this.deck.topCard(pileId);
-    const oldCardPile = card.pile;
 
-    // Empty stack
-    if (!topCard) {
-      if (
-        (card.value === 13 && TABLEAU_PILES.includes(pileId)) ||
-        (card.value === 1 && FOUNDATION_PILES.includes(pileId)) ||
-        (this.dragChildren.length === 1 && CELL_PILES.includes(pileId)) //This line is what handles the freecell dropping
-      ) {
-        //this.dropScore(pileId, card.pile);
-        card.reposition(pileId, 0);
-        dropped = true;
-      }
-    }
-
-    // Tableau
-    else if (TABLEAU_PILES.includes(pileId)) {
-      if (
-        SUIT_COLOR[card.suit] !== SUIT_COLOR[topCard.suit] &&
-        card.value === topCard.value - 1
-      ) {
-        this.dropScore(pileId, card.pile);
-        card.reposition(pileId, topCard.position + 1);
-        dropped = true;
-      }
-    }
-
-    // Foundation
-    else if (FOUNDATION_PILES.includes(pileId)) {
-      if (card.suit === topCard.suit && card.value === topCard.value + 1) {
-        this.dropScore(pileId, card.pile);
-        card.reposition(pileId, topCard.position + 1);
-        dropped = true;
-      }
-    }
-
-    // Drop all other cards on top
-
-    for (let i = 1; i < this.dragChildren.length; i += 1) {
-      this.dragChildren[i].reposition(card.pile, card.position + i);
-    }
-
-    // Flip top card on past stack
-    const topCardNew = this.deck.topCard(oldCardPile);
-    if (topCardNew && topCardNew !== card && !topCardNew.flipped) {
-      topCardNew.flip(this);
-      this.flipScore(topCardNew.pile);
-    }
-
-    return dropped;
-  }
-
-  public pointerUpCard(card: Card) {
-    if (!this.isDragging) {
+    // If the card can be dropped on the pile, reposition it
+    if (getValidDropPiles(this.deck, card, [pileId]).some(Boolean)) {
+      const dragChildren = this.deck.cardChildren(card);
       
-       // Populate drag children
-      this.dragChildren = [];
-      if (TABLEAU_PILES.includes(card.pile)) {
-        this.dragChildren = this.deck.cardChildren(card);
-      } else {
-        this.dragChildren.push(card);
-      }
-
-      if (this.dragChildren.length <= 1){
-        for (const pile of this.foundationPiles) {
-          if (!FOUNDATION_PILES.includes(card.pile) && this.dropCard(card,pile)) {
-            console.log("moving card to foundation pile");
-            break;
-          }
-        }
-      }
-
-      console.log("The card was clicked!");
+      const updatedPlacements = getUpdatedCardPlacements(this.deck, dragChildren, pileId);
+      dragChildren.forEach((child, index) => {
+        child.reposition(updatedPlacements[index].pileId, updatedPlacements[index].position);
+      });
     }
-    else {
-      console.log("The card was dragged!");
-    }
-    this.isDragging = false;
   }
+
+  // public pointerUpCard(card: Card) {
+  //   if (!this.isDragging) {
+
+  //     // Populate drag children
+  //     this.dragChildren = [];
+  //     if (TABLEAU_PILES.includes(card.pile)) {
+  //       this.dragChildren = this.deck.cardChildren(card);
+  //     } else {
+  //       this.dragChildren.push(card);
+  //     }
+
+  //     if (this.dragChildren.length <= 1) {
+  //       for (const pile of this.foundationPiles) {
+  //         if (!FOUNDATION_PILES.includes(card.pile) && this.dropCard(card, pile)) {
+  //           console.log("moving card to foundation pile");
+  //           break;
+  //         }
+  //       }
+  //     }
+
+  //     console.log("The card was clicked!");
+  //   }
+  //   else {
+  //     console.log("The card was dragged!");
+  //   }
+  //   this.isDragging = false;
+  // }
 
   public determineMaxCardsForMove(): number {
     let maxCards: number = 1;

@@ -2,7 +2,7 @@ import * as Phaser from "phaser";
 
 import Card from "./Card";
 import Deck from "./Deck";
-import { Pile } from "./Pile";
+import Pile from "./Pile";
 import { getUpdatedCardPlacements, getValidDropPiles } from "./Rules";
 import { STACK_DRAG_OFFSET } from "./constants/deck";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "./constants/screen";

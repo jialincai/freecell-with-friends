@@ -259,15 +259,19 @@ export default class GameState extends Phaser.Scene {
   }
 
   public snapCardToFoundation(card: Card): void {
-    // Get valid foundation pile
-    const validPiles = getValidDropPiles(this.deck, card, FOUNDATION_PILES);
-    const targetPile = validPiles[0]; // Returns undefined if no valid pile
+    // Don't snap foundation cards
+    if (FOUNDATION_PILES.includes(card.pile)) return;
+
+    // Only snap if card is at bottom of pile
+    if (this.deck.cardChildren(card).length > 1) return;
+
+    // Get the first valid foundation pile to drop into
+    const targetPile = getValidDropPiles(this.deck, card, FOUNDATION_PILES)[0];
+    if (!targetPile) return; // Exit early if no valid pile
 
     // Reposition card
-    if (targetPile) {
-      const [updatedPlacement] = getUpdatedCardPlacements(this.deck, [card], targetPile);
-      card.reposition(updatedPlacement.pileId, updatedPlacement.position);
-    }
+    const updatedPlacement = getUpdatedCardPlacements(this.deck, [card], targetPile)[0];
+    card.reposition(updatedPlacement.pileId, updatedPlacement.position);
   }
 
   public determineMaxCardsForMove(): number {

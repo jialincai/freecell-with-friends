@@ -29,8 +29,6 @@ export default class GameState extends Phaser.Scene {
 
   private winText!: Phaser.GameObjects.Text;
 
-  private isDragging: boolean = false;
-
   public constructor() {
     super(sceneConfig);
   }
@@ -38,7 +36,6 @@ export default class GameState extends Phaser.Scene {
   public create(): void {
     // Game state variables
     this.score = 0;
-    this.isDragging = false;
     this.dragChildren = [];
 
     // Add background
@@ -131,18 +128,16 @@ export default class GameState extends Phaser.Scene {
       this
     );
 
-    // this.input.on(
-    //   "gameobjectup",
-    //   (
-    //     _pointer: Phaser.Input.Pointer,
-    //     gameObject: Phaser.GameObjects.GameObject
-    //   ) => {
-    //     if (gameObject instanceof Card) {
-    //       this.pointerUpCard(gameObject);
-    //     }
-    //   },
-    //   this
-    // );
+    this.input.on("gameobjectdown",
+      (
+        _pointer: Phaser.Input.Pointer,
+        gameObject: Phaser.GameObjects.GameObject
+      ) => {
+        if (gameObject instanceof Card) {
+          this.snapCardToFoundation(gameObject);
+        }
+      }, this
+    );
   }
 
   public createButtons(): void {
@@ -219,7 +214,6 @@ export default class GameState extends Phaser.Scene {
   }
 
   public dragCardStart(card: Card): void {
-    this.isDragging = true;
     // Populate drag children
     this.dragChildren = [];
     if (TABLEAU_PILES.includes(card.pile)) {
@@ -256,7 +250,7 @@ export default class GameState extends Phaser.Scene {
     // If the card can be dropped on the pile, reposition it
     if (getValidDropPiles(this.deck, card, [pileId]).some(Boolean)) {
       const dragChildren = this.deck.cardChildren(card);
-      
+
       const updatedPlacements = getUpdatedCardPlacements(this.deck, dragChildren, pileId);
       dragChildren.forEach((child, index) => {
         child.reposition(updatedPlacements[index].pileId, updatedPlacements[index].position);
@@ -264,33 +258,17 @@ export default class GameState extends Phaser.Scene {
     }
   }
 
-  // public pointerUpCard(card: Card) {
-  //   if (!this.isDragging) {
+  public snapCardToFoundation(card: Card): void {
+    // Get valid foundation pile
+    const validPiles = getValidDropPiles(this.deck, card, FOUNDATION_PILES);
+    const targetPile = validPiles[0]; // Returns undefined if no valid pile
 
-  //     // Populate drag children
-  //     this.dragChildren = [];
-  //     if (TABLEAU_PILES.includes(card.pile)) {
-  //       this.dragChildren = this.deck.cardChildren(card);
-  //     } else {
-  //       this.dragChildren.push(card);
-  //     }
-
-  //     if (this.dragChildren.length <= 1) {
-  //       for (const pile of this.foundationPiles) {
-  //         if (!FOUNDATION_PILES.includes(card.pile) && this.dropCard(card, pile)) {
-  //           console.log("moving card to foundation pile");
-  //           break;
-  //         }
-  //       }
-  //     }
-
-  //     console.log("The card was clicked!");
-  //   }
-  //   else {
-  //     console.log("The card was dragged!");
-  //   }
-  //   this.isDragging = false;
-  // }
+    // Reposition card
+    if (targetPile) {
+      const [updatedPlacement] = getUpdatedCardPlacements(this.deck, [card], targetPile);
+      card.reposition(updatedPlacement.pileId, updatedPlacement.position);
+    }
+  }
 
   public determineMaxCardsForMove(): number {
     let maxCards: number = 1;

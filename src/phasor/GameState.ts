@@ -173,6 +173,20 @@ export default class GameState extends Phaser.Scene {
         },
         this
       );
+
+    // Undo button
+    this.add.graphics().fillStyle(0xffffff, 1).fillRect(190, 10, 80, 18);
+
+    this.add
+      .text(192, 12, "Undo", { color: "#000" })
+      .setInteractive()
+      .on(
+        "pointerdown",
+        () => {
+          console.log("Undo button clicked");
+        },
+        this
+      );
   }
 
   public createText(): void {

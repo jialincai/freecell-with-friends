@@ -1,7 +1,9 @@
+import * as Phaser from "phaser";
+
 import { CARD_DIMENSIONS, STACK_OFFSET } from "./constants/deck";
 import { PileId, PILE_POSITIONS, TABLEAU_PILES } from "./constants/table";
 
-export class Pile extends Phaser.GameObjects.Zone {
+export default class Pile extends Phaser.GameObjects.Zone {
   public pileId: PileId;
 
   public constructor(scene: Phaser.Scene, pileId: PileId) {

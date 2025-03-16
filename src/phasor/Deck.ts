@@ -1,3 +1,5 @@
+import * as Phaser from "phaser";
+
 import Card from "./Card";
 import { NUM_CARDS, Suit, SUIT_COLOR } from "./constants/deck";
 import type { PileId } from "./constants/table";

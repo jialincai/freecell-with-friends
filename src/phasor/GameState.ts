@@ -4,6 +4,7 @@ import Card from "./Card";
 import Deck from "./Deck";
 import Pile from "./Pile";
 import { getUpdatedCardPlacements, getValidDropPiles } from "./Rules";
+import { addButton } from "./UI";
 import { STACK_DRAG_OFFSET } from "./constants/deck";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "./constants/screen";
 import { CELL_PILES, FOUNDATION_PILES, PileId, TABLEAU_PILES } from "./constants/table";
@@ -141,52 +142,22 @@ export default class GameState extends Phaser.Scene {
   }
 
   public createButtons(): void {
-    // Redeal button
-    this.add.graphics().fillStyle(0xffffff, 1).fillRect(10, 10, 80, 18);
+    addButton(this, 10, 10, "Redeal", () => {
+      this.deck.deal(this);
+      this.winText.setVisible(false);
+      this.score = 0;
+    });
 
-    this.add
-      .text(12, 12, "Redeal", { color: "#000" })
-      .setInteractive()
-      .on(
-        "pointerdown",
-        () => {
-          this.deck.deal(this);
-          this.winText.setVisible(false);
-          this.score = 0;
-        },
-        this
-      );
+    addButton(this, 100, 10, "New Deal", () => {
+      this.deck.shuffle(this.deck.cards, 476);
+      this.deck.deal(this);
+      this.winText.setVisible(false);
+      this.score = 0;
+    });
 
-    // New deal button
-    this.add.graphics().fillStyle(0xffffff, 1).fillRect(100, 10, 80, 18);
-
-    this.add
-      .text(102, 12, "New Deal", { color: "#000" })
-      .setInteractive()
-      .on(
-        "pointerdown",
-        () => {
-          this.deck.shuffle(this.deck.cards, 476);
-          this.deck.deal(this);
-          this.winText.setVisible(false);
-          this.score = 0;
-        },
-        this
-      );
-
-    // Undo button
-    this.add.graphics().fillStyle(0xffffff, 1).fillRect(190, 10, 80, 18);
-
-    this.add
-      .text(192, 12, "Undo", { color: "#000" })
-      .setInteractive()
-      .on(
-        "pointerdown",
-        () => {
-          console.log("Undo button clicked");
-        },
-        this
-      );
+    addButton(this, 190, 10, "Undo", () => {
+      console.log("Undo button clicked");
+    });
   }
 
   public createText(): void {

@@ -3,6 +3,7 @@ import * as Phaser from "phaser";
 import Card from "./Card";
 import Deck from "./Deck";
 import Pile from "./Pile";
+import { CardMoveCommand, CommandManager, CompositeCommand } from "./Command";
 import { getUpdatedCardPlacements, getValidDropPiles } from "./Rules";
 import { addButton } from "./UI";
 import { STACK_DRAG_OFFSET } from "./constants/deck";
@@ -16,6 +17,8 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 };
 
 export default class GameState extends Phaser.Scene {
+  private commands = new CommandManager();
+
   private score: number = 0;
 
   private dragChildren: Card[] = [];
@@ -156,7 +159,7 @@ export default class GameState extends Phaser.Scene {
     });
 
     addButton(this, 190, 10, "Undo", () => {
-      console.log("Undo button clicked");
+      this.commands.pop();
     });
   }
 
@@ -213,6 +216,9 @@ export default class GameState extends Phaser.Scene {
     }
   }
 
+  // Resets dragged cards back to their original pile positions after dragging.
+  // This is purely a visual correction, not a user action.
+  // Therefore, it is NOT added to the command stack and cannot be undone.
   public dragCardEnd(): void {
     // Drop all other cards on top
     this.dragChildren.forEach((child: Card) => {
@@ -232,14 +238,25 @@ export default class GameState extends Phaser.Scene {
     // Get pile id of drop zone
     const pileId = dropZone.name as PileId;
 
-    // If the card can be dropped on the pile, reposition it
+    // Update card positions if valid
     if (getValidDropPiles(this.deck, card, [pileId]).some(Boolean)) {
       const dragChildren = this.deck.cardChildren(card);
 
       const updatedPlacements = getUpdatedCardPlacements(this.deck, dragChildren, pileId);
-      dragChildren.forEach((child, index) => {
-        child.reposition(updatedPlacements[index].pileId, updatedPlacements[index].position);
-      });
+      
+      // Push command to execution stack
+      const dropAllCommand = new CompositeCommand(
+        ...dragChildren.map((child, index) =>
+          new CardMoveCommand(
+            child,
+            child.pile,
+            child.position,
+            updatedPlacements[index].pileId,
+            updatedPlacements[index].position
+          )
+        )
+      );
+      this.commands.push(dropAllCommand);
     }
   }
 
@@ -254,9 +271,18 @@ export default class GameState extends Phaser.Scene {
     const targetPile = getValidDropPiles(this.deck, card, FOUNDATION_PILES)[0];
     if (!targetPile) return; // Exit early if no valid pile
 
-    // Reposition card
+    // Get updated placement
     const updatedPlacement = getUpdatedCardPlacements(this.deck, [card], targetPile)[0];
-    card.reposition(updatedPlacement.pileId, updatedPlacement.position);
+
+    // Create and execute card move command
+    const command = new CardMoveCommand(
+      card,
+      card.pile,
+      card.position,
+      updatedPlacement.pileId,
+      updatedPlacement.position
+    );
+    this.commands.push(command);
   }
 
   public determineMaxCardsForMove(): number {

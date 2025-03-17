@@ -3,6 +3,15 @@ import Card from "./Card";
 import { CELL_PILES, FOUNDATION_PILES, PileId, TABLEAU_PILES } from "./constants/table";
 import { SUIT_COLOR } from "./constants/deck";
 
+
+import {
+    isValidSequence,
+    hasAlternatingColor,
+    hasSameColor,
+    isDescendingOrder,
+    isAscendingOrder
+} from "./Validation";
+
 /**
  * Defines the drop rules for different pile types.
  */
@@ -26,13 +35,39 @@ const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> = Object.f
         const topCard = deck.topCard(pileId);
         const dragChildren = deck.cardChildren(card);
         if (!topCard) return true; // Any card can be placed on an empty tableau pile.
-        return dragChildren.length > 0 && dragChildren.every((child, index) => {
-            const prevCard: Card = index === 0 ? topCard : dragChildren[index - 1];
-            return (
-                SUIT_COLOR[child.suit] !== SUIT_COLOR[prevCard.suit] && // Must be opposite colors.
-                child.value === prevCard.value - 1 // Must be in descending order.
-            );
-        });
+        return dragChildren.length > 0 && isValidSequence([topCard, card], [hasAlternatingColor, isDescendingOrder]);
+    }])
+]);
+
+/**
+ * Defines the drag rules for different pile types.
+ */
+const DRAG_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> = Object.fromEntries([
+    // Cell piles: Only one card can be placed, and the pile must be empty.
+    ...CELL_PILES.map(pileId => [pileId, (deck: Deck, card: Card) => {
+        return true;
+    }]),
+
+    // Foundation piles: Cards must be placed in ascending order and match suit.
+    ...FOUNDATION_PILES.map(pileId => [pileId, (deck: Deck, card: Card) => {
+        return false;
+    }]),
+
+    // Tableau piles: Cards must alternate in color and be placed in descending order.
+    ...TABLEAU_PILES.map(pileId => [pileId, (deck: Deck, card: Card) => {
+        const dragChildren = deck.cardChildren(card);
+        const nEmptyPiles = [...TABLEAU_PILES, ...CELL_PILES].reduce((accum, pileId) => {
+            return accum + Number(deck.countCards(pileId) === 0);
+        }, 0);
+
+        // Check if the number of cards being dragged is valid
+        if (dragChildren.length > nEmptyPiles + 1) return false;
+
+        // Check if the cards are in descending order and alternating colors
+        return isValidSequence(dragChildren, [
+            hasAlternatingColor,
+            isDescendingOrder
+        ]);
     }])
 ]);
 
@@ -82,4 +117,14 @@ export function getUpdatedCardPlacements(
         pileId,
         position: basePosition + index,
     }));
+}
+
+/**
+ * Checks if a card (and its children) can be moved.
+ * @param deck The current deck state.
+ * @param card The card being moved.
+ * @returns Whether the move is allowed.
+ */
+export function canMoveCard(deck: Deck, card: Card): boolean {
+    return DRAG_RULES[card.pile]?.(deck, card) ?? false;
 }

@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 
 import Card from "./Card";
-import { NUM_CARDS, Suit, SUIT_COLOR } from "./constants/deck";
+import { NUM_CARDS, Suit } from "./constants/deck";
 import type { PileId } from "./constants/table";
 import { TABLEAU_PILES } from "./constants/table";
 
@@ -73,8 +73,7 @@ export default class Deck {
    */
   public cardChildren(card: Card): Card[] {
     return this.pileChildren(card.pile).filter(
-      (curr: Card) => curr.position >= card.position
+      (curr: Card) => curr.position >= card.position,
     );
   }
 }
-

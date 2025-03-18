@@ -29,3 +29,21 @@ A web Freecell game built with Phasor.
    Open your browser and open:
 
    [http://localhost:3000](http://localhost:3000)
+
+## Development Guide
+
+### Running the Linter
+
+To ensure code consistency and catch potential issues, run the linter:
+
+```bash
+npm run lint
+```
+
+To automatically fix linting issues:
+
+```bash
+npm run lint:fix
+```
+
+Make sure to fix any remaining issues manually if they cannot be auto-fixed.

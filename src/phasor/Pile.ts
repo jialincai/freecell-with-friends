@@ -24,7 +24,7 @@ export default class Pile extends Phaser.GameObjects.Zone {
     this.setPosition(position.x + addWidth / 2, position.y + addHeight / 2);
     this.setSize(
       CARD_DIMENSIONS.width + addWidth,
-      CARD_DIMENSIONS.height + addHeight
+      CARD_DIMENSIONS.height + addHeight,
     );
 
     const zone = this.setRectangleDropZone(this.width, this.height);
@@ -39,7 +39,7 @@ export default class Pile extends Phaser.GameObjects.Zone {
           this.x - this.width / 2,
           this.y - this.height / 2,
           CARD_DIMENSIONS.width,
-          CARD_DIMENSIONS.height
+          CARD_DIMENSIONS.height,
         );
     }
   }

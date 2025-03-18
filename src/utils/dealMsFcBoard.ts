@@ -68,7 +68,7 @@ function renderCard(card: number) {
   const suit = card % 4;
   const rank = Math.floor(card / 4) + 1;
   const suits = [Suit.Clubs, Suit.Diamonds, Suit.Hearts, Suit.Spades];
-  
+
   return { id, suit: suits[suit], rank };
 }
 
@@ -76,10 +76,7 @@ function deal_ms_fc_board(gamenumber: string) {
   const randomizer = new MSRand({ gamenumber });
   const numCols = 8;
 
-  const columns: CardProps[][] = Array.from(
-    { length: numCols },
-    () => [],
-  );
+  const columns: CardProps[][] = Array.from({ length: numCols }, () => []);
   const deck = perl_range(0, 4 * 13 - 1);
 
   randomizer.shuffle(deck);

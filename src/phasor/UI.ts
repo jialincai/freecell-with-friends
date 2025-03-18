@@ -11,19 +11,18 @@ import * as Phaser from "phaser";
  * @returns {void} This function does not return a value; it directly modifies the scene.
  */
 export function addButton(
-    scene: Phaser.Scene, 
-    x: number, 
-    y: number, 
-    label: string, 
-    onClick: () => void
+  scene: Phaser.Scene,
+  x: number,
+  y: number,
+  label: string,
+  onClick: () => void,
 ): void {
-    // Create button background
-    scene.add.graphics()
-        .fillStyle(0xffffff, 1)
-        .fillRect(x, y, 80, 18);
+  // Create button background
+  scene.add.graphics().fillStyle(0xffffff, 1).fillRect(x, y, 80, 18);
 
-    // Create text and make it interactive
-    scene.add.text(x + 2, y + 2, label, { color: "#000" })
-        .setInteractive()
-        .on("pointerdown", onClick);
+  // Create text and make it interactive
+  scene.add
+    .text(x + 2, y + 2, label, { color: "#000" })
+    .setInteractive()
+    .on("pointerdown", onClick);
 }

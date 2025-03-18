@@ -1,6 +1,4 @@
-export const images = [
-  { file: "img/background.png", key: "img_background" },
-];
+export const images = [{ file: "img/background.png", key: "img_background" }];
 
 export const spritesheets = [
   {

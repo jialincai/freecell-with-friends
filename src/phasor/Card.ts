@@ -52,12 +52,15 @@ export default class Card extends Phaser.GameObjects.Sprite {
     if (TABLEAU_PILES.includes(this.pile)) {
       this.setPosition(
         PILE_POSITIONS[this.pile].x,
-        PILE_POSITIONS[this.pile].y + position * STACK_OFFSET
+        PILE_POSITIONS[this.pile].y + position * STACK_OFFSET,
       );
-    } else if (FOUNDATION_PILES.includes(this.pile) || CELL_PILES.includes(this.pile)) {
+    } else if (
+      FOUNDATION_PILES.includes(this.pile) ||
+      CELL_PILES.includes(this.pile)
+    ) {
       this.setPosition(
         PILE_POSITIONS[this.pile].x,
-        PILE_POSITIONS[this.pile].y
+        PILE_POSITIONS[this.pile].y,
       );
     }
   }

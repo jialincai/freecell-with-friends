@@ -115,7 +115,11 @@ export default class GameState extends Phaser.Scene {
         gameObject: Phaser.GameObjects.GameObject,
         dropZone: Phaser.GameObjects.GameObject,
       ) => {
-        if (gameObject instanceof Card && dropZone instanceof Pile) {
+        if (
+          gameObject instanceof Card &&
+          dropZone instanceof Pile &&
+          canMoveCard(this.deck, gameObject)
+        ) {
           this.dropCard(gameObject, dropZone);
         }
       },

@@ -51,7 +51,7 @@ export default class InitState extends Phaser.Scene {
     });
 
     this.load.on("fileprogress", (file: { key: string }) =>
-      assetText.setText(`Loading asset: ${file.key}`)
+      assetText.setText(`Loading asset: ${file.key}`),
     );
 
     this.load.on("complete", () => {

@@ -31,7 +31,7 @@ export const CELL_PILES = [
   PileId.Cell2,
   PileId.Cell3,
   PileId.Cell4,
-]
+];
 
 /**
  * Define tableau piles

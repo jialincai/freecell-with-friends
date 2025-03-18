@@ -4,11 +4,20 @@ import Card from "./Card";
 import Deck from "./Deck";
 import Pile from "./Pile";
 import { CardMoveCommand, CommandManager, CompositeCommand } from "./Command";
-import { canMoveCard, getUpdatedCardPlacements, getValidDropPiles } from "./Rules";
+import {
+  canMoveCard,
+  getUpdatedCardPlacements,
+  getValidDropPiles,
+} from "./Rules";
 import { addButton } from "./UI";
 import { STACK_DRAG_OFFSET } from "./constants/deck";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "./constants/screen";
-import { CELL_PILES, FOUNDATION_PILES, PileId, TABLEAU_PILES } from "./constants/table";
+import {
+  CELL_PILES,
+  FOUNDATION_PILES,
+  PileId,
+  TABLEAU_PILES,
+} from "./constants/table";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -61,12 +70,9 @@ export default class GameState extends Phaser.Scene {
 
       if (FOUNDATION_PILES.includes(pile.pileId)) {
         this.foundationPiles.push(pile);
-      }
-
-      else if (CELL_PILES.includes(pile.pileId)) {
+      } else if (CELL_PILES.includes(pile.pileId)) {
         this.cellPiles.push(pile);
       }
-
     });
   }
 
@@ -76,7 +82,7 @@ export default class GameState extends Phaser.Scene {
       "dragstart",
       (
         _pointer: Phaser.Input.Pointer,
-        gameObject: Phaser.GameObjects.GameObject
+        gameObject: Phaser.GameObjects.GameObject,
       ) => {
         this.dragChildren = [];
 
@@ -84,7 +90,7 @@ export default class GameState extends Phaser.Scene {
           this.dragCardStart(gameObject);
         }
       },
-      this
+      this,
     );
 
     // End drag card
@@ -92,13 +98,13 @@ export default class GameState extends Phaser.Scene {
       "dragend",
       (
         _pointer: Phaser.Input.Pointer,
-        gameObject: Phaser.GameObjects.GameObject
+        gameObject: Phaser.GameObjects.GameObject,
       ) => {
         if (gameObject instanceof Card) {
           this.dragCardEnd();
         }
       },
-      this
+      this,
     );
 
     // Drop on pile
@@ -107,13 +113,13 @@ export default class GameState extends Phaser.Scene {
       (
         _pointer: Phaser.Input.Pointer,
         gameObject: Phaser.GameObjects.GameObject,
-        dropZone: Phaser.GameObjects.GameObject
+        dropZone: Phaser.GameObjects.GameObject,
       ) => {
         if (gameObject instanceof Card && dropZone instanceof Pile) {
           this.dropCard(gameObject, dropZone);
         }
       },
-      this
+      this,
     );
 
     // Drag card
@@ -123,24 +129,26 @@ export default class GameState extends Phaser.Scene {
         _pointer: Phaser.Input.Pointer,
         gameObject: Phaser.GameObjects.GameObject,
         dragX: number,
-        dragY: number
+        dragY: number,
       ) => {
         if (gameObject instanceof Card) {
           this.dragCard(gameObject, dragX, dragY);
         }
       },
-      this
+      this,
     );
 
-    this.input.on("gameobjectdown",
+    this.input.on(
+      "gameobjectdown",
       (
         _pointer: Phaser.Input.Pointer,
-        gameObject: Phaser.GameObjects.GameObject
+        gameObject: Phaser.GameObjects.GameObject,
       ) => {
         if (gameObject instanceof Card) {
           this.snapCardToFoundation(gameObject);
         }
-      }, this
+      },
+      this,
     );
   }
 
@@ -243,18 +251,23 @@ export default class GameState extends Phaser.Scene {
 
     // Update card placement
     const dragChildren = this.deck.cardChildren(card);
-    const updatedPlacements = getUpdatedCardPlacements(this.deck, dragChildren, pileId);
+    const updatedPlacements = getUpdatedCardPlacements(
+      this.deck,
+      dragChildren,
+      pileId,
+    );
 
     const dropAllCommand = new CompositeCommand(
-      ...dragChildren.map((child, index) =>
-        new CardMoveCommand(
-          child,
-          child.pile,
-          child.position,
-          updatedPlacements[index].pileId,
-          updatedPlacements[index].position
-        )
-      )
+      ...dragChildren.map(
+        (child, index) =>
+          new CardMoveCommand(
+            child,
+            child.pile,
+            child.position,
+            updatedPlacements[index].pileId,
+            updatedPlacements[index].position,
+          ),
+      ),
     );
     this.commands.push(dropAllCommand);
   }
@@ -271,7 +284,11 @@ export default class GameState extends Phaser.Scene {
     if (!targetPile) return; // Exit early if no valid pile
 
     // Get updated placement
-    const updatedPlacement = getUpdatedCardPlacements(this.deck, [card], targetPile)[0];
+    const updatedPlacement = getUpdatedCardPlacements(
+      this.deck,
+      [card],
+      targetPile,
+    )[0];
 
     // Create and execute card move command
     const command = new CardMoveCommand(
@@ -279,7 +296,7 @@ export default class GameState extends Phaser.Scene {
       card.pile,
       card.position,
       updatedPlacement.pileId,
-      updatedPlacement.position
+      updatedPlacement.position,
     );
     this.commands.push(command);
   }
@@ -293,7 +310,7 @@ export default class GameState extends Phaser.Scene {
     // Win
     const cardsOnFoundation = FOUNDATION_PILES.reduce(
       (acc, pile) => acc + this.deck.pileChildren(pile).length,
-      0
+      0,
     );
     if (cardsOnFoundation === 52) {
       this.winText.setVisible(true);

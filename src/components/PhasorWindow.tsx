@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
 import React, { useEffect } from "react";
-import "@styles/PhasorWindow.module.css"
+import "@styles/PhasorWindow.module.css";
 
 const PhasorWindow: React.FC = () => {
-    useEffect(() => {
-        const loadPhasorWindow = async () => {
-            const { initializeGame } = await import("@phasor/main");
-            initializeGame();
-        };
+  useEffect(() => {
+    const loadPhasorWindow = async () => {
+      const { initializeGame } = await import("@phasor/main");
+      initializeGame();
+    };
 
-        loadPhasorWindow();
-    }, []);
+    loadPhasorWindow();
+  }, []);
 
-    return <div id="game-container"></div>;
-  };
-  
+  return <div id="game-container"></div>;
+};
+
 export default PhasorWindow;

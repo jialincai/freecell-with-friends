@@ -292,7 +292,7 @@ export default class GameState extends Phaser.Scene {
 
     // Win
     const cardsOnFoundation = FOUNDATION_PILES.reduce(
-      (acc, pile) => acc + this.deck.countCards(pile),
+      (acc, pile) => acc + this.deck.pileChildren(pile).length,
       0
     );
     if (cardsOnFoundation === 52) {

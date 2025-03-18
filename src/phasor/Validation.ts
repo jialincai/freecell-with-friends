@@ -25,6 +25,12 @@ export const hasSameColor = (card1: Card, card2: Card): boolean =>
     SUIT_COLOR[card1.suit] === SUIT_COLOR[card2.suit];
 
 /**
+ * Checks if two cards have the same suit.
+ */
+export const hasSameSuit = (card1: Card, card2: Card): boolean =>
+    card1.suit === card2.suit;
+
+/**
  * Checks if two cards are in descending order.
  */
 export const isDescendingOrder = (card1: Card, card2: Card): boolean =>

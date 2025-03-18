@@ -54,33 +54,26 @@ export default class Deck {
   }
 
   /**
+   * Retrieves all cards in the specified pile, sorted by ascending position.
+   *
+   * @param {PileId} pile - The ID of the pile to retrieve cards from.
+   * @returns {Card[]} An array of cards in the pile, sorted by position.
+   */
+  public pileChildren(pile: PileId): Card[] {
+    return this.cards
+      .filter((curr: Card) => curr.pile === pile)
+      .sort((a: Card, b: Card) => a.position - b.position);
+  }
+
+  /**
    * Returns the given card and all following cards in the same pile.
    *
    * @param {Card} card - The reference card.
    * @returns {Card[]} Cards in the same pile, sorted by ascending position.
    */
   public cardChildren(card: Card): Card[] {
-    return this.cards
-      .filter(
-        (curr: Card) =>
-          curr.pile === card.pile && curr.position >= card.position
-      )
-      .sort((a: Card, b: Card) => a.position - b.position);
-  }
-
-  public topCard(pile: PileId): Card | null {
-    return (
-      this.cards
-        .filter((curr: Card) => curr.pile === pile)
-        .sort((a: Card, b: Card) => a.position - b.position)
-        .pop() ?? null
-    );
-  }
-
-  public countCards(pile: PileId): number {
-    return this.cards.reduce(
-      (acc: number, card: Card) => (card.pile === pile ? acc + 1 : acc),
-      0
+    return this.pileChildren(card.pile).filter(
+      (curr: Card) => curr.position >= card.position
     );
   }
 }

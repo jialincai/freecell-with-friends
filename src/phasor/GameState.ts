@@ -30,8 +30,6 @@ export default class GameState extends Phaser.Scene {
 
   private score: number = 0;
 
-  private dragChildren: Card[] = [];
-
   private foundationPiles: Pile[] = [];
 
   private cellPiles: Pile[] = [];
@@ -49,7 +47,6 @@ export default class GameState extends Phaser.Scene {
   public create(): void {
     // Game state variables
     this.score = 0;
-    this.dragChildren = [];
 
     // Add background
     this.add.image(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, "img_background");
@@ -84,8 +81,6 @@ export default class GameState extends Phaser.Scene {
         _pointer: Phaser.Input.Pointer,
         gameObject: Phaser.GameObjects.GameObject,
       ) => {
-        this.dragChildren = [];
-
         if (gameObject instanceof Card && canMoveCard(this.deck, gameObject)) {
           this.dragCardStart(gameObject);
         }
@@ -100,8 +95,8 @@ export default class GameState extends Phaser.Scene {
         _pointer: Phaser.Input.Pointer,
         gameObject: Phaser.GameObjects.GameObject,
       ) => {
-        if (gameObject instanceof Card) {
-          this.dragCardEnd();
+        if (gameObject instanceof Card && canMoveCard(this.deck, gameObject)) {
+          this.dragCardEnd(gameObject);
         }
       },
       this,
@@ -115,7 +110,11 @@ export default class GameState extends Phaser.Scene {
         gameObject: Phaser.GameObjects.GameObject,
         dropZone: Phaser.GameObjects.GameObject,
       ) => {
-        if (gameObject instanceof Card && dropZone instanceof Pile) {
+        if (
+          gameObject instanceof Card &&
+          dropZone instanceof Pile &&
+          canMoveCard(this.deck, gameObject)
+        ) {
           this.dropCard(gameObject, dropZone);
         }
       },
@@ -131,7 +130,7 @@ export default class GameState extends Phaser.Scene {
         dragX: number,
         dragY: number,
       ) => {
-        if (gameObject instanceof Card) {
+        if (gameObject instanceof Card && canMoveCard(this.deck, gameObject)) {
           this.dragCard(gameObject, dragX, dragY);
         }
       },
@@ -144,7 +143,7 @@ export default class GameState extends Phaser.Scene {
         _pointer: Phaser.Input.Pointer,
         gameObject: Phaser.GameObjects.GameObject,
       ) => {
-        if (gameObject instanceof Card) {
+        if (gameObject instanceof Card && canMoveCard(this.deck, gameObject)) {
           this.snapCardToFoundation(gameObject);
         }
       },
@@ -210,35 +209,30 @@ export default class GameState extends Phaser.Scene {
   }
 
   public dragCardStart(card: Card): void {
-    // Populate drag children
-    this.dragChildren = [];
-    if (TABLEAU_PILES.includes(card.pile)) {
-      this.dragChildren = this.deck.cardChildren(card);
-    } else {
-      this.dragChildren.push(card);
-    }
-
-    // Set depths
-    for (let i = 0; i < this.dragChildren.length; i += 1) {
-      this.dragChildren[i].setDepth(100 + i);
+    const dragChildren = this.deck.cardChildren(card);
+    // Set render order
+    for (let i = 0; i < dragChildren.length; i += 1) {
+      // Set render order
+      dragChildren[i].setDepth(100 + i);
     }
   }
 
   // Resets dragged cards back to their original pile positions after dragging.
   // This is purely a visual correction, not a user action.
   // Therefore, it is NOT added to the command stack and cannot be undone.
-  public dragCardEnd(): void {
-    // Drop all other cards on top
-    this.dragChildren.forEach((child: Card) => {
+  public dragCardEnd(card: Card): void {
+    const dragChildren = this.deck.cardChildren(card);
+    dragChildren.forEach((child: Card) => {
       child.reposition(child.pile, child.position);
     });
   }
 
-  public dragCard(_card: Card, dragX: number, dragY: number): void {
+  public dragCard(card: Card, dragX: number, dragY: number): void {
     // Set positions
-    for (let i = 0; i < this.dragChildren.length; i += 1) {
-      this.dragChildren[i].x = dragX;
-      this.dragChildren[i].y = dragY + i * STACK_DRAG_OFFSET;
+    const dragChildren = this.deck.cardChildren(card);
+    for (let i = 0; i < dragChildren.length; i += 1) {
+      dragChildren[i].x = dragX;
+      dragChildren[i].y = dragY + i * STACK_DRAG_OFFSET;
     }
   }
 

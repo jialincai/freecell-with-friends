@@ -4,7 +4,7 @@ import Card from "./Card";
 import Deck from "./Deck";
 import Pile from "./Pile";
 import { CardMoveCommand, CommandManager, CompositeCommand } from "./Command";
-import { getUpdatedCardPlacements, getValidDropPiles } from "./Rules";
+import { canMoveCard, getUpdatedCardPlacements, getValidDropPiles } from "./Rules";
 import { addButton } from "./UI";
 import { STACK_DRAG_OFFSET } from "./constants/deck";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "./constants/screen";
@@ -80,7 +80,7 @@ export default class GameState extends Phaser.Scene {
       ) => {
         this.dragChildren = [];
 
-        if (gameObject instanceof Card && this.deck.validDraggableCard(gameObject, this.determineMaxCardsForMove())) {
+        if (gameObject instanceof Card && canMoveCard(this.deck, gameObject)) {
           this.dragCardStart(gameObject);
         }
       },
@@ -238,26 +238,25 @@ export default class GameState extends Phaser.Scene {
     // Get pile id of drop zone
     const pileId = dropZone.name as PileId;
 
-    // Update card positions if valid
-    if (getValidDropPiles(this.deck, card, [pileId]).some(Boolean)) {
-      const dragChildren = this.deck.cardChildren(card);
+    // No valid drops
+    if (!getValidDropPiles(this.deck, card, [pileId]).some(Boolean)) return;
 
-      const updatedPlacements = getUpdatedCardPlacements(this.deck, dragChildren, pileId);
-      
-      // Push command to execution stack
-      const dropAllCommand = new CompositeCommand(
-        ...dragChildren.map((child, index) =>
-          new CardMoveCommand(
-            child,
-            child.pile,
-            child.position,
-            updatedPlacements[index].pileId,
-            updatedPlacements[index].position
-          )
+    // Update card placement
+    const dragChildren = this.deck.cardChildren(card);
+    const updatedPlacements = getUpdatedCardPlacements(this.deck, dragChildren, pileId);
+
+    const dropAllCommand = new CompositeCommand(
+      ...dragChildren.map((child, index) =>
+        new CardMoveCommand(
+          child,
+          child.pile,
+          child.position,
+          updatedPlacements[index].pileId,
+          updatedPlacements[index].position
         )
-      );
-      this.commands.push(dropAllCommand);
-    }
+      )
+    );
+    this.commands.push(dropAllCommand);
   }
 
   public snapCardToFoundation(card: Card): void {
@@ -285,17 +284,6 @@ export default class GameState extends Phaser.Scene {
     this.commands.push(command);
   }
 
-  public determineMaxCardsForMove(): number {
-    let maxCards: number = 1;
-    for (const cell of this.cellPiles) {
-      if (!this.deck.topCard(cell.pileId)) {
-        maxCards += 1;
-      }
-    }
-
-    return maxCards;
-  }
-
   public update(): void {
     // Ensure score is within range
     if (this.score < 0) {
@@ -304,7 +292,7 @@ export default class GameState extends Phaser.Scene {
 
     // Win
     const cardsOnFoundation = FOUNDATION_PILES.reduce(
-      (acc, pile) => acc + this.deck.countCards(pile),
+      (acc, pile) => acc + this.deck.pileChildren(pile).length,
       0
     );
     if (cardsOnFoundation === 52) {

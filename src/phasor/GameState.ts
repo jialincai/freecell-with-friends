@@ -64,13 +64,13 @@ export default class GameState extends Phaser.Scene {
 
   public createCommandListeners(): void {
     // Do commands
-    this.commands.subscribe("pop", (command) => {
-      command.undo();
+    this.commands.subscribe("push", (command) => {
+      command.do();
     });
 
     // Undo commands
-    this.commands.subscribe("push", (command) => {
-      command.do();
+    this.commands.subscribe("pop", (command) => {
+      if (command) command.undo();
     });
   }
 

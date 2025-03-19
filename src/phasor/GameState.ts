@@ -12,12 +12,7 @@ import {
 import { addButton } from "./UI";
 import { STACK_DRAG_OFFSET } from "./constants/deck";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "./constants/screen";
-import {
-  CELL_PILES,
-  FOUNDATION_PILES,
-  PileId,
-  TABLEAU_PILES,
-} from "./constants/table";
+import { FOUNDATION_PILES, PileId, TABLEAU_PILES } from "./constants/table";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,

@@ -6,6 +6,22 @@ export interface Command {
   undo(): void;
 }
 
+export class CompositeCommand implements Command {
+  private readonly commands: Command[];
+
+  constructor(...commands: Command[]) {
+    this.commands = commands;
+  }
+
+  do(): void {
+    this.commands.forEach((command) => command.do());
+  }
+
+  undo(): void {
+    [...this.commands].reverse().forEach((command) => command.undo());
+  }
+}
+
 export class CardMoveCommand implements Command {
   constructor(
     private card: Card,
@@ -21,22 +37,6 @@ export class CardMoveCommand implements Command {
 
   undo(): void {
     this.card.reposition(this.source, this.p1);
-  }
-}
-
-export class CompositeCommand implements Command {
-  private readonly commands: Command[];
-
-  constructor(...commands: Command[]) {
-    this.commands = commands;
-  }
-
-  do(): void {
-    this.commands.forEach((command) => command.do());
-  }
-
-  undo(): void {
-    [...this.commands].reverse().forEach((command) => command.undo());
   }
 }
 

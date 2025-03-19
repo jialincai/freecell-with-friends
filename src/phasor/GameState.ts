@@ -1,15 +1,18 @@
 import * as Phaser from "phaser";
 
+import { PubSubStack, CompositeCommand } from "@utils/Functions";
+
+import { CardMoveCommand } from "./Command";
 import Card from "./Card";
 import Deck from "./Deck";
 import Pile from "./Pile";
-import { CardMoveCommand, CommandManager, CompositeCommand } from "./Command";
 import {
   canMoveCard,
   getUpdatedCardPlacements,
   getValidDropPiles,
 } from "./Rules";
 import { addButton } from "./UI";
+
 import { STACK_DRAG_OFFSET } from "./constants/deck";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "./constants/screen";
 import { FOUNDATION_PILES, PileId, TABLEAU_PILES } from "./constants/table";
@@ -21,7 +24,7 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 };
 
 export default class GameState extends Phaser.Scene {
-  private commands = new CommandManager();
+  private commands = new PubSubStack();
 
   private score: number = 0;
 
@@ -46,6 +49,7 @@ export default class GameState extends Phaser.Scene {
     this.deck = new Deck(this);
 
     this.createZones();
+    this.createCommandListeners();
     this.createInputListeners();
     this.createButtons();
     this.createText();
@@ -55,6 +59,18 @@ export default class GameState extends Phaser.Scene {
     Object.values(PileId).forEach((pileId) => {
       const pile = new Pile(this, pileId);
       this.add.existing(pile);
+    });
+  }
+
+  public createCommandListeners(): void {
+    // Do commands
+    this.commands.subscribe("pop", (command) => {
+      command.undo();
+    });
+
+    // Undo commands
+    this.commands.subscribe("push", (command) => {
+      command.do();
     });
   }
 

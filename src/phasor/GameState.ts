@@ -30,10 +30,6 @@ export default class GameState extends Phaser.Scene {
 
   private score: number = 0;
 
-  private foundationPiles: Pile[] = [];
-
-  private cellPiles: Pile[] = [];
-
   private deck!: Deck;
 
   private scoreText!: Phaser.GameObjects.Text;
@@ -64,12 +60,6 @@ export default class GameState extends Phaser.Scene {
     Object.values(PileId).forEach((pileId) => {
       const pile = new Pile(this, pileId);
       this.add.existing(pile);
-
-      if (FOUNDATION_PILES.includes(pile.pileId)) {
-        this.foundationPiles.push(pile);
-      } else if (CELL_PILES.includes(pile.pileId)) {
-        this.cellPiles.push(pile);
-      }
     });
   }
 

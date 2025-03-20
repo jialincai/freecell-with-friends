@@ -268,9 +268,6 @@ export default class GameState extends Phaser.Scene {
   }
 
   public snapCardToFoundation(card: Card): void {
-    // Don't snap foundation cards
-    if (FOUNDATION_PILES.includes(card.pile)) return;
-
     // Only snap if card is at bottom of pile
     if (this.deck.cardChildren(card).length > 1) return;
 
@@ -279,11 +276,11 @@ export default class GameState extends Phaser.Scene {
     if (!targetPile) return; // Exit early if no valid pile
 
     // Get updated placement
-    const updatedPlacement = getUpdatedCardPlacements(
+    const [updatedPlacement] = getUpdatedCardPlacements(
       this.deck,
       [card],
       targetPile,
-    )[0];
+    );
 
     // Create and execute card move command
     const command = new CardMoveCommand(

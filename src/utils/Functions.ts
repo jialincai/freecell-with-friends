@@ -1,46 +1,46 @@
-import { EventEmitter } from 'events';
+import { EventEmitter } from "events";
 
 export class PubSubStack<T> {
-    private items: T[];
-    private events: EventEmitter;
+  private items: T[];
+  private events: EventEmitter;
 
-    constructor() {
-        this.items = [];
-        this.events = new EventEmitter();
-    }
+  constructor() {
+    this.items = [];
+    this.events = new EventEmitter();
+  }
 
-    push(item: T): void {
-        this.items.push(item);
-        this.events.emit('push', item);
-    }
+  push(item: T): void {
+    this.items.push(item);
+    this.events.emit("push", item);
+  }
 
-    pop(): void {
-        const item = this.items.pop();
-        this.events.emit('pop', item);
-    }
+  pop(): void {
+    const item = this.items.pop();
+    this.events.emit("pop", item);
+  }
 
-    subscribe(event: string, listener: (...args: any[]) => void): void {
-        this.events.on(event, listener);
-    }
+  subscribe(event: string, listener: (...args: any[]) => void): void {
+    this.events.on(event, listener);
+  }
 }
 
 export interface Command {
-    do(): void;
-    undo(): void;
+  do(): void;
+  undo(): void;
 }
 
 export class CompositeCommand implements Command {
-    private readonly commands: Command[];
+  private readonly commands: Command[];
 
-    constructor(...commands: Command[]) {
-        this.commands = commands;
-    }
+  constructor(...commands: Command[]) {
+    this.commands = commands;
+  }
 
-    do(): void {
-        this.commands.forEach((command) => command.do());
-    }
+  do(): void {
+    this.commands.forEach((command) => command.do());
+  }
 
-    undo(): void {
-        [...this.commands].reverse().forEach((command) => command.undo());
-    }
+  undo(): void {
+    [...this.commands].reverse().forEach((command) => command.undo());
+  }
 }

@@ -16,7 +16,7 @@ import {
   CELL_PILES,
 } from "./constants/table";
 
-export default class Card extends Phaser.GameObjects.Sprite {
+export default class Card extends Phaser.GameObjects.Image {
   public suit: Suit;
 
   public value: number;
@@ -28,7 +28,7 @@ export default class Card extends Phaser.GameObjects.Sprite {
   public flipped: boolean = false;
 
   public constructor(scene: Phaser.Scene, suit: Suit, value: number) {
-    // Create sprite
+    // Load image
     super(scene, 0, 0, "img_cards", CARD_BACK_INDEX);
     scene.add.existing(this);
 

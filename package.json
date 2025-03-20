@@ -11,9 +11,9 @@
   },
   "dependencies": {
     "next": "^15",
+    "phaser": "^3",
     "react": "^19",
-    "react-dom": "^19",
-    "phaser": "^3"
+    "react-dom": "^19"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -23,6 +23,7 @@
     "eslint": "^9",
     "eslint-config-next": "^15",
     "eslint-config-prettier": "^9",
+    "eslint-plugin-prettier": "^5",
     "postcss": "^8",
     "prettier": "^3",
     "tailwindcss": "^3",

@@ -10,7 +10,7 @@ export class CardMoveCommand implements Command {
     private p1: number,
     private destination: PileId,
     private p2: number,
-  ) { }
+  ) {}
 
   do(): void {
     this.card.reposition(this.destination, this.p2);

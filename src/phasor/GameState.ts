@@ -10,7 +10,7 @@ import {
   canMoveCard,
   getUpdatedCardPlacements,
   getValidDropPiles,
-} from "./Rules";
+} from "./Rule";
 import { addButton } from "./UI";
 
 import { STACK_DRAG_OFFSET } from "./constants/deck";

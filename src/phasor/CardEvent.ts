@@ -20,38 +20,47 @@ export function registerCardEvents(
   deck: Deck,
   commandsStack: PubSubStack<Command>,
 ): void {
-  const executeIfMovable =
-    (fn: Function) =>
-    (card: Card, deck: Deck, ...args: any[]) => {
-      if (!canMoveCard(card, deck)) return;
-
-      const command = fn(card, deck, ...args);
-      if (command) commandsStack.push(command);
-    };
-
   deck.cards.forEach((card) => {
     card.on(
       "dragstart",
-      (_pointer: Phaser.Input.Pointer, _dragX: number, _dragY: number) =>
-        executeIfMovable(dragStart)(card, deck),
+      (_pointer: Phaser.Input.Pointer, _dragX: number, _dragY: number) => {
+        if (!canMoveCard(card, deck)) return;
+        dragStart(card, deck);
+      },
     );
+
     card.on(
       "dragend",
-      (_pointer: Phaser.Input.Pointer, _dragX: number, _dragY: number) =>
-        executeIfMovable(dragEnd)(card, deck),
+      (_pointer: Phaser.Input.Pointer, _dragX: number, _dragY: number) => {
+        if (!canMoveCard(card, deck)) return;
+        dragEnd(card, deck);
+      },
     );
+
     card.on(
       "drag",
-      (_pointer: Phaser.Input.Pointer, dragX: number, dragY: number) =>
-        executeIfMovable(drag)(card, deck, dragX, dragY),
+      (_pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
+        if (!canMoveCard(card, deck)) return;
+        drag(card, deck, dragX, dragY);
+      },
     );
+
     card.on(
       "drop",
-      (_pointer: Phaser.Input.Pointer, target: Phaser.GameObjects.GameObject) =>
-        executeIfMovable(drop)(card, deck, target),
+      (
+        _pointer: Phaser.Input.Pointer,
+        target: Phaser.GameObjects.GameObject,
+      ) => {
+        if (!canMoveCard(card, deck)) return;
+        const command = drop(card, deck, target as Pile);
+        if (command) commandsStack.push(command);
+      },
     );
+
     card.on("pointerdown", (_pointer: Phaser.Input.Pointer) => {
-      executeIfMovable(snap)(card, deck);
+      if (!canMoveCard(card, deck)) return;
+      const command = snap(card, deck);
+      if (command) commandsStack.push(command);
     });
   });
 }

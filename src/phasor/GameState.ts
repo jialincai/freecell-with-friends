@@ -52,6 +52,9 @@ export default class GameState extends Phaser.Scene {
     Object.values(PileId).forEach((pileId) => {
       const pile = new Pile(this, pileId);
       this.add.existing(pile);
+
+      // Default none Pile is invisible
+      if (pile.pileId === PileId.None) pile.setAlpha(0);
     });
   }
 

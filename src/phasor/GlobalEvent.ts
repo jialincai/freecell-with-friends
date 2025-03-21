@@ -49,21 +49,12 @@ function dragEnter(card: Card, pile: Pile, deck: Deck): void {
   if (getValidDropPiles(deck, card, [pileId]).length === 0) return;
 
   const pileChildren = deck.pileChildren(pileId);
-  const highlightObject =
-    pileChildren.length !== 0 ? pileChildren[pileChildren.length - 1] : pile;
-  highlightObject.setTint(0x4A90E2);
+  const highlight = pileChildren.at(-1) ?? pile;
+  highlight.setTint(0x4a90e2);
 }
 
 function reset(scene: Phaser.Scene, deck: Deck): void {
-  const piles = scene.children.list.filter(
-    (obj) => obj instanceof Pile,
-  ) as Pile[];
-
-  piles.forEach((pile) => {
-    pile.clearTint();
-  });
-
-  deck.cards.forEach((card) => {
-    card.clearTint();
+  [...scene.children.list, ...deck.cards].forEach((obj) => {
+    if (obj instanceof Pile || obj instanceof Card) obj.clearTint();
   });
 }

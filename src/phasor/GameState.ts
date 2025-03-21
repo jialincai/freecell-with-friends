@@ -1,16 +1,13 @@
 import * as Phaser from "phaser";
 
-import { PubSubStack, CompositeCommand } from "@utils/Functions";
+import { PubSubStack, Command, CompositeCommand } from "@utils/Functions";
 
-import { CardMoveCommand } from "./Command";
 import Card from "./Card";
+import { registerCardEvents } from "./CardEvent";
+import { CardMoveCommand } from "./Command";
 import Deck from "./Deck";
 import Pile from "./Pile";
-import {
-  canMoveCard,
-  getUpdatedCardPlacements,
-  getValidDropPiles,
-} from "./Rule";
+import { getUpdatedCardPlacements, getValidDropPiles } from "./Rule";
 import { addButton } from "./UI";
 
 import { STACK_DRAG_OFFSET } from "./constants/deck";
@@ -24,7 +21,7 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 };
 
 export default class GameState extends Phaser.Scene {
-  private commands = new PubSubStack();
+  private commands = new PubSubStack<Command>();
 
   private score: number = 0;
 
@@ -39,9 +36,6 @@ export default class GameState extends Phaser.Scene {
   }
 
   public create(): void {
-    // Game state variables
-    this.score = 0;
-
     // Add background
     this.add.image(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, "img_background");
 
@@ -50,9 +44,10 @@ export default class GameState extends Phaser.Scene {
 
     this.createZones();
     this.createCommandListeners();
-    this.createInputListeners();
     this.createButtons();
     this.createText();
+
+    registerCardEvents(this.deck, this.commands);
   }
 
   public createZones(): void {
@@ -72,84 +67,6 @@ export default class GameState extends Phaser.Scene {
     this.commands.subscribe("pop", (command) => {
       if (command) command.undo();
     });
-  }
-
-  public createInputListeners(): void {
-    // Start drag card
-    this.input.on(
-      "dragstart",
-      (
-        _pointer: Phaser.Input.Pointer,
-        gameObject: Phaser.GameObjects.GameObject,
-      ) => {
-        if (gameObject instanceof Card && canMoveCard(this.deck, gameObject)) {
-          this.dragCardStart(gameObject);
-        }
-      },
-      this,
-    );
-
-    // End drag card
-    this.input.on(
-      "dragend",
-      (
-        _pointer: Phaser.Input.Pointer,
-        gameObject: Phaser.GameObjects.GameObject,
-      ) => {
-        if (gameObject instanceof Card && canMoveCard(this.deck, gameObject)) {
-          this.dragCardEnd(gameObject);
-        }
-      },
-      this,
-    );
-
-    // Drop on pile
-    this.input.on(
-      "drop",
-      (
-        _pointer: Phaser.Input.Pointer,
-        gameObject: Phaser.GameObjects.GameObject,
-        dropZone: Phaser.GameObjects.GameObject,
-      ) => {
-        if (
-          gameObject instanceof Card &&
-          dropZone instanceof Pile &&
-          canMoveCard(this.deck, gameObject)
-        ) {
-          this.dropCard(gameObject, dropZone);
-        }
-      },
-      this,
-    );
-
-    // Drag card
-    this.input.on(
-      "drag",
-      (
-        _pointer: Phaser.Input.Pointer,
-        gameObject: Phaser.GameObjects.GameObject,
-        dragX: number,
-        dragY: number,
-      ) => {
-        if (gameObject instanceof Card && canMoveCard(this.deck, gameObject)) {
-          this.dragCard(gameObject, dragX, dragY);
-        }
-      },
-      this,
-    );
-
-    this.input.on(
-      "gameobjectdown",
-      (
-        _pointer: Phaser.Input.Pointer,
-        gameObject: Phaser.GameObjects.GameObject,
-      ) => {
-        if (gameObject instanceof Card && canMoveCard(this.deck, gameObject)) {
-          this.snapCardToFoundation(gameObject);
-        }
-      },
-      this,
-    );
   }
 
   public createButtons(): void {

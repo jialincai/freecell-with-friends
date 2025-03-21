@@ -1,16 +1,13 @@
 import * as Phaser from "phaser";
 
-import { PubSubStack, Command, CompositeCommand } from "@utils/Functions";
+import { PubSubStack, Command } from "@utils/Functions";
 
-import Card from "./Card";
 import { registerCardEvents } from "./CardEvent";
-import { CardMoveCommand } from "./Command";
+import { registerGlobalEvents } from "./GlobalEvent";
 import Deck from "./Deck";
 import Pile from "./Pile";
-import { getUpdatedCardPlacements, getValidDropPiles } from "./Rule";
 import { addButton } from "./UI";
 
-import { STACK_DRAG_OFFSET } from "./constants/deck";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "./constants/screen";
 import { FOUNDATION_PILES, PileId, TABLEAU_PILES } from "./constants/table";
 
@@ -47,6 +44,7 @@ export default class GameState extends Phaser.Scene {
     this.createButtons();
     this.createText();
 
+    registerGlobalEvents(this, this.deck);
     registerCardEvents(this.deck, this.commands);
   }
 

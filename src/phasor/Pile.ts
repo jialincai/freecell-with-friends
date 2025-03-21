@@ -5,6 +5,7 @@ import { PileId, PILE_POSITIONS, TABLEAU_PILES } from "./constants/table";
 
 export default class Pile extends Phaser.GameObjects.Zone {
   public pileId: PileId;
+  private visual?: Phaser.GameObjects.Graphics;
 
   public constructor(scene: Phaser.Scene, pileId: PileId) {
     super(scene, 0, 0, 0, 0);
@@ -32,15 +33,58 @@ export default class Pile extends Phaser.GameObjects.Zone {
 
     // Drop zone visual
     if (this.pileId !== PileId.None) {
-      this.scene.add
-        .graphics()
-        .lineStyle(1, 0xffffff)
-        .strokeRect(
-          this.x - this.width / 2,
-          this.y - this.height / 2,
-          CARD_DIMENSIONS.width,
-          CARD_DIMENSIONS.height,
-        );
+      const gfx = scene.add.graphics();
+
+      // No fill by default
+      gfx.lineStyle(1, 0xffffff);
+      gfx.strokeRect(
+        this.x - this.width / 2,
+        this.y - this.height / 2,
+        CARD_DIMENSIONS.width,
+        CARD_DIMENSIONS.height,
+      );
+
+      this.visual = gfx;
+    }
+
+    scene.add.existing(this);
+  }
+
+  public setTint(tint: number): void {
+    if (this.visual) {
+      this.visual.clear();
+
+      // Add fill with provided tint when highlighted
+      this.visual.fillStyle(tint, .75);
+      this.visual.fillRect(
+        this.x - this.width / 2,
+        this.y - this.height / 2,
+        CARD_DIMENSIONS.width,
+        CARD_DIMENSIONS.height,
+      );
+
+      this.visual.lineStyle(1, 0xffffff);
+      this.visual.strokeRect(
+        this.x - this.width / 2,
+        this.y - this.height / 2,
+        CARD_DIMENSIONS.width,
+        CARD_DIMENSIONS.height,
+      );
+    }
+  }
+
+  public clearTint(): void {
+    if (this.visual) {
+      this.visual.clear();
+
+      // Back to transparent fill (no fill), just outline
+      this.visual.lineStyle(1, 0xffffff);
+      this.visual.strokeRect(
+        this.x - this.width / 2,
+        this.y - this.height / 2,
+        CARD_DIMENSIONS.width,
+        CARD_DIMENSIONS.height,
+      );
     }
   }
 }

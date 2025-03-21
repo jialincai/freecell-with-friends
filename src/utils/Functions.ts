@@ -16,10 +16,10 @@ export class PubSubStack<T> {
 
   pop(): void {
     const item = this.items.pop();
-    this.events.emit("pop", item);
+    if (item) this.events.emit("pop", item);
   }
 
-  subscribe(event: string, listener: (...args: any[]) => void): void {
+  subscribe(event: string, listener: (item: T) => void): void {
     this.events.on(event, listener);
   }
 }

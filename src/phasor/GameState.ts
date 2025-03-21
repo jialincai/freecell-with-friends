@@ -66,7 +66,7 @@ export default class GameState extends Phaser.Scene {
 
     // Undo commands
     this.commands.subscribe("pop", (command) => {
-      if (command) command.undo();
+      command.undo();
     });
   }
 

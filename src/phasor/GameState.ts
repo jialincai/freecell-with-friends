@@ -1,23 +1,15 @@
 import * as Phaser from "phaser";
 
-import Card from "./Card";
+import { PubSubStack, Command } from "@utils/Function";
+
+import { registerCardEvents } from "./CardEvent";
+import { registerGlobalEvents } from "./GlobalEvent";
 import Deck from "./Deck";
 import Pile from "./Pile";
-import { CardMoveCommand, CommandManager, CompositeCommand } from "./Command";
-import {
-  canMoveCard,
-  getUpdatedCardPlacements,
-  getValidDropPiles,
-} from "./Rules";
 import { addButton } from "./UI";
-import { STACK_DRAG_OFFSET } from "./constants/deck";
+
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "./constants/screen";
-import {
-  CELL_PILES,
-  FOUNDATION_PILES,
-  PileId,
-  TABLEAU_PILES,
-} from "./constants/table";
+import { FOUNDATION_PILES, PileId, TABLEAU_PILES } from "./constants/table";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -26,13 +18,9 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 };
 
 export default class GameState extends Phaser.Scene {
-  private commands = new CommandManager();
+  private commands = new PubSubStack<Command>();
 
   private score: number = 0;
-
-  private foundationPiles: Pile[] = [];
-
-  private cellPiles: Pile[] = [];
 
   private deck!: Deck;
 
@@ -45,9 +33,6 @@ export default class GameState extends Phaser.Scene {
   }
 
   public create(): void {
-    // Game state variables
-    this.score = 0;
-
     // Add background
     this.add.image(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, "img_background");
 
@@ -55,9 +40,12 @@ export default class GameState extends Phaser.Scene {
     this.deck = new Deck(this);
 
     this.createZones();
-    this.createInputListeners();
+    this.createCommandListeners();
     this.createButtons();
     this.createText();
+
+    registerGlobalEvents(this, this.deck);
+    registerCardEvents(this.deck, this.commands);
   }
 
   public createZones(): void {
@@ -65,90 +53,21 @@ export default class GameState extends Phaser.Scene {
       const pile = new Pile(this, pileId);
       this.add.existing(pile);
 
-      if (FOUNDATION_PILES.includes(pile.pileId)) {
-        this.foundationPiles.push(pile);
-      } else if (CELL_PILES.includes(pile.pileId)) {
-        this.cellPiles.push(pile);
-      }
+      // Default none Pile is invisible
+      if (pile.pileId === PileId.None) pile.setAlpha(0);
     });
   }
 
-  public createInputListeners(): void {
-    // Start drag card
-    this.input.on(
-      "dragstart",
-      (
-        _pointer: Phaser.Input.Pointer,
-        gameObject: Phaser.GameObjects.GameObject,
-      ) => {
-        if (gameObject instanceof Card && canMoveCard(this.deck, gameObject)) {
-          this.dragCardStart(gameObject);
-        }
-      },
-      this,
-    );
+  public createCommandListeners(): void {
+    // Do commands
+    this.commands.subscribe("push", (command) => {
+      command.do();
+    });
 
-    // End drag card
-    this.input.on(
-      "dragend",
-      (
-        _pointer: Phaser.Input.Pointer,
-        gameObject: Phaser.GameObjects.GameObject,
-      ) => {
-        if (gameObject instanceof Card && canMoveCard(this.deck, gameObject)) {
-          this.dragCardEnd(gameObject);
-        }
-      },
-      this,
-    );
-
-    // Drop on pile
-    this.input.on(
-      "drop",
-      (
-        _pointer: Phaser.Input.Pointer,
-        gameObject: Phaser.GameObjects.GameObject,
-        dropZone: Phaser.GameObjects.GameObject,
-      ) => {
-        if (
-          gameObject instanceof Card &&
-          dropZone instanceof Pile &&
-          canMoveCard(this.deck, gameObject)
-        ) {
-          this.dropCard(gameObject, dropZone);
-        }
-      },
-      this,
-    );
-
-    // Drag card
-    this.input.on(
-      "drag",
-      (
-        _pointer: Phaser.Input.Pointer,
-        gameObject: Phaser.GameObjects.GameObject,
-        dragX: number,
-        dragY: number,
-      ) => {
-        if (gameObject instanceof Card && canMoveCard(this.deck, gameObject)) {
-          this.dragCard(gameObject, dragX, dragY);
-        }
-      },
-      this,
-    );
-
-    this.input.on(
-      "gameobjectdown",
-      (
-        _pointer: Phaser.Input.Pointer,
-        gameObject: Phaser.GameObjects.GameObject,
-      ) => {
-        if (gameObject instanceof Card && canMoveCard(this.deck, gameObject)) {
-          this.snapCardToFoundation(gameObject);
-        }
-      },
-      this,
-    );
+    // Undo commands
+    this.commands.subscribe("pop", (command) => {
+      command.undo();
+    });
   }
 
   public createButtons(): void {
@@ -206,93 +125,6 @@ export default class GameState extends Phaser.Scene {
     ) {
       this.score -= 15;
     }
-  }
-
-  public dragCardStart(card: Card): void {
-    const dragChildren = this.deck.cardChildren(card);
-    // Set render order
-    for (let i = 0; i < dragChildren.length; i += 1) {
-      // Set render order
-      dragChildren[i].setDepth(100 + i);
-    }
-  }
-
-  // Resets dragged cards back to their original pile positions after dragging.
-  // This is purely a visual correction, not a user action.
-  // Therefore, it is NOT added to the command stack and cannot be undone.
-  public dragCardEnd(card: Card): void {
-    const dragChildren = this.deck.cardChildren(card);
-    dragChildren.forEach((child: Card) => {
-      child.reposition(child.pile, child.position);
-    });
-  }
-
-  public dragCard(card: Card, dragX: number, dragY: number): void {
-    // Set positions
-    const dragChildren = this.deck.cardChildren(card);
-    for (let i = 0; i < dragChildren.length; i += 1) {
-      dragChildren[i].x = dragX;
-      dragChildren[i].y = dragY + i * STACK_DRAG_OFFSET;
-    }
-  }
-
-  public dropCard(card: Card, dropZone: Phaser.GameObjects.GameObject): void {
-    // Get pile id of drop zone
-    const pileId = dropZone.name as PileId;
-
-    // No valid drops
-    if (!getValidDropPiles(this.deck, card, [pileId]).some(Boolean)) return;
-
-    // Update card placement
-    const dragChildren = this.deck.cardChildren(card);
-    const updatedPlacements = getUpdatedCardPlacements(
-      this.deck,
-      dragChildren,
-      pileId,
-    );
-
-    const dropAllCommand = new CompositeCommand(
-      ...dragChildren.map(
-        (child, index) =>
-          new CardMoveCommand(
-            child,
-            child.pile,
-            child.position,
-            updatedPlacements[index].pileId,
-            updatedPlacements[index].position,
-          ),
-      ),
-    );
-    this.commands.push(dropAllCommand);
-  }
-
-  public snapCardToFoundation(card: Card): void {
-    // Don't snap foundation cards
-    if (FOUNDATION_PILES.includes(card.pile)) return;
-
-    // Only snap if card is at bottom of pile
-    if (this.deck.cardChildren(card).length > 1) return;
-
-    // Get the first valid foundation pile to drop into
-    const targetPile = getValidDropPiles(this.deck, card, FOUNDATION_PILES)[0];
-    if (!targetPile) return; // Exit early if no valid pile
-
-    // Get updated placement
-    const updatedPlacement = getUpdatedCardPlacements(
-      this.deck,
-      [card],
-      targetPile,
-    )[0];
-
-    // Create and execute card move command
-    const command = new CardMoveCommand(
-      card,
-      card.pile,
-      card.position,
-      updatedPlacement.pileId,
-      updatedPlacement.position,
-    );
-    this.commands.push(command);
   }
 
   public update(): void {

@@ -3,44 +3,48 @@ import * as Phaser from "phaser";
 import { CARD_DIMENSIONS, STACK_OFFSET } from "./constants/deck";
 import { PileId, PILE_POSITIONS, TABLEAU_PILES } from "./constants/table";
 
-export default class Pile extends Phaser.GameObjects.Zone {
+export default class Pile extends Phaser.GameObjects.Rectangle {
   public pileId: PileId;
 
   public constructor(scene: Phaser.Scene, pileId: PileId) {
-    super(scene, 0, 0, 0, 0);
+    // Create rectangle for visual outline only
+    super(
+      scene,
+      PILE_POSITIONS[pileId].x,
+      PILE_POSITIONS[pileId].y,
+      CARD_DIMENSIONS.width,
+      CARD_DIMENSIONS.height,
+      0x000000,
+      0, // transparent fill
+    );
+    this.setStrokeStyle(1, 0xffffff);
 
+    // Set unique pile ID
     this.pileId = pileId;
+    this.setName(pileId);
 
-    // Additional height for tableau
-    const addHeight = TABLEAU_PILES.includes(this.pileId)
-      ? STACK_OFFSET * 10
-      : 0;
-    const addWidth = 0;
-
-    // Get position
-    const position = PILE_POSITIONS[this.pileId];
-
-    // Make zone
-    this.setPosition(position.x + addWidth / 2, position.y + addHeight / 2);
-    this.setSize(
-      CARD_DIMENSIONS.width + addWidth,
-      CARD_DIMENSIONS.height + addHeight,
+    // Manually set larger hit area for drop zone
+    const addHeight = TABLEAU_PILES.includes(pileId) ? STACK_OFFSET * 10 : 0;
+    this.setInteractive(
+      new Phaser.Geom.Rectangle(
+        0,
+        0,
+        CARD_DIMENSIONS.width,
+        CARD_DIMENSIONS.height + addHeight,
+      ),
+      Phaser.Geom.Rectangle.Contains,
+      true,
     );
 
-    const zone = this.setRectangleDropZone(this.width, this.height);
-    zone.setName(this.pileId);
+    // Add to scene
+    scene.add.existing(this);
+  }
 
-    // Drop zone visual
-    if (this.pileId !== PileId.None) {
-      this.scene.add
-        .graphics()
-        .lineStyle(1, 0xffffff)
-        .strokeRect(
-          this.x - this.width / 2,
-          this.y - this.height / 2,
-          CARD_DIMENSIONS.width,
-          CARD_DIMENSIONS.height,
-        );
-    }
+  public setTint(tint: number): void {
+    this.setFillStyle(tint, 0.75);
+  }
+
+  public clearTint(): void {
+    this.setFillStyle(0x000000, 0);
   }
 }

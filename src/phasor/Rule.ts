@@ -169,6 +169,6 @@ export function getUpdatedCardPlacements(
  * @param card The card being moved.
  * @returns Whether the move is allowed.
  */
-export function canMoveCard(deck: Deck, card: Card): boolean {
+export function canMoveCard(card: Card, deck: Deck): boolean {
   return DRAG_RULES[card.pile]?.(deck, card) ?? false;
 }

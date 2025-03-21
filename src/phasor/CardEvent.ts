@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 
-import { Command, CompositeCommand, PubSubStack } from "@utils/Functions";
+import { Command, CompositeCommand, PubSubStack } from "@utils/Function";
 
 import Card from "./Card";
 import { CardMoveCommand } from "./Command";

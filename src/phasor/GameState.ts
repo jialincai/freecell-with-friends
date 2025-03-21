@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 
-import { PubSubStack, Command } from "@utils/Functions";
+import { PubSubStack, Command } from "@utils/Function";
 
 import { registerCardEvents } from "./CardEvent";
 import { registerGlobalEvents } from "./GlobalEvent";

@@ -1,4 +1,4 @@
-import { Command } from "@utils/Functions";
+import { Command } from "@utils/Function";
 
 import Card from "./Card";
 import { PileId } from "./constants/table";

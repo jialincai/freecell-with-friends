@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 
-import { PubSubStack, CompositeCommand } from "@utils/Function";
+import { CompositeCommand, createPubSubStack } from "@utils/Function";
 
 import { registerCardEvents } from "./CardEvent";
 import { registerGlobalEvents } from "./GlobalEvent";
@@ -18,7 +18,7 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 };
 
 export default class GameState extends Phaser.Scene {
-  private commands = new PubSubStack<CompositeCommand>();
+  private commands = createPubSubStack<CompositeCommand>();
 
   private score: number = 0;
 

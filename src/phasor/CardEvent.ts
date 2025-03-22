@@ -1,9 +1,13 @@
 import * as Phaser from "phaser";
 
-import { CompositeCommand, PubSubStack } from "@utils/Function";
+import {
+  CompositeCommand,
+  createCompositeCommand,
+  PubSubStack,
+} from "@utils/Function";
 
 import Card from "./Card";
-import { CardMoveCommand } from "./CardMoveCommand";
+import { createCardMoveCommand } from "./CardMove";
 import Deck from "./Deck";
 import Pile from "./Pile";
 import {
@@ -93,16 +97,13 @@ function drop(card: Card, deck: Deck, target: Pile): CompositeCommand | null {
     pileId,
   );
 
-  return new CompositeCommand(
-    ...dragChildren.map(
-      (child, index) =>
-        new CardMoveCommand(
-          child,
-          child.pile,
-          child.position,
-          updatedPlacements[index].pileId,
-          updatedPlacements[index].position,
-        ),
+  return createCompositeCommand(
+    dragChildren.map((card, index) =>
+      createCardMoveCommand(
+        card,
+        { pileId: card.pile, position: card.position },
+        updatedPlacements[index],
+      ),
     ),
   );
 }
@@ -115,11 +116,11 @@ function snap(card: Card, deck: Deck): CompositeCommand | null {
 
   const [updatedPlacement] = getUpdatedCardPlacements(deck, [card], targetPile);
 
-  return new CompositeCommand(new CardMoveCommand(
-    card,
-    card.pile,
-    card.position,
-    updatedPlacement.pileId,
-    updatedPlacement.position,
-  ));
+  return createCompositeCommand([
+    createCardMoveCommand(
+      card,
+      { pileId: card.pile, position: card.position },
+      updatedPlacement,
+    ),
+  ]);
 }

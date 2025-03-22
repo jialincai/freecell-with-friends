@@ -49,16 +49,16 @@ const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
     ]),
 
     // Tableau piles: Cards must alternate in color and be placed in descending order.
+    // Additionally, card count must not exceed max drop size.
     ...TABLEAU_PILES.map((pileId) => [
       pileId,
       (deck: Deck, card: Card) => {
-        const pileAfterDrop = [
-          ...deck.pileChildren(pileId),
-          ...deck.cardChildren(card),
-        ];
-        const activeSequence = pileAfterDrop.slice(
-          -deck.cardChildren(card).length - 1,
-        );
+        const dragChildren = deck.cardChildren(card);
+        if (dragChildren.length > _getMaxMovableStackSize(deck, pileId))
+          return false;
+
+        const pileAfterDrop = [...deck.pileChildren(pileId), ...dragChildren];
+        const activeSequence = pileAfterDrop.slice(-dragChildren.length - 1);
         return isValidSequence(activeSequence, [
           hasAlternatingColor,
           isDescendingOrder,
@@ -93,15 +93,8 @@ const DRAG_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
       pileId,
       (deck: Deck, card: Card) => {
         const dragChildren = deck.cardChildren(card);
-        const maxMoveSize = [...TABLEAU_PILES, ...CELL_PILES].reduce(
-          (accum, pileId) => {
-            return accum + Number(deck.pileChildren(pileId).length === 0);
-          },
-          1,
-        );
-
         return (
-          dragChildren.length <= maxMoveSize &&
+          dragChildren.length <= _getMaxMovableStackSize(deck, PileId.None) &&
           isValidSequence(dragChildren, [
             hasAlternatingColor,
             isDescendingOrder,
@@ -171,4 +164,24 @@ export function getUpdatedCardPlacements(
  */
 export function canMoveCard(card: Card, deck: Deck): boolean {
   return DRAG_RULES[card.pile]?.(deck, card) ?? false;
+}
+
+/**
+ * Calculates the maximum number of cards that can be moved in a single stack.
+ * Based on Freecell-style rules: (empty cells + 1) * 2^(empty tableaus excluding the target).
+ *
+ * @param deck - The current deck state
+ * @param targetPileId - The pile the stack will be dropped on. If PileId.None, all tableau piles are considered.
+ */
+function _getMaxMovableStackSize(deck: Deck, targetPileId: PileId): number {
+  const emptyCellCount = CELL_PILES.filter(
+    (cellId) => deck.pileChildren(cellId).length === 0,
+  ).length;
+
+  const emptyTableauCount = TABLEAU_PILES.filter(
+    (tableauId) =>
+      tableauId !== targetPileId && deck.pileChildren(tableauId).length === 0,
+  ).length;
+
+  return (emptyCellCount + 1) * 2 ** emptyTableauCount;
 }

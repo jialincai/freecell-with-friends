@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 
-import { PubSubStack, Command } from "@utils/Function";
+import { PubSubStack, CompositeCommand } from "@utils/Function";
 
 import { registerCardEvents } from "./CardEvent";
 import { registerGlobalEvents } from "./GlobalEvent";
@@ -18,7 +18,7 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 };
 
 export default class GameState extends Phaser.Scene {
-  private commands = new PubSubStack<Command>();
+  private commands = new PubSubStack<CompositeCommand>();
 
   private score: number = 0;
 
@@ -61,7 +61,6 @@ export default class GameState extends Phaser.Scene {
   public createCommandListeners(): void {
     // Do commands
     this.commands.subscribe("push", (command) => {
-      command.do();
     });
 
     // Undo commands
@@ -135,7 +134,7 @@ export default class GameState extends Phaser.Scene {
 
     // Win
     const cardsOnFoundation = FOUNDATION_PILES.reduce(
-      (acc, pile) => acc + this.deck.pileChildren(pile).length,
+      (acc, pile) => acc + this.deck.getPileChildren(pile).length,
       0,
     );
     if (cardsOnFoundation === 52) {

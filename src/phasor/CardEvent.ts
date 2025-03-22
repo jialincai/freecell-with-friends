@@ -1,9 +1,9 @@
 import * as Phaser from "phaser";
 
-import { Command, CompositeCommand, PubSubStack } from "@utils/Function";
+import { CompositeCommand, PubSubStack } from "@utils/Function";
 
 import Card from "./Card";
-import { CardMoveCommand } from "./Command";
+import { CardMoveCommand } from "./CardMoveCommand";
 import Deck from "./Deck";
 import Pile from "./Pile";
 import {
@@ -18,7 +18,7 @@ import { FOUNDATION_PILES, PileId } from "./constants/table";
 // Register handlers for various card events.
 export function registerCardEvents(
   deck: Deck,
-  commandsStack: PubSubStack<Command>,
+  commandsStack: PubSubStack<CompositeCommand>,
 ): void {
   deck.cards.forEach((card) => {
     card.on(
@@ -66,27 +66,27 @@ export function registerCardEvents(
 }
 
 function dragStart(card: Card, deck: Deck): void {
-  deck.cardChildren(card).forEach((child, i) => child.setDepth(100 + i));
+  deck.getCardChildren(card).forEach((child, i) => child.setDepth(100 + i));
 }
 
 function dragEnd(card: Card, deck: Deck): void {
-  deck.cardChildren(card).forEach((child) => {
+  deck.getCardChildren(card).forEach((child) => {
     child.reposition(child.pile, child.position);
   });
 }
 
 function drag(card: Card, deck: Deck, dragX: number, dragY: number): void {
-  deck.cardChildren(card).forEach((child, i) => {
+  deck.getCardChildren(card).forEach((child, i) => {
     child.x = dragX;
     child.y = dragY + i * STACK_DRAG_OFFSET;
   });
 }
 
-function drop(card: Card, deck: Deck, target: Pile): Command | null {
+function drop(card: Card, deck: Deck, target: Pile): CompositeCommand | null {
   const pileId = target.name as PileId;
   if (getValidDropPiles(deck, card, [pileId]).length === 0) return null;
 
-  const dragChildren = deck.cardChildren(card);
+  const dragChildren = deck.getCardChildren(card);
   const updatedPlacements = getUpdatedCardPlacements(
     deck,
     dragChildren,
@@ -107,19 +107,19 @@ function drop(card: Card, deck: Deck, target: Pile): Command | null {
   );
 }
 
-function snap(card: Card, deck: Deck): Command | null {
-  if (deck.cardChildren(card).length > 1) return null;
+function snap(card: Card, deck: Deck): CompositeCommand | null {
+  if (deck.getCardChildren(card).length > 1) return null;
 
   const targetPile = getValidDropPiles(deck, card, FOUNDATION_PILES)?.[0];
   if (!targetPile) return null;
 
   const [updatedPlacement] = getUpdatedCardPlacements(deck, [card], targetPile);
 
-  return new CardMoveCommand(
+  return new CompositeCommand(new CardMoveCommand(
     card,
     card.pile,
     card.position,
     updatedPlacement.pileId,
     updatedPlacement.position,
-  );
+  ));
 }

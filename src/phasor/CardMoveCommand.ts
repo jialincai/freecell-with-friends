@@ -5,11 +5,11 @@ import { PileId } from "./constants/table";
 
 export class CardMoveCommand implements Command {
   constructor(
-    private card: Card,
-    private source: PileId,
-    private p1: number,
-    private destination: PileId,
-    private p2: number,
+    public readonly card: Card,
+    public readonly source: PileId,
+    public readonly p1: number,
+    public readonly destination: PileId,
+    public readonly p2: number,
   ) {}
 
   do(): void {

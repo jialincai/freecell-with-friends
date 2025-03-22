@@ -25,8 +25,8 @@ const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
       pileId,
       (deck: Deck, card: Card) => {
         const pileAfterDrop = [
-          ...deck.pileChildren(pileId),
-          ...deck.cardChildren(card),
+          ...deck.getPileChildren(pileId),
+          ...deck.getCardChildren(card),
         ];
         return pileAfterDrop.length === 1;
       },
@@ -37,12 +37,12 @@ const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
       pileId,
       (deck: Deck, card: Card) => {
         const pileAfterDrop = [
-          ...deck.pileChildren(pileId),
-          ...deck.cardChildren(card),
+          ...deck.getPileChildren(pileId),
+          ...deck.getCardChildren(card),
         ];
         if (pileAfterDrop[0].value !== 1) return false;
         return isValidSequence(
-          [...deck.pileChildren(pileId), ...deck.cardChildren(card)],
+          [...deck.getPileChildren(pileId), ...deck.getCardChildren(card)],
           [hasSameSuit, isAscendingOrder],
         );
       },
@@ -53,11 +53,14 @@ const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
     ...TABLEAU_PILES.map((pileId) => [
       pileId,
       (deck: Deck, card: Card) => {
-        const dragChildren = deck.cardChildren(card);
+        const dragChildren = deck.getCardChildren(card);
         if (dragChildren.length > _getMaxMovableStackSize(deck, pileId))
           return false;
 
-        const pileAfterDrop = [...deck.pileChildren(pileId), ...dragChildren];
+        const pileAfterDrop = [
+          ...deck.getPileChildren(pileId),
+          ...dragChildren,
+        ];
         const activeSequence = pileAfterDrop.slice(-dragChildren.length - 1);
         return isValidSequence(activeSequence, [
           hasAlternatingColor,
@@ -92,7 +95,7 @@ const DRAG_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
     ...TABLEAU_PILES.map((pileId) => [
       pileId,
       (deck: Deck, card: Card) => {
-        const dragChildren = deck.cardChildren(card);
+        const dragChildren = deck.getCardChildren(card);
         return (
           dragChildren.length <= _getMaxMovableStackSize(deck, PileId.None) &&
           isValidSequence(dragChildren, [
@@ -149,7 +152,7 @@ export function getUpdatedCardPlacements(
   cards: Card[],
   pileId: PileId,
 ): Array<{ pileId: PileId; position: number }> {
-  const basePosition = deck.pileChildren(pileId).length;
+  const basePosition = deck.getPileChildren(pileId).length;
   return cards.map((_, index) => ({
     pileId,
     position: basePosition + index,
@@ -174,13 +177,9 @@ export function canMoveCard(card: Card, deck: Deck): boolean {
  * @param targetPileId - The pile the stack will be dropped on. If PileId.None, all tableau piles are considered.
  */
 function _getMaxMovableStackSize(deck: Deck, targetPileId: PileId): number {
-  const emptyCellCount = CELL_PILES.filter(
-    (cellId) => deck.pileChildren(cellId).length === 0,
-  ).length;
-
-  const emptyTableauCount = TABLEAU_PILES.filter(
-    (tableauId) =>
-      tableauId !== targetPileId && deck.pileChildren(tableauId).length === 0,
+  const emptyCellCount = deck.getEmptyPiles(CELL_PILES).length;
+  const emptyTableauCount = deck.getEmptyPiles(
+    TABLEAU_PILES.filter((id) => id !== targetPileId),
   ).length;
 
   return (emptyCellCount + 1) * 2 ** emptyTableauCount;

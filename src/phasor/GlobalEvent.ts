@@ -48,7 +48,7 @@ function dragEnter(card: Card, pile: Pile, deck: Deck): void {
   const pileId = pile.name as PileId;
   if (getValidDropPiles(deck, card, [pileId]).length === 0) return;
 
-  const pileChildren = deck.pileChildren(pileId);
+  const pileChildren = deck.getPileChildren(pileId);
   const highlight = pileChildren.at(-1) ?? pile;
   highlight.setTint(0x4a90e2);
 }

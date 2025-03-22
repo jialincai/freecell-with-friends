@@ -29,8 +29,8 @@ export interface Command {
   undo(): void;
 }
 
-export class CompositeCommand implements Command {
-  private readonly commands: Command[];
+export class CompositeCommand {
+  public readonly commands: Command[];
 
   constructor(...commands: Command[]) {
     this.commands = commands;

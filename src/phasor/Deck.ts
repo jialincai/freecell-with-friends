@@ -59,7 +59,7 @@ export default class Deck {
    * @param {PileId} pile - The ID of the pile to retrieve cards from.
    * @returns {Card[]} An array of cards in the pile, sorted by position.
    */
-  public pileChildren(pile: PileId): Card[] {
+  public getPileChildren(pile: PileId): Card[] {
     return this.cards
       .filter((curr: Card) => curr.pile === pile)
       .sort((a: Card, b: Card) => a.position - b.position);
@@ -71,9 +71,15 @@ export default class Deck {
    * @param {Card} card - The reference card.
    * @returns {Card[]} Cards in the same pile, sorted by ascending position.
    */
-  public cardChildren(card: Card): Card[] {
-    return this.pileChildren(card.pile).filter(
+  public getCardChildren(card: Card): Card[] {
+    return this.getPileChildren(card.pile).filter(
       (curr: Card) => curr.position >= card.position,
+    );
+  }
+
+  public getEmptyPiles(pileIds: PileId[]): PileId[] {
+    return pileIds.filter(
+      (pileId) => this.getPileChildren(pileId).length === 0,
     );
   }
 }

@@ -5,7 +5,7 @@ import { CompositeCommand, createPubSubStack } from "@utils/Function";
 import { registerCardEvents } from "./CardEvent";
 import { registerGlobalEvents } from "./GlobalEvent";
 import Deck from "./Deck";
-import Pile from "./Pile";
+import PileView from "./PileView";
 import { addButton } from "./UI";
 
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "./constants/screen";
@@ -50,10 +50,9 @@ export default class GameState extends Phaser.Scene {
 
   public createZones(): void {
     Object.values(PileId).forEach((pileId) => {
-      const pile = new Pile(this, pileId);
+      const pile = new PileView(this, pileId);
       this.add.existing(pile);
 
-      // Default none Pile is invisible
       if (pile.pileId === PileId.None) pile.setAlpha(0);
     });
   }

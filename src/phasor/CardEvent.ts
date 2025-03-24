@@ -9,7 +9,7 @@ import {
 import Card from "./Card";
 import { createCardMoveCommand } from "./CardMove";
 import Deck from "./Deck";
-import Pile from "./Pile";
+import PileView from "./PileView";
 import {
   canMoveCard,
   getUpdatedCardPlacements,
@@ -56,7 +56,7 @@ export function registerCardEvents(
         target: Phaser.GameObjects.GameObject,
       ) => {
         if (!canMoveCard(card, deck)) return;
-        const command = drop(card, deck, target as Pile);
+        const command = drop(card, deck, target as PileView);
         if (command) commandsStack.push(command);
       },
     );
@@ -86,7 +86,7 @@ function drag(card: Card, deck: Deck, dragX: number, dragY: number): void {
   });
 }
 
-function drop(card: Card, deck: Deck, target: Pile): CompositeCommand | null {
+function drop(card: Card, deck: Deck, target: PileView): CompositeCommand | null {
   const pileId = target.name as PileId;
   if (getValidDropPiles(deck, card, [pileId]).length === 0) return null;
 

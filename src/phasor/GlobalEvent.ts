@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 
 import Card from "./Card";
-import Pile from "./Pile";
+import PileView from "./PileView";
 import Deck from "./Deck";
 import { getValidDropPiles } from "./Rule";
 
@@ -16,7 +16,7 @@ export function registerGlobalEvents(scene: Phaser.Scene, deck: Deck): void {
       gameObject: Phaser.GameObjects.GameObject,
       target: Phaser.GameObjects.GameObject,
     ) => {
-      if (gameObject instanceof Card && target instanceof Pile)
+      if (gameObject instanceof Card && target instanceof PileView)
         dragEnter(gameObject, target, deck);
     },
   );
@@ -28,7 +28,7 @@ export function registerGlobalEvents(scene: Phaser.Scene, deck: Deck): void {
       gameObject: Phaser.GameObjects.GameObject,
       target: Phaser.GameObjects.GameObject,
     ) => {
-      if (gameObject instanceof Card && target instanceof Pile)
+      if (gameObject instanceof Card && target instanceof PileView)
         reset(scene, deck);
     },
   );
@@ -44,7 +44,7 @@ export function registerGlobalEvents(scene: Phaser.Scene, deck: Deck): void {
   );
 }
 
-function dragEnter(card: Card, pile: Pile, deck: Deck): void {
+function dragEnter(card: Card, pile: PileView, deck: Deck): void {
   const pileId = pile.name as PileId;
   if (getValidDropPiles(deck, card, [pileId]).length === 0) return;
 
@@ -55,6 +55,6 @@ function dragEnter(card: Card, pile: Pile, deck: Deck): void {
 
 function reset(scene: Phaser.Scene, deck: Deck): void {
   [...scene.children.list, ...deck.cards].forEach((obj) => {
-    if (obj instanceof Pile || obj instanceof Card) obj.clearTint();
+    if (obj instanceof PileView || obj instanceof Card) obj.clearTint();
   });
 }

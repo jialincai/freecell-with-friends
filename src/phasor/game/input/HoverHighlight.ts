@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 import { getDroppablePiles } from "@phasor/game/domain/FreecellRules";
-import { pileChildren } from "@phasor/deck/domain/DeckLogic";
+import { getPileChildren } from "@phasor/deck/domain/DeckLogic";
 
 import { PileId } from "@phasor/constants/table";
 import { PileView } from "@phasor/pile/PileView";

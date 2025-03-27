@@ -25,18 +25,9 @@ export function setupHoverHighlight(
       },
     );
 
-    cardController.view.on(
-      "dragleave",
-      (
-        _pointer: Phaser.Input.Pointer,
-        gameObject: Phaser.GameObjects.GameObject,
-        target: Phaser.GameObjects.GameObject,
-      ) => {
-        if (target instanceof PileView) {
-          removeHighlight(deckController, PileControllers);
-        }
-      },
-    );
+    cardController.view.on("dragleave", () => {
+      removeHighlight(deckController, PileControllers);
+    });
 
     cardController.view.on("pointerup", () => {
       removeHighlight(deckController, PileControllers);

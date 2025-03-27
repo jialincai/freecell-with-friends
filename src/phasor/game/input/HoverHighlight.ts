@@ -1,12 +1,12 @@
 import * as Phaser from "phaser";
-import { filterValidDropPiles } from "@phasor/game/domain/FreecellRules";
-import { getCardsInPile } from "@phasor/deck/domain/DeckLogic";
 
 import { PileId } from "@phasor/constants/table";
-import { PileView } from "@phasor/pile/PileView";
-import { DeckController } from "@phasor/deck/DeckController";
+import { filterValidDropPiles } from "@phasor/game/domain/FreecellRules";
+import { getCardsInPile } from "@phasor/deck/domain/DeckLogic";
 import { CardController } from "@phasor/card/CardController";
+import { DeckController } from "@phasor/deck/DeckController";
 import { PileController } from "@phasor/pile/PileController";
+import { PileView } from "@phasor/pile/PileView";
 
 /**
  * Registers event handling for hover highlighting.
@@ -25,7 +25,7 @@ export function setupHoverHighlight(
         target: Phaser.GameObjects.GameObject,
       ) => {
         if (target instanceof PileView) {
-          onDragEnter(controller, target, deckController);
+          onDragEnter(deckController, controller, target);
         }
       },
     );
@@ -50,9 +50,9 @@ export function setupHoverHighlight(
 }
 
 function onDragEnter(
+  deckController: DeckController,
   card: CardController,
   pileView: PileView,
-  deckController: DeckController,
 ): void {
   const pileId = pileView.name as PileId;
   const model = card.model;

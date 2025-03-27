@@ -1,22 +1,22 @@
-import { Card } from "@phasor/card/state/Card";
-import { Deck } from "@phasor/deck/state/Deck";
 import {
-  PileId,
   CELL_PILES,
   FOUNDATION_PILES,
+  PileId,
   TABLEAU_PILES,
 } from "@phasor/constants/table";
+import { Card } from "@phasor/card/state/Card";
 import {
-  isDifferentColor,
-  isSameSuit,
   isAscending,
   isDescending,
+  isDifferentColor,
   isFollowingRules,
+  isSameSuit,
 } from "@phasor/card/domain/CardComparison";
 import {
-  getCardsStartingFrom,
   getCardsInPile,
+  getCardsStartingFrom,
 } from "@phasor/deck/domain/DeckLogic";
+import { Deck } from "@phasor/deck/state/Deck";
 
 export function mapValidDropPiles(
   deck: Deck,

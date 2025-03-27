@@ -1,21 +1,14 @@
 import * as Phaser from "phaser";
 
+import { PubSubStack, CompositeCommand } from "@utils/Function";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@phasor/constants/screen";
 import { FOUNDATION_PILES, PileId } from "@phasor/constants/table";
-
-import { PubSubStack, CompositeCommand } from "@utils/Function";
-
 import { setupCardInteraction } from "@phasor/game/input/CardInteraction";
 import { setupHoverHighlight } from "@phasor/game/input/HoverHighlight";
-
-import { addButton } from "@phasor/UI";
-
 import { DeckController } from "@phasor/deck/DeckController";
 import { createDeck } from "@phasor/deck/state/Deck";
-
 import { CardController } from "@phasor/card/CardController";
 import { CardView } from "@phasor/card/CardView";
-
 import { PileController } from "@phasor/pile/PileController";
 import { createPile } from "@phasor/pile/state/Pile";
 import { PileView } from "@phasor/pile/PileView";
@@ -85,20 +78,35 @@ export default class GameState extends Phaser.Scene {
   }
 
   public createButtons(): void {
-    addButton(this, 10, 10, "Redeal", () => {
-      this.deck.deal();
-      this.winText.setVisible(false);
-    });
+    // Redeal Button
+    this.add.graphics().fillStyle(0xffffff, 1).fillRect(10, 10, 80, 18);
+    this.add
+      .text(12, 12, "Redeal", { color: "#000" })
+      .setInteractive()
+      .on("pointerdown", () => {
+        this.deck.deal();
+        this.winText.setVisible(false);
+      });
 
-    addButton(this, 100, 10, "New Deal", () => {
-      this.deck.shuffle(476);
-      this.deck.deal();
-      this.winText.setVisible(false);
-    });
+    // New Deal Button
+    this.add.graphics().fillStyle(0xffffff, 1).fillRect(100, 10, 80, 18);
+    this.add
+      .text(102, 12, "New Deal", { color: "#000" })
+      .setInteractive()
+      .on("pointerdown", () => {
+        this.deck.shuffle(476);
+        this.deck.deal();
+        this.winText.setVisible(false);
+      });
 
-    addButton(this, 190, 10, "Undo", () => {
-      this.moveHistory.pop();
-    });
+    // Undo Button
+    this.add.graphics().fillStyle(0xffffff, 1).fillRect(190, 10, 80, 18);
+    this.add
+      .text(192, 12, "Undo", { color: "#000" })
+      .setInteractive()
+      .on("pointerdown", () => {
+        this.moveHistory.pop();
+      });
   }
 
   public createText(): void {
@@ -111,7 +119,7 @@ export default class GameState extends Phaser.Scene {
   }
 
   public update(): void {
-    // Win
+    // Win condition
     const cardsOnFoundation = FOUNDATION_PILES.reduce(
       (acc: number, pile: PileId) =>
         acc + this.deck.getCardsInPile(pile).length,

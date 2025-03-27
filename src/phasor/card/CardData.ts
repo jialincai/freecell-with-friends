@@ -4,4 +4,4 @@ export type CardData = {
   id: string;
   suit: Suit;
   value: number;
-};
+}

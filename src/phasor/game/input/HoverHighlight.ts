@@ -15,22 +15,20 @@ export function setupHoverHighlight(
   deckController: DeckController,
   PileControllers: PileController[],
 ): void {
-  deckController.cardControllers.forEach((controller) => {
-    const view = controller.view;
-
-    view.on(
+  deckController.cardControllers.forEach((cardController) => {
+    cardController.view.on(
       "dragenter",
       (
         _pointer: Phaser.Input.Pointer,
         target: Phaser.GameObjects.GameObject,
       ) => {
         if (target instanceof PileView) {
-          onDragEnter(deckController, controller, target);
+          onDragEnter(deckController, cardController, target);
         }
       },
     );
 
-    view.on(
+    cardController.view.on(
       "dragleave",
       (
         _pointer: Phaser.Input.Pointer,
@@ -43,7 +41,7 @@ export function setupHoverHighlight(
       },
     );
 
-    view.on("pointerup", () => {
+    cardController.view.on("pointerup", () => {
       resetHighlights(deckController, PileControllers);
     });
   });
@@ -78,11 +76,11 @@ function resetHighlights(
   deckController: DeckController,
   PileControllers: PileController[],
 ): void {
-  deckController.cardControllers.forEach((controller) => {
-    controller.view.clearTint();
+  deckController.cardControllers.forEach((cardController) => {
+    cardController.view.clearTint();
   });
 
-  PileControllers.forEach((controller) => {
-    controller.clearTint();
+  PileControllers.forEach((cardController) => {
+    cardController.clearTint();
   });
 }

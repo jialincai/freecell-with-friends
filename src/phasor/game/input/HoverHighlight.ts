@@ -61,7 +61,7 @@ function onDragEnter(
   const valid = getDroppablePiles(deckModel, model, [pileId]);
   if (!valid.includes(pileId)) return;
 
-  const pileCards = pileChildren(deckModel, pileId);
+  const pileCards = getPileChildren(deckModel, pileId);
 
   const bottom = pileCards.at(-1);
   if (bottom) {

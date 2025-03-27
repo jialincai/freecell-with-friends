@@ -22,8 +22,8 @@ const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
       pileId,
       (deck: Deck, card: Card) => {
         const resultingPile = [
-          ...pileChildren(deck, pileId),
-          ...cardChildren(deck, card),
+          ...getPileChildren(deck, pileId),
+          ...getCardChildren(deck, card),
         ];
         return resultingPile.length === 1;
       },
@@ -33,8 +33,8 @@ const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
       pileId,
       (deck: Deck, card: Card) => {
         const resultingPile = [
-          ...pileChildren(deck, pileId),
-          ...cardChildren(deck, card),
+          ...getPileChildren(deck, pileId),
+          ...getCardChildren(deck, card),
         ];
         if (resultingPile[0]?.data.value !== 1) return false;
 
@@ -48,10 +48,10 @@ const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
     ...TABLEAU_PILES.map((pileId) => [
       pileId,
       (deck: Deck, card: Card) => {
-        const stack = cardChildren(deck, card);
+        const stack = getCardChildren(deck, card);
         if (stack.length > maxStackSize(deck, pileId)) return false;
 
-        const resultingPile = [...pileChildren(deck, pileId), ...stack];
+        const resultingPile = [...getPileChildren(deck, pileId), ...stack];
         const activeSequence = resultingPile.slice(-stack.length - 1);
 
         return isValidSequence(
@@ -70,7 +70,7 @@ const DRAG_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
     ...TABLEAU_PILES.map((pileId) => [
       pileId,
       (deck: Deck, card: Card) => {
-        const stack = cardChildren(deck, card);
+        const stack = getCardChildren(deck, card);
         return (
           stack.length <= maxStackSize(deck, PileId.None) &&
           isValidSequence(
@@ -112,7 +112,7 @@ export function getDropPlacements(
   cards: Card[],
   pileId: PileId,
 ): Array<{ pileId: PileId; position: number }> {
-  const startPosition = pileChildren(deck, pileId).length;
+  const startPosition = getPileChildren(deck, pileId).length;
   return cards.map((_, i) => ({
     pileId,
     position: startPosition + i,
@@ -131,11 +131,11 @@ export function canMoveCard(card: Card, deck: Deck): boolean {
  */
 function maxStackSize(deck: Deck, excludePile: PileId): number {
   const emptyCells = CELL_PILES.filter(
-    (id) => pileChildren(deck, id).length === 0,
+    (id) => getPileChildren(deck, id).length === 0,
   ).length;
 
   const emptyTableaus = TABLEAU_PILES.filter(
-    (id) => id !== excludePile && pileChildren(deck, id).length === 0,
+    (id) => id !== excludePile && getPileChildren(deck, id).length === 0,
   ).length;
 
   return (emptyCells + 1) * 2 ** emptyTableaus;

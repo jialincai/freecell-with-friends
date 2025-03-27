@@ -3,21 +3,13 @@ import Phaser from "phaser";
 import { PileId } from "@phasor/constants/table";
 import { Deck } from "@phasor/deck/state/Deck";
 
-import { CardView } from "@phasor/card/CardView";
 import { CardController } from "@phasor/card/controller/CardController";
 
 export class DeckController {
-  readonly model: Deck;
-  private cardControllers: CardController[];
-
-  constructor(deck: Deck, scene: Phaser.Scene) {
-    this.model = deck;
-
-    this.cardControllers = deck.cards.map((model) => {
-      const view = new CardView(scene);
-      return new CardController(model, view);
-    });
-  }
+  constructor(
+    public readonly model: Deck,
+    public readonly cardControllers: CardController[],
+  ) {}
 
   getCards(): CardController[] {
     return this.cardControllers;
@@ -36,4 +28,3 @@ export class DeckController {
       .sort((a, b) => a.model.state.position - b.model.state.position);
   }
 }
-

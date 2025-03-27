@@ -6,7 +6,7 @@ import { CardState } from "@phasor/card/state/CardState";
 export type Card = {
   data: CardData;
   state: CardState;
-}
+};
 
 export function createCard(suit: Suit, value: number): Card {
   return {

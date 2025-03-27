@@ -2,8 +2,8 @@ import { CardMoveCommand } from "@phasor/Command";
 import { CardController } from "@phasor/card/CardController";
 import {
   canMoveCard,
-  getDropPlacements,
-  getDroppablePiles,
+  calculateNewPilePosition,
+  filterValidDropPiles,
 } from "@phasor/game/domain/FreecellRules";
 import { STACK_DRAG_OFFSET } from "@phasor/constants/deck";
 import { FOUNDATION_PILES, PileId } from "@phasor/constants/table";
@@ -22,7 +22,7 @@ export function setupCardInteraction(
     const view = controller.view;
     const model = controller.model;
 
-    const isMovable = () => canMoveCard(model, deckController.model);
+    const isMovable = () => canMoveCard(deckController.model, model);
 
     view.on("dragstart", () => {
       if (!isMovable()) return;
@@ -66,7 +66,7 @@ export function setupCardInteraction(
 
 // Input Handlers
 function dragStart(card: CardController, deck: DeckController): void {
-  deck.getCardChildren(card).forEach((child, i) => {
+  deck.getCardsStartingFrom(card).forEach((child, i) => {
     child.view.setDepth(100 + i);
   });
 }
@@ -77,7 +77,7 @@ function drag(
   dragX: number,
   dragY: number,
 ): void {
-  deck.getCardChildren(card).forEach((child, i) => {
+  deck.getCardsStartingFrom(card).forEach((child, i) => {
     const view = child.view;
     view.x = dragX;
     view.y = dragY + i * STACK_DRAG_OFFSET;
@@ -85,7 +85,7 @@ function drag(
 }
 
 function dragEnd(card: CardController, deck: DeckController): void {
-  deck.getCardChildren(card).forEach((child) => {
+  deck.getCardsStartingFrom(card).forEach((child) => {
     child.setPosition(child.model.state.pile, child.model.state.position);
   });
 }
@@ -100,10 +100,10 @@ function drop(
   const cardModel = card.model;
   const deckModel = deck.model;
 
-  if (!getDroppablePiles(deckModel, cardModel, [pileId]).length) return null;
+  if (!filterValidDropPiles(deckModel, cardModel, [pileId]).length) return null;
 
-  const dragChildren = deck.getCardChildren(card);
-  const updatedPlacements = getDropPlacements(
+  const dragChildren = deck.getCardsStartingFrom(card);
+  const updatedPlacements = calculateNewPilePosition(
     deckModel,
     dragChildren.map((c) => c.model),
     pileId,
@@ -124,20 +124,20 @@ function drop(
 }
 
 function snap(card: CardController, deck: DeckController): Command | null {
-  const dragChildren = deck.getCardChildren(card);
+  const dragChildren = deck.getCardsStartingFrom(card);
   if (dragChildren.length > 1) return null;
 
   const cardModel = card.model;
   const deckModel = deck.model;
 
-  const targetPile = getDroppablePiles(
+  const targetPile = filterValidDropPiles(
     deckModel,
     cardModel,
     FOUNDATION_PILES,
   )[0];
   if (!targetPile) return null;
 
-  const [updatedPlacement] = getDropPlacements(
+  const [updatedPlacement] = calculateNewPilePosition(
     deckModel,
     [cardModel],
     targetPile,

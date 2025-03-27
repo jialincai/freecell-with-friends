@@ -3,14 +3,14 @@ import { Deck } from "@phasor/deck/state/Deck";
 import { PileId, TABLEAU_PILES } from "@phasor/constants/table";
 import { withFaceUp } from "@phasor/card/domain/CardLogic";
 
-export function getPileChildren(deck: Deck, pileId: PileId): Card[] {
+export function getCardsInPile(deck: Deck, pileId: PileId): Card[] {
   return deck.cards
     .filter((card) => card.state.pile === pileId)
     .sort((a, b) => a.state.position - b.state.position);
 }
 
-export function getCardChildren(deck: Deck, target: Card): Card[] {
-  return getPileChildren(deck, target.state.pile).filter(
+export function getCardsStartingFrom(deck: Deck, target: Card): Card[] {
+  return getCardsInPile(deck, target.state.pile).filter(
     (card) => card.state.position >= target.state.position,
   );
 }

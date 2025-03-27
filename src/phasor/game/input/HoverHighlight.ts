@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
-import { getDroppablePiles } from "@phasor/game/domain/FreecellRules";
-import { getPileChildren } from "@phasor/deck/domain/DeckLogic";
+import { filterValidDropPiles } from "@phasor/game/domain/FreecellRules";
+import { getCardsInPile } from "@phasor/deck/domain/DeckLogic";
 
 import { PileId } from "@phasor/constants/table";
 import { PileView } from "@phasor/pile/PileView";
@@ -58,10 +58,10 @@ function onDragEnter(
   const model = card.model;
   const deckModel = deckController.model;
 
-  const valid = getDroppablePiles(deckModel, model, [pileId]);
+  const valid = filterValidDropPiles(deckModel, model, [pileId]);
   if (!valid.includes(pileId)) return;
 
-  const pileCards = getPileChildren(deckModel, pileId);
+  const pileCards = getCardsInPile(deckModel, pileId);
 
   const bottom = pileCards.at(-1);
   if (bottom) {

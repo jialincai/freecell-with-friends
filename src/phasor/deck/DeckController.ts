@@ -9,14 +9,14 @@ export class DeckController {
     public readonly cardControllers: CardController[],
   ) {}
 
-  getCardChildren(card: CardController): CardController[] {
+  getCardsStartingFrom(card: CardController): CardController[] {
     const { pile, position } = card.model.state;
     return this.cardControllers.filter(
       (c) => c.model.state.pile === pile && c.model.state.position >= position,
     );
   }
 
-  getPileChildren(pileId: PileId): CardController[] {
+  getCardsInPile(pileId: PileId): CardController[] {
     return this.cardControllers
       .filter((c) => c.model.state.pile === pileId)
       .sort((a, b) => a.model.state.position - b.model.state.position);

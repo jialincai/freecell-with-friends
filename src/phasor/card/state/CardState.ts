@@ -4,4 +4,4 @@ export type CardState = {
   pile: PileId;
   position: number;
   flipped: boolean;
-}
+};

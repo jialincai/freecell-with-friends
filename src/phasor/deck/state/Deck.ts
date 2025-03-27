@@ -1,7 +1,7 @@
-import { NUM_VALUES } from "phaser/constants/deck";
+import { NUM_VALUES } from "@phasor/constants/deck";
 
-import { Card, createCard } from "phaser/card/state/Card";
-import { Suit } from "phaser/constants/deck";
+import { Card, createCard } from "@phasor/card/state/Card";
+import { Suit } from "@phasor/constants/deck";
 
 export type Deck = {
   cards: Card[];

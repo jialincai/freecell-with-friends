@@ -1,10 +1,10 @@
 import Phaser from "phaser";
 
-import { PileId } from "phaser/constants/table";
-import { Deck } from "phaser/deck/state/Deck";
+import { PileId } from "@phasor/constants/table";
+import { Deck } from "@phasor/deck/state/Deck";
 
-import { CardView } from "phaser/card/CardView";
-import { CardController } from "phaser/card/controller/CardController";
+import { CardView } from "@phasor/card/CardView";
+import { CardController } from "@phasor/card/controller/CardController";
 
 export class DeckController {
   readonly model: Deck;

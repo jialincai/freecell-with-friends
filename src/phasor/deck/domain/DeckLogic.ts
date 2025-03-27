@@ -1,6 +1,6 @@
-import { Card } from "phaser/card/state/Card";
-import { Deck } from "phaser/deck/state/Deck";
-import { PileId } from "phaser/constants/table";
+import { Card } from "@phasor/card/state/Card";
+import { Deck } from "@phasor/deck/state/Deck";
+import { PileId } from "@phasor/constants/table";
 
 export function pileChildren(deck: Deck, pileId: PileId): Card[] {
   return deck.cards

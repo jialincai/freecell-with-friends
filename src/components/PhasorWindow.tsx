@@ -6,7 +6,7 @@ import "@styles/PhasorWindow.module.css";
 const PhasorWindow: React.FC = () => {
   useEffect(() => {
     const loadPhasorWindow = async () => {
-      const { initializeGame } = await import("phaser/main");
+      const { initializeGame } = await import("@phasor/main");
       initializeGame();
     };
 

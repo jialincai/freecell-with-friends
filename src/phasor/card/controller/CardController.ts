@@ -1,9 +1,9 @@
 // card/CardController.ts
 
-import { Card } from "phaser/card/state/Card";
-import { CardView } from "phaser/card/CardView";
-import { PileId } from "phaser/constants/table";
-import * as CardLogic from "phaser/card/domain/CardLogic";
+import { Card } from "@phasor/card/state/Card";
+import { CardView } from "@phasor/card/CardView";
+import { PileId } from "@phasor/constants/table";
+import * as CardLogic from "@phasor/card/domain/CardLogic";
 
 export class CardController {
   constructor(

@@ -1,4 +1,4 @@
-import { Suit } from "phaser/constants/deck";
+import { Suit } from "@phasor/constants/deck";
 
 export type CardData = {
   id: string;

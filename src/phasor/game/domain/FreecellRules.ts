@@ -1,19 +1,19 @@
-import { Card } from "phaser/card/state/Card";
-import { Deck } from "phaser/deck/state/Deck";
+import { Card } from "@phasor/card/state/Card";
+import { Deck } from "@phasor/deck/state/Deck";
 import {
   PileId,
   CELL_PILES,
   FOUNDATION_PILES,
   TABLEAU_PILES,
-} from "phaser/constants/table";
+} from "@phasor/constants/table";
 import {
   hasAlternatingColor,
   hasSameSuit,
   isAscendingOrder,
   isDescendingOrder,
   isValidSequence,
-} from "phaser/card/domain/CardComparison";
-import { cardChildren, pileChildren } from "phaser/deck/domain/DeckLogic";
+} from "@phasor/card/domain/CardComparison";
+import { cardChildren, pileChildren } from "@phasor/deck/domain/DeckLogic";
 
 // DROP RULES — defines legal drop destinations by pile type
 const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =

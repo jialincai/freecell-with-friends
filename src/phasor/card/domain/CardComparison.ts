@@ -1,5 +1,5 @@
-import { CardData } from "phaser/card/CardData";
-import { SUIT_COLOR } from "phaser/constants/deck";
+import { CardData } from "@phasor/card/CardData";
+import { SUIT_COLOR } from "@phasor/constants/deck";
 
 /**
  * Higher-order function to validate a sequence of cards based on multiple checks.

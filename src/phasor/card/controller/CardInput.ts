@@ -1,14 +1,14 @@
-import { CardMoveCommand } from "phaser/Command";
-import { CardController } from "phaser/card/controller/CardController";
+import { CardMoveCommand } from "@phasor/Command";
+import { CardController } from "@phasor/card/controller/CardController";
 import {
   canMoveCard,
   getDropPlacements,
   getDroppablePiles,
-} from "phaser/game/domain/FreecellRules";
-import { STACK_DRAG_OFFSET } from "phaser/constants/deck";
-import { FOUNDATION_PILES, PileId } from "phaser/constants/table";
-import { DeckController } from "phaser/deck/DeckController";
-import Pile from "phaser/Pile";
+} from "@phasor/game/domain/FreecellRules";
+import { STACK_DRAG_OFFSET } from "@phasor/constants/deck";
+import { FOUNDATION_PILES, PileId } from "@phasor/constants/table";
+import { DeckController } from "@phasor/deck/DeckController";
+import Pile from "@phasor/Pile";
 import { Command, CompositeCommand, PubSubStack } from "@utils/Function";
 
 export function registerCardInput(

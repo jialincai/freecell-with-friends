@@ -11,9 +11,6 @@ import { DeckController } from "@phasor/deck/DeckController";
 import Pile from "@phasor/Pile";
 import { Command, CompositeCommand, PubSubStack } from "@utils/Function";
 
-/**
- * Registers event handling for card interactions.
- */
 export function setupCardInteraction(
   deckController: DeckController,
   commandStack: PubSubStack<Command>,
@@ -24,20 +21,25 @@ export function setupCardInteraction(
 
     cardController.view.on("dragstart", () => {
       if (!isMovable()) return;
-      dragStart(deckController, cardController);
+      updateDragCardRenderOrder(deckController, cardController);
     });
 
     cardController.view.on(
       "drag",
       (_pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
         if (!isMovable()) return;
-        drag(deckController, cardController, dragX, dragY);
+        updateDragCardWorldPosition(
+          deckController,
+          cardController,
+          dragX,
+          dragY,
+        );
       },
     );
 
     cardController.view.on("dragend", () => {
       if (!isMovable()) return;
-      dragEnd(deckController, cardController);
+      resetDragCardWorldPosition(deckController, cardController);
     });
 
     cardController.view.on(
@@ -48,25 +50,27 @@ export function setupCardInteraction(
       ) => {
         if (!isMovable()) return;
         if (!(target instanceof Pile)) return;
-        drop(deckController, cardController, target, commandStack);
+        dropCardInNewPile(deckController, cardController, target, commandStack);
       },
     );
 
     cardController.view.on("pointerdown", () => {
       if (!isMovable()) return;
-      snap(deckController, cardController, commandStack);
+      snapCardToFoundationPile(deckController, cardController, commandStack);
     });
   });
 }
 
-// Input Handlers
-function dragStart(deck: DeckController, card: CardController): void {
+function updateDragCardRenderOrder(
+  deck: DeckController,
+  card: CardController,
+): void {
   deck.getCardsStartingFrom(card).forEach((child, i) => {
     child.view.setDepth(100 + i);
   });
 }
 
-function drag(
+function updateDragCardWorldPosition(
   deck: DeckController,
   card: CardController,
   dragX: number,
@@ -79,13 +83,16 @@ function drag(
   });
 }
 
-function dragEnd(deck: DeckController, card: CardController): void {
+function resetDragCardWorldPosition(
+  deck: DeckController,
+  card: CardController,
+): void {
   deck.getCardsStartingFrom(card).forEach((child) => {
     child.setPilePosition(child.model.state.pile, child.model.state.position);
   });
 }
 
-function drop(
+function dropCardInNewPile(
   deck: DeckController,
   card: CardController,
   target: Pile,
@@ -120,7 +127,7 @@ function drop(
   );
 }
 
-function snap(
+function snapCardToFoundationPile(
   deck: DeckController,
   card: CardController,
   commandStack: PubSubStack<Command>,

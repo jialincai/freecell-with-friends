@@ -8,9 +8,6 @@ import { DeckController } from "@phasor/deck/DeckController";
 import { PileController } from "@phasor/pile/PileController";
 import { PileView } from "@phasor/pile/PileView";
 
-/**
- * Registers event handling for hover highlighting.
- */
 export function setupHoverHighlight(
   deckController: DeckController,
   PileControllers: PileController[],
@@ -23,7 +20,7 @@ export function setupHoverHighlight(
         target: Phaser.GameObjects.GameObject,
       ) => {
         if (target instanceof PileView) {
-          onDragEnter(deckController, cardController, target);
+          setHighlight(deckController, cardController, target);
         }
       },
     );
@@ -36,18 +33,18 @@ export function setupHoverHighlight(
         target: Phaser.GameObjects.GameObject,
       ) => {
         if (target instanceof PileView) {
-          resetHighlights(deckController, PileControllers);
+          removeHighlight(deckController, PileControllers);
         }
       },
     );
 
     cardController.view.on("pointerup", () => {
-      resetHighlights(deckController, PileControllers);
+      removeHighlight(deckController, PileControllers);
     });
   });
 }
 
-function onDragEnter(
+function setHighlight(
   deckController: DeckController,
   card: CardController,
   pileView: PileView,
@@ -72,7 +69,7 @@ function onDragEnter(
   }
 }
 
-function resetHighlights(
+function removeHighlight(
   deckController: DeckController,
   PileControllers: PileController[],
 ): void {

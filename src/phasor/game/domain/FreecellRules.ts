@@ -8,7 +8,7 @@ import {
 } from "@phasor/constants/table";
 import {
   isDifferentColor,
-  hasSameSuit,
+  isSameSuit,
   isAscending,
   isDescending,
   isValidStack,
@@ -40,7 +40,7 @@ const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
 
         return isValidStack(
           resultingPile.map((c) => c.data),
-          [hasSameSuit, isAscending],
+          [isSameSuit, isAscending],
         );
       },
     ]),

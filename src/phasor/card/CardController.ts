@@ -1,38 +1,36 @@
-// card/CardController.ts
-
-import { Card } from "@phasor/card/state/Card";
-import { CardView } from "@phasor/card/CardView";
 import { PileId } from "@phasor/constants/table";
+import { CardView } from "@phasor/card/CardView";
 import * as CardLogic from "@phasor/card/domain/CardLogic";
+import { Card } from "@phasor/card/state/Card";
 
 export class CardController {
   constructor(
     public readonly model: Card,
     public readonly view: CardView,
   ) {
-    this.updateView();
+    this.syncViewToModel();
   }
 
-  updateView(): void {
-    this.view.updateFromModel(this.model);
+  syncViewToModel(): void {
+    this.view.applyState(this.model);
   }
 
-  withFaceUp(): void {
+  setFaceUp(): void {
     this.model.state = CardLogic.withFaceUp(this.model.state);
-    this.updateView();
+    this.syncViewToModel();
   }
 
-  withFaceDown(): void {
+  setFaceDown(): void {
     this.model.state = CardLogic.withFaceDown(this.model.state);
-    this.updateView();
+    this.syncViewToModel();
   }
 
-  withReposition(pile: PileId, position: number): void {
-    this.model.state = CardLogic.withReposition(
+  setPilePosition(pile: PileId, position: number): void {
+    this.model.state = CardLogic.withPilePosition(
       this.model.state,
       pile,
       position,
     );
-    this.updateView();
+    this.syncViewToModel();
   }
 }

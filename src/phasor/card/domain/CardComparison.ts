@@ -1,5 +1,5 @@
-import { CardData } from "@phasor/card/CardData";
 import { SUIT_COLOR } from "@phasor/constants/deck";
+import { CardData } from "@phasor/card/CardData";
 
 export const isValidStack = (
   cards: CardData[],

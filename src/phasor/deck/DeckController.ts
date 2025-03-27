@@ -24,11 +24,11 @@ export class DeckController {
 
   deal(): void {
     this.model = deal(this.model);
-    this.cardControllers.forEach((c) => c.updateView());
+    this.cardControllers.forEach((c) => c.syncViewToModel());
   }
 
   shuffle(seed: number): void {
     this.model = shuffle(this.model, seed);
-    this.cardControllers.forEach((c) => c.updateView());
+    this.cardControllers.forEach((c) => c.syncViewToModel());
   }
 }

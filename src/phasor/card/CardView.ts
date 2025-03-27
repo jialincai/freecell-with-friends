@@ -1,4 +1,5 @@
 import * as Phaser from "phaser";
+
 import {
   CARD_BACK_INDEX,
   CARD_DIMENSIONS,
@@ -8,7 +9,6 @@ import {
   Suit,
 } from "@phasor/constants/deck";
 import { PILE_POSITIONS, TABLEAU_PILES } from "@phasor/constants/table";
-
 import { Card } from "@phasor/card/state/Card";
 import { CardState } from "@phasor/card/state/CardState";
 
@@ -18,10 +18,10 @@ export class CardView extends Phaser.GameObjects.Image {
     this.setDisplaySize(CARD_DIMENSIONS.width, CARD_DIMENSIONS.height);
     this.setInteractive();
     scene.add.existing(this);
-    this.updateFromModel(model);
+    this.applyState(model);
   }
 
-  updateFromModel(model: Card) {
+  applyState(model: Card) {
     const { suit, value } = model.data;
     const { position, flipped } = model.state;
 

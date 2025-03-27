@@ -9,7 +9,7 @@ export function withFaceDown(state: CardState): CardState {
   return { ...state, flipped: false };
 }
 
-export function withReposition(
+export function withPilePosition(
   state: CardState,
   pile: PileId,
   position: number,

@@ -1,6 +1,7 @@
 import { Card } from "@phasor/card/state/Card";
 import { Deck } from "@phasor/deck/state/Deck";
-import { PileId } from "@phasor/constants/table";
+import { PileId, TABLEAU_PILES } from "@phasor/constants/table";
+import { flipFaceUp } from "@phasor/card/domain/CardLogic";
 
 export function pileChildren(deck: Deck, pileId: PileId): Card[] {
   return deck.cards
@@ -12,6 +13,24 @@ export function cardChildren(deck: Deck, target: Card): Card[] {
   return pileChildren(deck, target.state.pile).filter(
     (card) => card.state.position >= target.state.position,
   );
+}
+
+export function deal(deck: Deck): Deck {
+  const cards = deck.cards.map((card, index) => {
+    const pile = TABLEAU_PILES[index % 8];
+    const position = Math.floor(index / 8);
+
+    return {
+      ...card,
+      state: {
+        ...flipFaceUp(card.state),
+        pile,
+        position,
+      },
+    };
+  });
+
+  return { ...deck, cards };
 }
 
 export function shuffle(deck: Deck, seed: number): Deck {

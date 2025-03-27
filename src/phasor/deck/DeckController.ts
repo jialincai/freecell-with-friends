@@ -1,30 +1,34 @@
-import Phaser from "phaser";
-
+import { CardController } from "@phasor/card/CardController";
 import { PileId } from "@phasor/constants/table";
 import { Deck } from "@phasor/deck/state/Deck";
-
-import { CardController } from "@phasor/card/controller/CardController";
+import { deal, shuffle } from "@phasor/deck/domain/DeckLogic";
 
 export class DeckController {
   constructor(
-    public readonly model: Deck,
+    public model: Deck,
     public readonly cardControllers: CardController[],
   ) {}
 
-  getCards(): CardController[] {
-    return this.cardControllers;
-  }
-
-  getCardChildren(card: CardController): CardController[] {
+  cardChildren(card: CardController): CardController[] {
     const { pile, position } = card.model.state;
     return this.cardControllers.filter(
       (c) => c.model.state.pile === pile && c.model.state.position >= position,
     );
   }
 
-  getPileChildren(pileId: PileId): CardController[] {
+  pileChildren(pileId: PileId): CardController[] {
     return this.cardControllers
       .filter((c) => c.model.state.pile === pileId)
       .sort((a, b) => a.model.state.position - b.model.state.position);
+  }
+
+  deal(): void {
+    this.model = deal(this.model);
+    this.cardControllers.forEach((c) => c.updateView());
+  }
+
+  shuffle(seed: number): void {
+    this.model = shuffle(this.model, seed);
+    this.cardControllers.forEach((c) => c.updateView());
   }
 }

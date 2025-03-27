@@ -1,5 +1,5 @@
 import { CardMoveCommand } from "@phasor/Command";
-import { CardController } from "@phasor/card/controller/CardController";
+import { CardController } from "@phasor/card/CardController";
 import {
   canMoveCard,
   getDropPlacements,
@@ -11,11 +11,14 @@ import { DeckController } from "@phasor/deck/DeckController";
 import Pile from "@phasor/Pile";
 import { Command, CompositeCommand, PubSubStack } from "@utils/Function";
 
-export function registerCardInput(
+/**
+ * Registers event handling for card interactions.
+ */
+export function setupCardInteraction(
   deckController: DeckController,
   commandStack: PubSubStack<Command>,
 ): void {
-  deckController.getCards().forEach((controller) => {
+  deckController.cardControllers.forEach((controller) => {
     const view = controller.view;
     const model = controller.model;
 

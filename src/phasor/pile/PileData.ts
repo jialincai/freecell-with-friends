@@ -1,5 +1,5 @@
 import { PileId } from "@phasor/constants/table";
 
-export interface PileData {
+export type PileData = {
   id: PileId;
-}
+};

@@ -86,7 +86,7 @@ function drag(
 
 function dragEnd(card: CardController, deck: DeckController): void {
   deck.getCardChildren(card).forEach((child) => {
-    child.reposition(child.model.state.pile, child.model.state.position);
+    child.withReposition(child.model.state.pile, child.model.state.position);
   });
 }
 

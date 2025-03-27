@@ -1,15 +1,15 @@
 import { PileId } from "@phasor/constants/table";
 import { CardState } from "@phasor/card/state/CardState";
 
-export function flipFaceUp(state: CardState): CardState {
+export function withFaceUp(state: CardState): CardState {
   return { ...state, flipped: true };
 }
 
-export function flipFaceDown(state: CardState): CardState {
+export function withFaceDown(state: CardState): CardState {
   return { ...state, flipped: false };
 }
 
-export function reposition(
+export function withReposition(
   state: CardState,
   pile: PileId,
   position: number,

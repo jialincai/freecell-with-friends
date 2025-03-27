@@ -7,11 +7,11 @@ import {
   TABLEAU_PILES,
 } from "@phasor/constants/table";
 import {
-  hasAlternatingColor,
+  isDifferentColor,
   hasSameSuit,
-  isAscendingOrder,
-  isDescendingOrder,
-  isValidSequence,
+  isAscending,
+  isDescending,
+  isValidStack,
 } from "@phasor/card/domain/CardComparison";
 import { cardChildren, pileChildren } from "@phasor/deck/domain/DeckLogic";
 
@@ -38,9 +38,9 @@ const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
         ];
         if (resultingPile[0]?.data.value !== 1) return false;
 
-        return isValidSequence(
+        return isValidStack(
           resultingPile.map((c) => c.data),
-          [hasSameSuit, isAscendingOrder],
+          [hasSameSuit, isAscending],
         );
       },
     ]),
@@ -54,9 +54,9 @@ const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
         const resultingPile = [...getPileChildren(deck, pileId), ...stack];
         const activeSequence = resultingPile.slice(-stack.length - 1);
 
-        return isValidSequence(
+        return isValidStack(
           activeSequence.map((c) => c.data),
-          [hasAlternatingColor, isDescendingOrder],
+          [isDifferentColor, isDescending],
         );
       },
     ]),
@@ -73,9 +73,9 @@ const DRAG_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
         const stack = getCardChildren(deck, card);
         return (
           stack.length <= maxStackSize(deck, PileId.None) &&
-          isValidSequence(
+          isValidStack(
             stack.map((c) => c.data),
-            [hasAlternatingColor, isDescendingOrder],
+            [isDifferentColor, isDescending],
           )
         );
       },

@@ -17,18 +17,22 @@ export class CardController {
     this.view.updateFromModel(this.model);
   }
 
-  flip(): void {
-    this.model.state = CardLogic.flipFaceUp(this.model.state);
+  withFaceUp(): void {
+    this.model.state = CardLogic.withFaceUp(this.model.state);
     this.updateView();
   }
 
-  flipBack(): void {
-    this.model.state = CardLogic.flipFaceDown(this.model.state);
+  withFaceDown(): void {
+    this.model.state = CardLogic.withFaceDown(this.model.state);
     this.updateView();
   }
 
-  reposition(pile: PileId, position: number): void {
-    this.model.state = CardLogic.reposition(this.model.state, pile, position);
+  withReposition(pile: PileId, position: number): void {
+    this.model.state = CardLogic.withReposition(
+      this.model.state,
+      pile,
+      position,
+    );
     this.updateView();
   }
 }

@@ -1,7 +1,7 @@
 import { Card } from "@phasor/card/state/Card";
 import { Deck } from "@phasor/deck/state/Deck";
 import { PileId, TABLEAU_PILES } from "@phasor/constants/table";
-import { flipFaceUp } from "@phasor/card/domain/CardLogic";
+import { withFaceUp } from "@phasor/card/domain/CardLogic";
 
 export function getPileChildren(deck: Deck, pileId: PileId): Card[] {
   return deck.cards
@@ -23,7 +23,7 @@ export function deal(deck: Deck): Deck {
     return {
       ...card,
       state: {
-        ...flipFaceUp(card.state),
+        ...withFaceUp(card.state),
         pile,
         position,
       },

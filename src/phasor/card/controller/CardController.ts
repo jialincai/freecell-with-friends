@@ -8,7 +8,7 @@ import * as CardLogic from "@phasor/card/domain/CardLogic";
 export class CardController {
   constructor(
     public readonly model: Card,
-    private readonly view: CardView, // 🔐 make it private
+    public readonly view: CardView,
   ) {
     this.updateView();
   }
@@ -31,9 +31,4 @@ export class CardController {
     this.model.state = CardLogic.reposition(this.model.state, pile, position);
     this.updateView();
   }
-
-  getView(): CardView {
-    return this.view;
-  }
 }
-

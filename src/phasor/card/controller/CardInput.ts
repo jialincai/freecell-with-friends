@@ -16,7 +16,7 @@ export function registerCardInput(
   commandStack: PubSubStack<Command>,
 ): void {
   deckController.getCards().forEach((controller) => {
-    const view = controller.getView();
+    const view = controller.view;
     const model = controller.model;
 
     const isMovable = () => canMoveCard(model, deckController.model);
@@ -26,23 +26,32 @@ export function registerCardInput(
       dragStart(controller, deckController);
     });
 
-    view.on("drag", (_pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
-      if (!isMovable()) return;
-      drag(controller, deckController, dragX, dragY);
-    });
+    view.on(
+      "drag",
+      (_pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
+        if (!isMovable()) return;
+        drag(controller, deckController, dragX, dragY);
+      },
+    );
 
     view.on("dragend", () => {
       if (!isMovable()) return;
       dragEnd(controller, deckController);
     });
 
-    view.on("drop", (_pointer: Phaser.Input.Pointer, target: Phaser.GameObjects.GameObject) => {
-      if (!isMovable()) return;
-      if (!(target instanceof Pile)) return;
+    view.on(
+      "drop",
+      (
+        _pointer: Phaser.Input.Pointer,
+        target: Phaser.GameObjects.GameObject,
+      ) => {
+        if (!isMovable()) return;
+        if (!(target instanceof Pile)) return;
 
-      const command = drop(controller, deckController, target);
-      if (command) commandStack.push(command);
-    });
+        const command = drop(controller, deckController, target);
+        if (command) commandStack.push(command);
+      },
+    );
 
     view.on("pointerdown", () => {
       if (!isMovable()) return;
@@ -55,7 +64,7 @@ export function registerCardInput(
 // Input Handlers
 function dragStart(card: CardController, deck: DeckController): void {
   deck.getCardChildren(card).forEach((child, i) => {
-    child.getView().setDepth(100 + i);
+    child.view.setDepth(100 + i);
   });
 }
 
@@ -66,7 +75,7 @@ function drag(
   dragY: number,
 ): void {
   deck.getCardChildren(card).forEach((child, i) => {
-    const view = child.getView();
+    const view = child.view;
     view.x = dragX;
     view.y = dragY + i * STACK_DRAG_OFFSET;
   });
@@ -118,10 +127,18 @@ function snap(card: CardController, deck: DeckController): Command | null {
   const cardModel = card.model;
   const deckModel = deck.model;
 
-  const targetPile = getDroppablePiles(deckModel, cardModel, FOUNDATION_PILES)[0];
+  const targetPile = getDroppablePiles(
+    deckModel,
+    cardModel,
+    FOUNDATION_PILES,
+  )[0];
   if (!targetPile) return null;
 
-  const [updatedPlacement] = getDropPlacements(deckModel, [cardModel], targetPile);
+  const [updatedPlacement] = getDropPlacements(
+    deckModel,
+    [cardModel],
+    targetPile,
+  );
 
   return new CardMoveCommand(
     cardModel,

@@ -1,4 +1,4 @@
-import Phaser from "phaser";
+import * as Phaser from "phaser";
 import { CARD_DIMENSIONS, STACK_OFFSET } from "@phasor/constants/deck";
 import { PILE_POSITIONS, TABLEAU_PILES } from "@phasor/constants/table";
 import { Pile } from "@phasor/pile/state/Pile";

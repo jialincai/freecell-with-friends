@@ -1,19 +1,19 @@
-import { CardMoveCommand } from "@phasor/Command";
+import { Command, PubSubStack } from "@utils/Function";
+import { STACK_DRAG_OFFSET } from "@phasor/constants/deck";
+import { FOUNDATION_PILES, PileId } from "@phasor/constants/table";
+import { createCardMoveCommand } from "@phasor/command/state/Command";
 import { CardController } from "@phasor/card/CardController";
+import { DeckController } from "@phasor/deck/DeckController";
+import { PileView } from "@phasor/pile/PileView";
 import {
   canMoveCard,
   calculateNewPilePosition,
   filterValidDropPiles,
 } from "@phasor/game/domain/FreecellRules";
-import { STACK_DRAG_OFFSET } from "@phasor/constants/deck";
-import { FOUNDATION_PILES, PileId } from "@phasor/constants/table";
-import { DeckController } from "@phasor/deck/DeckController";
-import Pile from "@phasor/Pile";
-import { Command, CompositeCommand, PubSubStack } from "@utils/Function";
 
 export function setupCardInteraction(
   deckController: DeckController,
-  commandStack: PubSubStack<Command>,
+  moveHistory: PubSubStack<Command>,
 ): void {
   deckController.cardControllers.forEach((cardController) => {
     const isMovable = () =>
@@ -49,14 +49,14 @@ export function setupCardInteraction(
         target: Phaser.GameObjects.GameObject,
       ) => {
         if (!isMovable()) return;
-        if (!(target instanceof Pile)) return;
-        dropCardInNewPile(deckController, cardController, target, commandStack);
+        if (!(target instanceof PileView)) return;
+        dropCardInNewPile(deckController, cardController, target, moveHistory);
       },
     );
 
     cardController.view.on("pointerdown", () => {
       if (!isMovable()) return;
-      snapCardToFoundationPile(deckController, cardController, commandStack);
+      snapCardToFoundationPile(deckController, cardController, moveHistory);
     });
   });
 }
@@ -95,69 +95,65 @@ function resetDragCardWorldPosition(
 function dropCardInNewPile(
   deck: DeckController,
   card: CardController,
-  target: Pile,
-  commandStack: PubSubStack<Command>,
+  target: PileView,
+  _moveHistory: PubSubStack<Command>,
 ): void {
   const pileId = target.name as PileId;
-  const cardModel = card.model;
-  const deckModel = deck.model;
-
-  if (!filterValidDropPiles(deckModel, cardModel, [pileId]).length) return;
+  if (!filterValidDropPiles(deck.model, card.model, [pileId]).length) return;
 
   const dragChildren = deck.getCardsStartingFrom(card);
-  const updatedPlacements = calculateNewPilePosition(
-    deckModel,
+  const newPilePositions = calculateNewPilePosition(
+    deck.model,
     dragChildren.map((c) => c.model),
     pileId,
   );
 
-  commandStack.push(
-    new CompositeCommand(
-      ...dragChildren.map(
-        (c, i) =>
-          new CardMoveCommand(
-            c.model,
-            c.model.state.pile,
-            c.model.state.position,
-            updatedPlacements[i].pileId,
-            updatedPlacements[i].position,
-          ),
-      ),
-    ),
-  );
+  // TODO sync up do and undo...
+  const cardMoves = dragChildren.map((card, i) => {
+    return createCardMoveCommand(
+      card,
+      newPilePositions[i].pile,
+      newPilePositions[i].position,
+    );
+  });
+  // moveHistory.push(cardMove);
+
+  cardMoves.forEach((cardMove) => {
+    cardMove.data.card.setPilePosition(
+      cardMove.data.toPile,
+      cardMove.data.toPosition,
+    );
+  });
 }
 
 function snapCardToFoundationPile(
   deck: DeckController,
   card: CardController,
-  commandStack: PubSubStack<Command>,
+  _moveHistory: PubSubStack<Command>,
 ): void {
   const dragChildren = deck.getCardsStartingFrom(card);
   if (dragChildren.length > 1) return;
 
-  const cardModel = card.model;
-  const deckModel = deck.model;
-
-  const targetPile = filterValidDropPiles(
-    deckModel,
-    cardModel,
+  const targetFoundationPile = filterValidDropPiles(
+    deck.model,
+    card.model,
     FOUNDATION_PILES,
   )[0];
-  if (!targetPile) return;
+  if (!targetFoundationPile) return;
 
-  const [updatedPlacement] = calculateNewPilePosition(
-    deckModel,
-    [cardModel],
-    targetPile,
+  const [newPilePosition] = calculateNewPilePosition(
+    deck.model,
+    [card.model],
+    targetFoundationPile,
   );
 
-  commandStack.push(
-    new CardMoveCommand(
-      cardModel,
-      cardModel.state.pile,
-      cardModel.state.position,
-      updatedPlacement.pileId,
-      updatedPlacement.position,
-    ),
+  // TODO sync up do and undo...
+  const cardMove = createCardMoveCommand(
+    card,
+    newPilePosition.pile,
+    newPilePosition.position,
   );
+  // moveHistory.push(cardMove);
+
+  card.setPilePosition(cardMove.data.toPile, cardMove.data.toPosition);
 }

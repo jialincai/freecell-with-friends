@@ -38,10 +38,10 @@ export function calculateNewPilePosition(
   deck: Deck,
   cards: Card[],
   pileId: PileId,
-): Array<{ pileId: PileId; position: number }> {
+): Array<{ pile: PileId; position: number }> {
   const startPosition = getCardsInPile(deck, pileId).length;
   return cards.map((_, i) => ({
-    pileId,
+    pile: pileId,
     position: startPosition + i,
   }));
 }

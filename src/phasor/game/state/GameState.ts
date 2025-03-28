@@ -12,6 +12,7 @@ import { CardView } from "@phasor/card/CardView";
 import { PileController } from "@phasor/pile/PileController";
 import { createPile } from "@phasor/pile/state/Pile";
 import { PileView } from "@phasor/pile/PileView";
+import { deal, shuffle } from "@phasor/deck/domain/DeckLogic";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -36,9 +37,9 @@ export default class GameState extends Phaser.Scene {
     this.add.image(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, "img_background");
 
     // Create deck
-    const deckModel = createDeck();
-    const cardControllers = createDeck().cards.map((c) => {
-      return new CardController(c, new CardView(this, c));
+    const deckModel = deal(shuffle(createDeck(), 476));
+    const cardControllers = deckModel.cards.map((card) => {
+      return new CardController(card, new CardView(this, card));
     });
     this.deck = new DeckController(deckModel, cardControllers);
 

@@ -96,7 +96,7 @@ function dropCardInNewPile(
   deck: DeckController,
   card: CardController,
   target: PileView,
-  _moveHistory: PubSubStack<CardMoveCommand[]>,
+  moveHistory: PubSubStack<CardMoveCommand[]>,
 ): void {
   const pileId = target.name as PileId;
   if (!filterValidDropPiles(deck.model, card.model, [pileId]).length) return;
@@ -108,7 +108,6 @@ function dropCardInNewPile(
     pileId,
   );
 
-  // TODO sync up do and undo...
   const cardMoves = dragChildren.map((card, i) => {
     return createCardMoveCommand(
       card,
@@ -116,7 +115,7 @@ function dropCardInNewPile(
       newPilePositions[i].position,
     );
   });
-  // moveHistory.push(cardMove);
+  moveHistory.push(cardMoves);
 
   cardMoves.forEach((cardMove) => {
     cardMove.data.card.setPilePosition(
@@ -129,7 +128,7 @@ function dropCardInNewPile(
 function snapCardToFoundationPile(
   deck: DeckController,
   card: CardController,
-  _moveHistory: PubSubStack<CardMoveCommand[]>,
+  moveHistory: PubSubStack<CardMoveCommand[]>,
 ): void {
   const dragChildren = deck.getCardsStartingFrom(card);
   if (dragChildren.length > 1) return;
@@ -147,13 +146,12 @@ function snapCardToFoundationPile(
     targetFoundationPile,
   );
 
-  // TODO sync up do and undo...
   const cardMove = createCardMoveCommand(
     card,
     newPilePosition.pile,
     newPilePosition.position,
   );
-  // moveHistory.push(cardMove);
+  moveHistory.push([cardMove]);
 
   card.setPilePosition(cardMove.data.toPile, cardMove.data.toPosition);
 }

@@ -19,8 +19,8 @@ export class DeckController {
 
   getCardsStartingFrom(card: CardController): CardController[] {
     const { pile, position } = card.model.state;
-    return this.cardControllers.filter(
-      (c) => c.model.state.pile === pile && c.model.state.position >= position,
+    return this.getCardsInPile(pile).filter(
+      (c) => c.model.state.position >= position
     );
   }
 

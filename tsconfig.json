@@ -29,8 +29,8 @@
       "@components/*": [
         "components/*"
       ],
-      "@phasor/*": [
-        "phasor/*"
+      "@phaser/*": [
+        "phaser/*"
       ],
       "@pixi/*": [
         "pixi/*"

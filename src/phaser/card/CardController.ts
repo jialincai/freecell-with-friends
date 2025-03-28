@@ -4,15 +4,21 @@ import * as CardLogic from "@phaser/card/domain/CardLogic";
 import { Card } from "@phaser/card/state/Card";
 
 export class CardController {
+  public model: Card;
+  public readonly view: CardView;
+
   constructor(
-    public readonly model: Card,
-    public readonly view: CardView,
+    scene: Phaser.Scene,
+    card: Card,
   ) {
+    this.model = card;
+    this.view = new CardView(scene, card);
     this.syncViewToModel();
   }
 
-  syncViewToModel(): void {
-    this.view.applyState(this.model);
+  setModel(card: Card): void {
+    this.model = card;
+    this.syncViewToModel();
   }
 
   setFaceUp(): void {
@@ -32,5 +38,9 @@ export class CardController {
       position,
     );
     this.syncViewToModel();
+  }
+
+  syncViewToModel(): void {
+    this.view.applyState(this.model);
   }
 }

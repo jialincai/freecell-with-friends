@@ -4,10 +4,18 @@ import { Deck } from "@phaser/deck/state/Deck";
 import { deal, shuffle } from "@phaser/deck/domain/DeckLogic";
 
 export class DeckController {
+  public model: Deck;
+  public readonly cardControllers: CardController[];
+
   constructor(
-    public model: Deck,
-    public readonly cardControllers: CardController[],
-  ) {}
+    scene: Phaser.Scene,
+    deck: Deck,
+  ) {
+    this.model = deck;
+    this.cardControllers = this.model.cards.map((card) => {
+      return new CardController(scene, card);
+    });
+  }
 
   getCardsStartingFrom(card: CardController): CardController[] {
     const { pile, position } = card.model.state;
@@ -24,11 +32,11 @@ export class DeckController {
 
   deal(): void {
     this.model = deal(this.model);
-    this.cardControllers.forEach((c) => c.syncViewToModel());
+    this.cardControllers.forEach((c, i) => c.setModel(this.model.cards[i]));
   }
 
   shuffle(seed: number): void {
     this.model = shuffle(this.model, seed);
-    this.cardControllers.forEach((c) => c.syncViewToModel());
+    this.cardControllers.forEach((c, i) => c.setModel(this.model.cards[i]));
   }
 }

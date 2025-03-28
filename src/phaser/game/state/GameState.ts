@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 
-import { PubSubStack, CompositeCommand } from "@utils/Function";
+import { PubSubStack } from "@utils/Function";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@phaser/constants/screen";
 import { FOUNDATION_PILES, PileId } from "@phaser/constants/table";
 import { setupCardInteraction } from "@phaser/game/input/CardInteraction";
@@ -39,17 +39,15 @@ export default class GameState extends Phaser.Scene {
     this.add.image(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, "img_background");
 
     // Create deck
-    const deckModel = deal(shuffle(createDeck(), 476));
-    const cardControllers = deckModel.cards.map((card) => {
-      return new CardController(card, new CardView(this, card));
-    });
-    this.deck = new DeckController(deckModel, cardControllers);
+    const deckModel = createDeck();
+    this.deck = new DeckController(this, deckModel);
+    this.deck.shuffle(476);
+    this.deck.deal();
 
     // Create piles
     this.piles = Object.values(PileId).map((pileId) => {
       const pileModel = createPile(pileId);
-      const pileView = new PileView(this, pileModel);
-      const pile = new PileController(pileModel, pileView);
+      const pile = new PileController(this, pileModel);
 
       if (pile.model.data.id === PileId.None) pile.view.setAlpha(0);
 

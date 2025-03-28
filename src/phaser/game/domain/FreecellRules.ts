@@ -3,20 +3,20 @@ import {
   FOUNDATION_PILES,
   PileId,
   TABLEAU_PILES,
-} from "phaser/constants/table";
-import { Card } from "phaser/card/state/Card";
+} from "@phaser/constants/table";
+import { Card } from "@phaser/card/state/Card";
 import {
   isAscending,
   isDescending,
   isDifferentColor,
   isFollowingRules,
   isSameSuit,
-} from "phaser/card/domain/CardComparison";
+} from "@phaser/card/domain/CardComparison";
 import {
   getCardsInPile,
   getCardsStartingFrom,
-} from "phaser/deck/domain/DeckLogic";
-import { Deck } from "phaser/deck/state/Deck";
+} from "@phaser/deck/domain/DeckLogic";
+import { Deck } from "@phaser/deck/state/Deck";
 
 export function mapValidDropPiles(
   deck: Deck,

@@ -13,22 +13,22 @@ export class CardController {
   ) {
     this.model = card;
     this.view = new CardView(scene, card);
-    this.syncViewToModel();
+    this.view.applyState(this.model);
   }
 
   setModel(card: Card): void {
     this.model = card;
-    this.syncViewToModel();
+    this.view.applyState(this.model);
   }
 
   setFaceUp(): void {
     this.model.state = CardLogic.withFaceUp(this.model.state);
-    this.syncViewToModel();
+    this.view.applyState(this.model);
   }
 
   setFaceDown(): void {
     this.model.state = CardLogic.withFaceDown(this.model.state);
-    this.syncViewToModel();
+    this.view.applyState(this.model);
   }
 
   setPilePosition(pile: PileId, position: number): void {
@@ -37,10 +37,6 @@ export class CardController {
       pile,
       position,
     );
-    this.syncViewToModel();
-  }
-
-  syncViewToModel(): void {
     this.view.applyState(this.model);
   }
 }

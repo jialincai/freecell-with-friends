@@ -16,8 +16,9 @@ export class CardView extends Phaser.GameObjects.Image {
   constructor(scene: Phaser.Scene, model: Card) {
     super(scene, 0, 0, "img_cards", CARD_BACK_INDEX);
     this.setDisplaySize(CARD_DIMENSIONS.width, CARD_DIMENSIONS.height);
-    scene.add.existing(this);
+    this.setInteractive({draggable: true});
     this.applyState(model);
+    scene.add.existing(this);
   }
 
   applyState(model: Card) {
@@ -25,7 +26,7 @@ export class CardView extends Phaser.GameObjects.Image {
     const { position, flipped } = model.state;
 
     const frame = flipped ? this.getSpriteIndex(suit, value) : CARD_BACK_INDEX;
-    this.setInteractive({ draggable: flipped });
+    flipped ? this.setInteractive() : this.disableInteractive();
 
     this.setTexture("img_cards", frame);
     this.setDepth(position + 10);

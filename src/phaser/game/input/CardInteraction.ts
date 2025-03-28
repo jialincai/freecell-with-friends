@@ -1,7 +1,7 @@
 import { Command, PubSubStack } from "@utils/Function";
 import { STACK_DRAG_OFFSET } from "phaser/constants/deck";
 import { FOUNDATION_PILES, PileId } from "phaser/constants/table";
-import { createCardMoveCommand } from "phaser/command/state/Command";
+import { CardMoveCommand, createCardMoveCommand } from "phaser/command/state/Command";
 import { CardController } from "phaser/card/CardController";
 import { DeckController } from "phaser/deck/DeckController";
 import { PileView } from "phaser/pile/PileView";
@@ -13,7 +13,7 @@ import {
 
 export function setupCardInteraction(
   deckController: DeckController,
-  moveHistory: PubSubStack<Command>,
+  moveHistory: PubSubStack<CardMoveCommand[]>,
 ): void {
   deckController.cardControllers.forEach((cardController) => {
     const isMovable = () =>
@@ -96,7 +96,7 @@ function dropCardInNewPile(
   deck: DeckController,
   card: CardController,
   target: PileView,
-  _moveHistory: PubSubStack<Command>,
+  _moveHistory: PubSubStack<CardMoveCommand[]>,
 ): void {
   const pileId = target.name as PileId;
   if (!filterValidDropPiles(deck.model, card.model, [pileId]).length) return;
@@ -129,7 +129,7 @@ function dropCardInNewPile(
 function snapCardToFoundationPile(
   deck: DeckController,
   card: CardController,
-  _moveHistory: PubSubStack<Command>,
+  _moveHistory: PubSubStack<CardMoveCommand[]>,
 ): void {
   const dragChildren = deck.getCardsStartingFrom(card);
   if (dragChildren.length > 1) return;

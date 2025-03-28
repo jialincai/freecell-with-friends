@@ -9,10 +9,12 @@ import { DeckController } from "phaser/deck/DeckController";
 import { createDeck } from "phaser/deck/state/Deck";
 import { CardController } from "phaser/card/CardController";
 import { CardView } from "phaser/card/CardView";
+import { undo } from "phaser/command/domain/CommandLogic";
 import { PileController } from "phaser/pile/PileController";
 import { createPile } from "phaser/pile/state/Pile";
 import { PileView } from "phaser/pile/PileView";
 import { deal, shuffle } from "phaser/deck/domain/DeckLogic";
+import { CardMoveCommand } from "phaser/command/state/Command";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -21,7 +23,7 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 };
 
 export default class GameState extends Phaser.Scene {
-  private moveHistory = new PubSubStack<CompositeCommand>();
+  private moveHistory = new PubSubStack<CardMoveCommand[]>();
 
   private deck!: DeckController;
   private piles!: PileController[];
@@ -67,14 +69,9 @@ export default class GameState extends Phaser.Scene {
   }
 
   public createCommandListeners(): void {
-    // Do commands
-    this.moveHistory.subscribe("push", (move) => {
-      move.do();
-    });
-
     // Undo commands
     this.moveHistory.subscribe("pop", (move) => {
-      move.undo();
+      undo(move);
     });
   }
 

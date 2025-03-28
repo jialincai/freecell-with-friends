@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 
 import InitState from "./InitState";
-import GameState from "phaser/game/state/GameState";
+import GameState from "@phaser/game/state/GameState";
 import PreInitState from "./PreInitState";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "./constants/screen";
 

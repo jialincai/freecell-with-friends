@@ -7,10 +7,10 @@ import {
   SPRITE_CARD_WIDTH,
   SUIT_IMAGE_INDEX,
   Suit,
-} from "phaser/constants/deck";
-import { PILE_POSITIONS, TABLEAU_PILES } from "phaser/constants/table";
-import { Card } from "phaser/card/state/Card";
-import { CardState } from "phaser/card/state/CardState";
+} from "@phaser/constants/deck";
+import { PILE_POSITIONS, TABLEAU_PILES } from "@phaser/constants/table";
+import { Card } from "@phaser/card/state/Card";
+import { CardState } from "@phaser/card/state/CardState";
 
 export class CardView extends Phaser.GameObjects.Image {
   constructor(scene: Phaser.Scene, model: Card) {

@@ -1,7 +1,7 @@
-import { CardController } from "phaser/card/CardController";
-import { PileId } from "phaser/constants/table";
-import { Deck } from "phaser/deck/state/Deck";
-import { deal, shuffle } from "phaser/deck/domain/DeckLogic";
+import { CardController } from "@phaser/card/CardController";
+import { PileId } from "@phaser/constants/table";
+import { Deck } from "@phaser/deck/state/Deck";
+import { deal, shuffle } from "@phaser/deck/domain/DeckLogic";
 
 export class DeckController {
   constructor(

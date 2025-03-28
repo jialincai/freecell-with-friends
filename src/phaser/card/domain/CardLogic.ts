@@ -1,5 +1,5 @@
-import { PileId } from "phaser/constants/table";
-import { CardState } from "phaser/card/state/CardState";
+import { PileId } from "@phaser/constants/table";
+import { CardState } from "@phaser/card/state/CardState";
 
 export function withFaceUp(state: CardState): CardState {
   return { ...state, flipped: true };

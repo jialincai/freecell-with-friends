@@ -1,7 +1,7 @@
-import { Suit } from "phaser/constants/deck";
-import { PileId } from "phaser/constants/table";
-import { CardData } from "phaser/card/CardData";
-import { CardState } from "phaser/card/state/CardState";
+import { Suit } from "@phaser/constants/deck";
+import { PileId } from "@phaser/constants/table";
+import { CardData } from "@phaser/card/CardData";
+import { CardState } from "@phaser/card/state/CardState";
 
 export type Card = {
   data: CardData;

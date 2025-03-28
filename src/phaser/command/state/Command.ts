@@ -1,6 +1,6 @@
-import { PileId } from "phaser/constants/table";
-import { cardMoveCommandData } from "phaser/command/CommandData";
-import { CardController } from "phaser/card/CardController";
+import { PileId } from "@phaser/constants/table";
+import { cardMoveCommandData } from "@phaser/command/CommandData";
+import { CardController } from "@phaser/card/CardController";
 
 export type CardMoveCommand = {
   data: cardMoveCommandData;

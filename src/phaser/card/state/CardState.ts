@@ -1,4 +1,4 @@
-import { PileId } from "phaser/constants/table";
+import { PileId } from "@phaser/constants/table";
 
 export type CardState = {
   pile: PileId;

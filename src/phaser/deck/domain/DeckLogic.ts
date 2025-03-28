@@ -1,7 +1,7 @@
-import { Card } from "phaser/card/state/Card";
-import { Deck } from "phaser/deck/state/Deck";
-import { PileId, TABLEAU_PILES } from "phaser/constants/table";
-import { withFaceUp } from "phaser/card/domain/CardLogic";
+import { Card } from "@phaser/card/state/Card";
+import { Deck } from "@phaser/deck/state/Deck";
+import { PileId, TABLEAU_PILES } from "@phaser/constants/table";
+import { withFaceUp } from "@phaser/card/domain/CardLogic";
 
 export function getCardsInPile(deck: Deck, pileId: PileId): Card[] {
   return deck.cards

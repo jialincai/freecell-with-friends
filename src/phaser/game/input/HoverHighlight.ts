@@ -1,12 +1,12 @@
 import * as Phaser from "phaser";
 
-import { PileId } from "phaser/constants/table";
-import { filterValidDropPiles } from "phaser/game/domain/FreecellRules";
-import { getCardsInPile } from "phaser/deck/domain/DeckLogic";
-import { CardController } from "phaser/card/CardController";
-import { DeckController } from "phaser/deck/DeckController";
-import { PileController } from "phaser/pile/PileController";
-import { PileView } from "phaser/pile/PileView";
+import { PileId } from "@phaser/constants/table";
+import { filterValidDropPiles } from "@phaser/game/domain/FreecellRules";
+import { getCardsInPile } from "@phaser/deck/domain/DeckLogic";
+import { CardController } from "@phaser/card/CardController";
+import { DeckController } from "@phaser/deck/DeckController";
+import { PileController } from "@phaser/pile/PileController";
+import { PileView } from "@phaser/pile/PileView";
 
 export function setupHoverHighlight(
   deckController: DeckController,

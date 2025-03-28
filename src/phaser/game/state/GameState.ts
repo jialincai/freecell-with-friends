@@ -1,20 +1,20 @@
 import * as Phaser from "phaser";
 
 import { PubSubStack, CompositeCommand } from "@utils/Function";
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from "phaser/constants/screen";
-import { FOUNDATION_PILES, PileId } from "phaser/constants/table";
-import { setupCardInteraction } from "phaser/game/input/CardInteraction";
-import { setupHoverHighlight } from "phaser/game/input/HoverHighlight";
-import { DeckController } from "phaser/deck/DeckController";
-import { createDeck } from "phaser/deck/state/Deck";
-import { CardController } from "phaser/card/CardController";
-import { CardView } from "phaser/card/CardView";
-import { undo } from "phaser/command/domain/CommandLogic";
-import { PileController } from "phaser/pile/PileController";
-import { createPile } from "phaser/pile/state/Pile";
-import { PileView } from "phaser/pile/PileView";
-import { deal, shuffle } from "phaser/deck/domain/DeckLogic";
-import { CardMoveCommand } from "phaser/command/state/Command";
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@phaser/constants/screen";
+import { FOUNDATION_PILES, PileId } from "@phaser/constants/table";
+import { setupCardInteraction } from "@phaser/game/input/CardInteraction";
+import { setupHoverHighlight } from "@phaser/game/input/HoverHighlight";
+import { DeckController } from "@phaser/deck/DeckController";
+import { createDeck } from "@phaser/deck/state/Deck";
+import { CardController } from "@phaser/card/CardController";
+import { CardView } from "@phaser/card/CardView";
+import { undo } from "@phaser/command/domain/CommandLogic";
+import { PileController } from "@phaser/pile/PileController";
+import { createPile } from "@phaser/pile/state/Pile";
+import { PileView } from "@phaser/pile/PileView";
+import { deal, shuffle } from "@phaser/deck/domain/DeckLogic";
+import { CardMoveCommand } from "@phaser/command/state/Command";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,

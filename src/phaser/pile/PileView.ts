@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
-import { CARD_DIMENSIONS, STACK_OFFSET } from "phaser/constants/deck";
-import { PILE_POSITIONS, TABLEAU_PILES } from "phaser/constants/table";
-import { Pile } from "phaser/pile/state/Pile";
+import { CARD_DIMENSIONS, STACK_OFFSET } from "@phaser/constants/deck";
+import { PILE_POSITIONS, TABLEAU_PILES } from "@phaser/constants/table";
+import { Pile } from "@phaser/pile/state/Pile";
 
 export class PileView extends Phaser.GameObjects.Rectangle {
   constructor(scene: Phaser.Scene, model: Pile) {

@@ -1,7 +1,7 @@
-import { PileId } from "phaser/constants/table";
-import { CardView } from "phaser/card/CardView";
-import * as CardLogic from "phaser/card/domain/CardLogic";
-import { Card } from "phaser/card/state/Card";
+import { PileId } from "@phaser/constants/table";
+import { CardView } from "@phaser/card/CardView";
+import * as CardLogic from "@phaser/card/domain/CardLogic";
+import { Card } from "@phaser/card/state/Card";
 
 export class CardController {
   constructor(

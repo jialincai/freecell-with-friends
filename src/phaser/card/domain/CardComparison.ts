@@ -1,5 +1,5 @@
-import { SUIT_COLOR } from "phaser/constants/deck";
-import { CardData } from "phaser/card/CardData";
+import { SUIT_COLOR } from "@phaser/constants/deck";
+import { CardData } from "@phaser/card/CardData";
 
 export const isFollowingRules = (
   cards: CardData[],

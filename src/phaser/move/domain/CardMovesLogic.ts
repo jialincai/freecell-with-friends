@@ -1,6 +1,6 @@
 import { CardMoves, createCardMoves } from "@phaser/move/CardMoves";
 
-export function deriveUndoCardMove(cardMoves: CardMoves): CardMoves {
+export function deriveUndoCardMoves(cardMoves: CardMoves): CardMoves {
   return createCardMoves(
     [...cardMoves.sequence].reverse().map((move) => {
       return {

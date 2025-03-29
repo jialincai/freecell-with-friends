@@ -29,9 +29,9 @@ export const isDifferentSuit = (a: CardData, b: CardData): boolean => {
 };
 
 export const isDescending = (a: CardData, b: CardData): boolean => {
-  return a.value === b.value - 1;
+  return a.rank === b.rank - 1;
 };
 
 export const isAscending = (a: CardData, b: CardData): boolean => {
-  return a.value === b.value + 1;
+  return a.rank === b.rank + 1;
 };

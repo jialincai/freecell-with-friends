@@ -7,10 +7,7 @@ export class DeckController {
   public model: Deck;
   public readonly cardControllers: CardController[];
 
-  constructor(
-    scene: Phaser.Scene,
-    deck: Deck,
-  ) {
+  constructor(scene: Phaser.Scene, deck: Deck) {
     this.model = deck;
     this.cardControllers = this.model.cards.map((card) => {
       return new CardController(scene, card);
@@ -20,7 +17,7 @@ export class DeckController {
   getCardsStartingFrom(card: CardController): CardController[] {
     const { pile, position } = card.model.state;
     return this.getCardsInPile(pile).filter(
-      (c) => c.model.state.position >= position
+      (c) => c.model.state.position >= position,
     );
   }
 

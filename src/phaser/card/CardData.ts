@@ -1,7 +1,8 @@
 import { Suit } from "@phaser/constants/deck";
+import { CardId } from "./domain/CardId";
 
 export type CardData = {
-  id: string;
+  id: CardId;
   suit: Suit;
-  value: number;
+  rank: number;
 };

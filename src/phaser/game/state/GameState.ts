@@ -10,7 +10,7 @@ import { createDeck } from "@phaser/deck/state/Deck";
 import { PileController } from "@phaser/pile/PileController";
 import { createPile } from "@phaser/pile/state/Pile";
 import { CardMoves } from "@phaser/move/CardMoves";
-import { deriveUndoCardMoves } from "@phaser/move/domain/CardMovesLogic";
+import { deriveUndo } from "@phaser/move/domain/CardMovesLogic";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -65,7 +65,7 @@ export default class GameState extends Phaser.Scene {
   public createCommandListeners(): void {
     // Undo commands
     this.moveHistory.subscribe("pop", (move) => {
-      const undo = deriveUndoCardMoves(move);
+      const undo = deriveUndo(move);
       this.deck.executeCardMoves(undo);
     });
   }

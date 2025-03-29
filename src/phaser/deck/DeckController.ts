@@ -1,7 +1,9 @@
 import { CardController } from "@phaser/card/CardController";
 import { PileId } from "@phaser/constants/table";
 import { Deck } from "@phaser/deck/state/Deck";
-import { deal, shuffle } from "@phaser/deck/domain/DeckLogic";
+import { dealCards, shuffleCards } from "@phaser/deck/domain/DeckLogic";
+import { CardMoveSequence } from "@phaser/move/CardMoveSequence";
+import { CardId } from "@phaser/card/domain/CardId";
 
 export class DeckController {
   public model: Deck;
@@ -27,13 +29,26 @@ export class DeckController {
       .sort((a, b) => a.model.state.position - b.model.state.position);
   }
 
-  deal(): void {
-    this.model = deal(this.model);
+  executeCardMoveSequence(cardMoves: CardMoveSequence) {
+    cardMoves.steps.forEach((move) => {
+      const cardController = this.findCardControllerWithId(move.card);
+      cardController?.setPilePosition(move.toPile, move.toPosition);
+    });
+  }
+
+  dealCards(): void {
+    this.model = dealCards(this.model);
     this.cardControllers.forEach((c, i) => c.setModel(this.model.cards[i]));
   }
 
-  shuffle(seed: number): void {
-    this.model = shuffle(this.model, seed);
+  shuffleCards(seed: number): void {
+    this.model = shuffleCards(this.model, seed);
     this.cardControllers.forEach((c, i) => c.setModel(this.model.cards[i]));
+  }
+
+  private findCardControllerWithId(cardId: CardId): CardController | undefined {
+    return this.cardControllers.find(
+      (controller) => controller.model.data.id === cardId,
+    );
   }
 }

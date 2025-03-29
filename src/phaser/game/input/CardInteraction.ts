@@ -10,11 +10,14 @@ import {
   filterValidDropPiles,
 } from "@phaser/game/domain/FreecellRules";
 import { createCardMove } from "@phaser/move/CardMove";
-import { CardMoves, createCardMoves } from "@phaser/move/CardMoves";
+import {
+  CardMoveSequence,
+  createCardMoveSequence,
+} from "@phaser/move/CardMoveSequence";
 
 export function setupCardInteraction(
   deckController: DeckController,
-  moveHistory: PubSubStack<CardMoves>,
+  moveHistory: PubSubStack<CardMoveSequence>,
 ): void {
   deckController.cardControllers.forEach((cardController) => {
     const isMovable = () =>
@@ -97,7 +100,7 @@ function dropCardInNewPile(
   deck: DeckController,
   card: CardController,
   target: PileView,
-  moveHistory: PubSubStack<CardMoves>,
+  moveHistory: PubSubStack<CardMoveSequence>,
 ): void {
   const pileId = target.name as PileId;
   if (!filterValidDropPiles(deck.model, card.model, [pileId]).length) return;
@@ -109,7 +112,7 @@ function dropCardInNewPile(
     pileId,
   );
 
-  const moveSequence = createCardMoves(
+  const moveSequence = createCardMoveSequence(
     dragChildren.map((card, i) => {
       return createCardMove(
         card.model.data.id,
@@ -120,14 +123,14 @@ function dropCardInNewPile(
       );
     }),
   );
-  deck.executeCardMoves(moveSequence);
+  deck.executeCardMoveSequence(moveSequence);
   moveHistory.push(moveSequence);
 }
 
 function snapCardToFoundationPile(
   deck: DeckController,
   card: CardController,
-  moveHistory: PubSubStack<CardMoves>,
+  moveHistory: PubSubStack<CardMoveSequence>,
 ): void {
   const dragChildren = deck.getCardsStartingFrom(card);
   if (dragChildren.length > 1) return;
@@ -145,7 +148,7 @@ function snapCardToFoundationPile(
     targetFoundationPile,
   );
 
-  const moveSequence = createCardMoves([
+  const moveSequence = createCardMoveSequence([
     createCardMove(
       card.model.data.id,
       card.model.state.pile,
@@ -154,6 +157,6 @@ function snapCardToFoundationPile(
       newPilePosition.position,
     ),
   ]);
-  deck.executeCardMoves(moveSequence);
+  deck.executeCardMoveSequence(moveSequence);
   moveHistory.push(moveSequence);
 }

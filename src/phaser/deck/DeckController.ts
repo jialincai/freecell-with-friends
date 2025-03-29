@@ -2,7 +2,7 @@ import { CardController } from "@phaser/card/CardController";
 import { PileId } from "@phaser/constants/table";
 import { Deck } from "@phaser/deck/state/Deck";
 import { dealCards, shuffleCards } from "@phaser/deck/domain/DeckLogic";
-import { CardMoves } from "@phaser/move/CardMoves";
+import { CardMoveSequence } from "@phaser/move/CardMoveSequence";
 import { CardId } from "@phaser/card/domain/CardId";
 
 export class DeckController {
@@ -29,8 +29,8 @@ export class DeckController {
       .sort((a, b) => a.model.state.position - b.model.state.position);
   }
 
-  executeCardMoves(cardMoves: CardMoves) {
-    cardMoves.sequence.forEach((move) => {
+  executeCardMoveSequence(cardMoves: CardMoveSequence) {
+    cardMoves.steps.forEach((move) => {
       const cardController = this.findCardControllerWithId(move.card);
       cardController?.setPilePosition(move.toPile, move.toPosition);
     });

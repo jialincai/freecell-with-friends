@@ -15,6 +15,7 @@ import { CardState } from "@phaser/card/state/CardState";
 export class CardView extends Phaser.GameObjects.Image {
   constructor(scene: Phaser.Scene, model: Card) {
     super(scene, 0, 0, "img_cards", CARD_BACK_INDEX);
+    this.setName(model.data.id);
     this.setDisplaySize(CARD_DIMENSIONS.width, CARD_DIMENSIONS.height);
     this.setInteractive({draggable: true});
     this.applyState(model);

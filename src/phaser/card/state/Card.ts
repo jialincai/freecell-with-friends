@@ -1,19 +1,20 @@
-import { Suit } from "@phaser/constants/deck";
+import { Rank, Suit } from "@phaser/constants/deck";
 import { PileId } from "@phaser/constants/table";
 import { CardData } from "@phaser/card/CardData";
 import { CardState } from "@phaser/card/state/CardState";
+import { createCardId } from "../domain/CardId";
 
 export type Card = {
   data: CardData;
   state: CardState;
 };
 
-export function createCard(suit: Suit, value: number): Card {
+export function createCard(suit: Suit, rank: Rank): Card {
   return {
     data: {
-      id: `${suit}-${value}`, // For now, assume single deck so IDs like heart-1 or spade-12 are unique.
+      id: createCardId(suit, rank),
       suit,
-      value,
+      rank,
     },
     state: {
       pile: PileId.None,

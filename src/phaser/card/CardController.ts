@@ -7,10 +7,7 @@ export class CardController {
   public model: Card;
   public readonly view: CardView;
 
-  constructor(
-    scene: Phaser.Scene,
-    card: Card,
-  ) {
+  constructor(scene: Phaser.Scene, card: Card) {
     this.model = card;
     this.view = new CardView(scene, card);
     this.view.applyState(this.model);

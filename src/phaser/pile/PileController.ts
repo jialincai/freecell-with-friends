@@ -5,10 +5,7 @@ export class PileController {
   public readonly model: Pile;
   public readonly view: PileView;
 
-  constructor(
-    scene: Phaser.Scene,
-    pile: Pile,
-  ) {
+  constructor(scene: Phaser.Scene, pile: Pile) {
     this.model = pile;
     this.view = new PileView(scene, pile);
   }

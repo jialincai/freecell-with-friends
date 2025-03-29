@@ -92,7 +92,7 @@ const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
           ...getCardsInPile(deck, pileId),
           ...getCardsStartingFrom(deck, card),
         ];
-        if (resultingPile[0]?.data.value !== 1) return false;
+        if (resultingPile[0]?.data.rank !== 1) return false;
 
         return isFollowingRules(
           resultingPile.map((c) => c.data),

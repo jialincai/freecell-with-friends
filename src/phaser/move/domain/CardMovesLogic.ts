@@ -1,18 +1,15 @@
-import { CardMove } from "@phaser/move/CardMove";
 import { CardMoves, createCardMoves } from "@phaser/move/CardMoves";
 
-export function deriveUndoCardMove(cardMove: CardMove): CardMove {
-  return {
-    card: cardMove.card,
-    fromPile: cardMove.toPile,
-    fromPosition: cardMove.toPosition,
-    toPile: cardMove.fromPile,
-    toPosition: cardMove.fromPosition,
-  };
-}
-
-export function deriveUndoCardMoves(cardMoves: CardMoves): CardMoves {
+export function deriveUndoCardMove(cardMoves: CardMoves): CardMoves {
   return createCardMoves(
-    [...cardMoves.sequence].reverse().map(deriveUndoCardMove),
+    [...cardMoves.sequence].reverse().map((move) => {
+      return {
+        card: move.card,
+        fromPile: move.toPile,
+        fromPosition: move.toPosition,
+        toPile: move.fromPile,
+        toPosition: move.fromPosition,
+      };
+    }),
   );
 }

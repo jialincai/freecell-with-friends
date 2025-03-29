@@ -1,10 +1,6 @@
 import { PubSubStack } from "@utils/Function";
 import { STACK_DRAG_OFFSET } from "@phaser/constants/deck";
 import { FOUNDATION_PILES, PileId } from "@phaser/constants/table";
-import {
-  CardMoveCommand,
-  createCardMoveCommand,
-} from "@phaser/command/state/Command";
 import { CardController } from "@phaser/card/CardController";
 import { DeckController } from "@phaser/deck/DeckController";
 import { PileView } from "@phaser/pile/PileView";
@@ -13,10 +9,12 @@ import {
   calculateNewPilePosition,
   filterValidDropPiles,
 } from "@phaser/game/domain/FreecellRules";
+import { createCardMove } from "@phaser/move/CardMove";
+import { CardMoves, createCardMoves } from "@phaser/move/CardMoves";
 
 export function setupCardInteraction(
   deckController: DeckController,
-  moveHistory: PubSubStack<CardMoveCommand[]>,
+  moveHistory: PubSubStack<CardMoves>,
 ): void {
   deckController.cardControllers.forEach((cardController) => {
     const isMovable = () =>
@@ -99,7 +97,7 @@ function dropCardInNewPile(
   deck: DeckController,
   card: CardController,
   target: PileView,
-  moveHistory: PubSubStack<CardMoveCommand[]>,
+  moveHistory: PubSubStack<CardMoves>,
 ): void {
   const pileId = target.name as PileId;
   if (!filterValidDropPiles(deck.model, card.model, [pileId]).length) return;
@@ -111,27 +109,25 @@ function dropCardInNewPile(
     pileId,
   );
 
-  const cardMoves = dragChildren.map((card, i) => {
-    return createCardMoveCommand(
-      card,
-      newPilePositions[i].pile,
-      newPilePositions[i].position,
-    );
-  });
-  moveHistory.push(cardMoves);
-
-  cardMoves.forEach((cardMove) => {
-    cardMove.data.card.setPilePosition(
-      cardMove.data.toPile,
-      cardMove.data.toPosition,
-    );
-  });
+  const moveSequence = createCardMoves(
+    dragChildren.map((card, i) => {
+      return createCardMove(
+        card.model.data.id,
+        card.model.state.pile,
+        card.model.state.position,
+        newPilePositions[i].pile,
+        newPilePositions[i].position,
+      );
+    }),
+  );
+  deck.executeCardMoves(moveSequence);
+  moveHistory.push(moveSequence);
 }
 
 function snapCardToFoundationPile(
   deck: DeckController,
   card: CardController,
-  moveHistory: PubSubStack<CardMoveCommand[]>,
+  moveHistory: PubSubStack<CardMoves>,
 ): void {
   const dragChildren = deck.getCardsStartingFrom(card);
   if (dragChildren.length > 1) return;
@@ -149,12 +145,15 @@ function snapCardToFoundationPile(
     targetFoundationPile,
   );
 
-  const cardMove = createCardMoveCommand(
-    card,
-    newPilePosition.pile,
-    newPilePosition.position,
-  );
-  moveHistory.push([cardMove]);
-
-  card.setPilePosition(cardMove.data.toPile, cardMove.data.toPosition);
+  const moveSequence = createCardMoves([
+    createCardMove(
+      card.model.data.id,
+      card.model.state.pile,
+      card.model.state.position,
+      newPilePosition.pile,
+      newPilePosition.position,
+    ),
+  ]);
+  deck.executeCardMoves(moveSequence);
+  moveHistory.push(moveSequence);
 }

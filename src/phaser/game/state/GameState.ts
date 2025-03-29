@@ -7,10 +7,10 @@ import { setupCardInteraction } from "@phaser/game/input/CardInteraction";
 import { setupHoverHighlight } from "@phaser/game/input/HoverHighlight";
 import { DeckController } from "@phaser/deck/DeckController";
 import { createDeck } from "@phaser/deck/state/Deck";
-import { undo } from "@phaser/command/domain/CommandLogic";
 import { PileController } from "@phaser/pile/PileController";
 import { createPile } from "@phaser/pile/state/Pile";
-import { CardMoveCommand } from "@phaser/command/state/Command";
+import { CardMoves } from "@phaser/move/CardMoves";
+import { deriveUndoCardMoves } from "@phaser/move/domain/CardMovesLogic";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -19,7 +19,7 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 };
 
 export default class GameState extends Phaser.Scene {
-  private moveHistory = new PubSubStack<CardMoveCommand[]>();
+  private moveHistory = new PubSubStack<CardMoves>();
 
   private deck!: DeckController;
   private piles!: PileController[];
@@ -37,8 +37,8 @@ export default class GameState extends Phaser.Scene {
     // Create deck
     const deckModel = createDeck();
     this.deck = new DeckController(this, deckModel);
-    this.deck.shuffle(476);
-    this.deck.deal();
+    this.deck.shuffleCards(476);
+    this.deck.dealCards();
 
     // Create piles
     this.piles = Object.values(PileId).map((pileId) => {
@@ -65,7 +65,8 @@ export default class GameState extends Phaser.Scene {
   public createCommandListeners(): void {
     // Undo commands
     this.moveHistory.subscribe("pop", (move) => {
-      undo(move);
+      const undo = deriveUndoCardMoves(move);
+      this.deck.executeCardMoves(undo);
     });
   }
 
@@ -76,7 +77,7 @@ export default class GameState extends Phaser.Scene {
       .text(12, 12, "Redeal", { color: "#000" })
       .setInteractive()
       .on("pointerdown", () => {
-        this.deck.deal();
+        this.deck.dealCards();
         this.winText.setVisible(false);
       });
 
@@ -86,8 +87,8 @@ export default class GameState extends Phaser.Scene {
       .text(102, 12, "New Deal", { color: "#000" })
       .setInteractive()
       .on("pointerdown", () => {
-        this.deck.shuffle(476);
-        this.deck.deal();
+        this.deck.shuffleCards(476);
+        this.deck.dealCards();
         this.winText.setVisible(false);
       });
 

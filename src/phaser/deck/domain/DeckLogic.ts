@@ -15,7 +15,7 @@ export function getCardsStartingFrom(deck: Deck, target: Card): Card[] {
   );
 }
 
-export function deal(deck: Deck): Deck {
+export function dealCards(deck: Deck): Deck {
   const cards = deck.cards.map((card, index) => {
     const pile = TABLEAU_PILES[index % 8];
     const position = Math.floor(index / 8);
@@ -33,7 +33,7 @@ export function deal(deck: Deck): Deck {
   return { ...deck, cards };
 }
 
-export function shuffle(deck: Deck, seed: number): Deck {
+export function shuffleCards(deck: Deck, seed: number): Deck {
   const a = 214013;
   const c = 2531011;
   const m = 2147483648;

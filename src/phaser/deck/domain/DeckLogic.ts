@@ -1,7 +1,29 @@
 import { Card } from "@phaser/card/state/Card";
 import { Deck } from "@phaser/deck/state/Deck";
 import { PileId, TABLEAU_PILES } from "@phaser/constants/table";
-import { withFaceUp } from "@phaser/card/domain/CardLogic";
+import { withFaceUp, withPilePosition } from "@phaser/card/domain/CardLogic";
+import { CardMoveSequence } from "@phaser/move/CardMoveSequence";
+
+export function getDeckAfterCardMoves(
+  deck: Deck,
+  cardMoves: CardMoveSequence,
+): Deck {
+  const updatedCards = cardMoves.steps.reduce((cards, move) => {
+    return cards.map((card) => {
+      if (card.data.id !== move.card) return card;
+
+      return {
+        ...card,
+        state: withPilePosition(card.state, move.toPile, move.toPosition),
+      };
+    });
+  }, deck.cards);
+
+  return {
+    ...deck,
+    cards: updatedCards,
+  };
+}
 
 export function getCardsInPile(deck: Deck, pileId: PileId): Card[] {
   return deck.cards
@@ -13,6 +35,12 @@ export function getCardsStartingFrom(deck: Deck, target: Card): Card[] {
   return getCardsInPile(deck, target.state.pile).filter(
     (card) => card.state.position >= target.state.position,
   );
+}
+
+export function filterEmptyPiles(deck: Deck, piles: PileId[]) {
+  return piles.filter((pile) => {
+    return getCardsInPile(deck, pile).length === 0;
+  });
 }
 
 export function dealCards(deck: Deck): Deck {

@@ -13,6 +13,7 @@ import {
   isSameSuit,
 } from "@phaser/card/domain/CardComparison";
 import {
+  filterEmptyPiles,
   getCardsInPile,
   getCardsStartingFrom,
 } from "@phaser/deck/domain/DeckLogic";
@@ -53,17 +54,21 @@ export function canMoveCard(deck: Deck, card: Card): boolean {
 /**
  * Calculates how many cards can be moved according to formula:
  * maxMoveSize = (emptyCells + 1) * 2^emptyTableaus
+ *
+ * Specify tableau piles to ignore during calculation.
  */
-function calculateMaxMoveSize(deck: Deck, excludePile: PileId): number {
-  const emptyCells = CELL_PILES.filter(
-    (id) => getCardsInPile(deck, id).length === 0,
-  ).length;
+export function calculateMaxMoveSize(
+  deck: Deck,
+  tableausToIgnore: PileId[],
+): number {
+  const remainingTableaus = TABLEAU_PILES.filter(
+    (pile) => !tableausToIgnore.includes(pile),
+  );
 
-  const emptyTableaus = TABLEAU_PILES.filter(
-    (id) => id !== excludePile && getCardsInPile(deck, id).length === 0,
-  ).length;
+  const emptyCells = filterEmptyPiles(deck, CELL_PILES).length;
+  const emptyTableaus = filterEmptyPiles(deck, remainingTableaus).length;
 
-  return (emptyCells + 1) * 2 ** emptyTableaus;
+  return (emptyCells + 1) << emptyTableaus;
 }
 
 const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
@@ -108,7 +113,7 @@ const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
       pileId,
       (deck: Deck, card: Card) => {
         const stack = getCardsStartingFrom(deck, card);
-        if (stack.length > calculateMaxMoveSize(deck, pileId)) return false;
+        if (stack.length > calculateMaxMoveSize(deck, [pileId])) return false;
 
         const resultingPile = [...getCardsInPile(deck, pileId), ...stack];
         const activeSequence = resultingPile.slice(-stack.length - 1);
@@ -140,7 +145,7 @@ const DRAG_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
       pileId,
       (deck: Deck, card: Card) => {
         const stack = getCardsStartingFrom(deck, card);
-        if (stack.length > calculateMaxMoveSize(deck, pileId)) return false;
+        if (stack.length > calculateMaxMoveSize(deck, [pileId])) return false;
 
         return isFollowingRules(
           stack.map((c) => c.data),

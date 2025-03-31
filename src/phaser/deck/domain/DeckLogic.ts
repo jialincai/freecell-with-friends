@@ -4,7 +4,7 @@ import { PileId, TABLEAU_PILES } from "@phaser/constants/table";
 import { withFaceUp, withPilePosition } from "@phaser/card/domain/CardLogic";
 import { CardMoveSequence } from "@phaser/move/CardMoveSequence";
 
-export function getDeckAfterCardMoves(
+export function applyCardMoves(
   deck: Deck,
   cardMoves: CardMoveSequence,
 ): Deck {

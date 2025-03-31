@@ -2,7 +2,7 @@ import { CELL_PILES, PileId, TABLEAU_PILES } from "@phaser/constants/table";
 import {
   filterEmptyPiles,
   getCardsInPile,
-  getDeckAfterCardMoves,
+  applyCardMoves,
 } from "@phaser/deck/domain/DeckLogic";
 import { Deck } from "@phaser/deck/state/Deck";
 import { calculateMaxMoveSize } from "@phaser/game/domain/FreecellRules";
@@ -54,7 +54,7 @@ export function expand(
         maxCellOnlyMoveSize,
       ),
     );
-    workingDeck = getDeckAfterCardMoves(deck, maxToTableau);
+    workingDeck = applyCardMoves(deck, maxToTableau);
 
     const remainingToTarget = expand(
       deck,
@@ -65,7 +65,7 @@ export function expand(
         moveSize - maxCellOnlyMoveSize,
       ),
     );
-    workingDeck = getDeckAfterCardMoves(deck, remainingToTarget);
+    workingDeck = applyCardMoves(deck, remainingToTarget);
 
     // Move tableau to target
     const tableauToTarget = expand(

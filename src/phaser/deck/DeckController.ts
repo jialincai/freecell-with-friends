@@ -3,7 +3,7 @@ import { PileId } from "@phaser/constants/table";
 import { Deck } from "@phaser/deck/state/Deck";
 import {
   dealCards,
-  getDeckAfterCardMoves,
+  applyCardMoves,
   shuffleCards,
 } from "@phaser/deck/domain/DeckLogic";
 import { CardMoveSequence } from "@phaser/move/CardMoveSequence";
@@ -34,7 +34,7 @@ export class DeckController {
   }
 
   executeCardMoveSequence(cardMoves: CardMoveSequence) {
-    this.model = getDeckAfterCardMoves(this.model, cardMoves);
+    this.model = applyCardMoves(this.model, cardMoves);
     this.cardControllers.forEach((c, i) => c.setModel(this.model.cards[i]));
   }
 

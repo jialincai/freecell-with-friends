@@ -18,6 +18,7 @@ import {
   getCardsStartingFrom,
 } from "@phaser/deck/domain/DeckLogic";
 import { Deck } from "@phaser/deck/state/Deck";
+import { CardMoveSequence } from "@phaser/move/CardMoveSequence";
 
 export function mapValidDropPiles(
   deck: Deck,
@@ -52,23 +53,39 @@ export function canMoveCard(deck: Deck, card: Card): boolean {
 }
 
 /**
- * Calculates how many cards can be moved according to formula:
- * maxMoveSize = (emptyCells + 1) * 2^emptyTableaus
+ * Calculate maximum number of cards that be moved according to the formula:
+ * `maxMoveSize = (emptyCells + 1) * 2^emptyTableaus`
  *
- * Specify tableau piles to ignore during calculation.
+ * You can specify any piles to ignore during this calculation.
  */
 export function calculateMaxMoveSize(
   deck: Deck,
-  tableausToIgnore: PileId[],
+  pilesToIgnore: PileId[] = [],
 ): number {
+  const remainingCells = CELL_PILES.filter(
+    (pile) => !pilesToIgnore.includes(pile),
+  );
   const remainingTableaus = TABLEAU_PILES.filter(
-    (pile) => !tableausToIgnore.includes(pile),
+    (pile) => !pilesToIgnore.includes(pile),
   );
 
-  const emptyCells = filterEmptyPiles(deck, CELL_PILES).length;
+  const emptyCells = filterEmptyPiles(deck, remainingCells).length;
   const emptyTableaus = filterEmptyPiles(deck, remainingTableaus).length;
 
   return (emptyCells + 1) << emptyTableaus;
+}
+
+/**
+ * Calculates the minimum empty tableau piles
+ * required to temporarily store cards according to the formula:
+ * `requiredTableaus >= log2(moveSize / (emptyCells + 1))`
+ */
+function calculateMinTempTableaus(
+  cardMoves: CardMoveSequence,
+  emptyCells: number,
+): number {
+  const moveSize = cardMoves.steps.length;
+  return Math.ceil(Math.log2(moveSize / (emptyCells + 1)));
 }
 
 const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =

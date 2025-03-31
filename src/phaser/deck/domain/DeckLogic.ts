@@ -89,17 +89,16 @@ export function setupTableauDrag(deck: Deck): Deck {
   const spades = sorted.filter((c) => c.data.suit === Suit.Spades);
   const clubs = sorted.filter((c) => c.data.suit === Suit.Clubs);
 
-  // Build red/black stack (starts with red)
-  const redSuits = [...hearts, ...diamonds];
-  const blackSuits = [...spades, ...clubs];
-  const redFirstStack1 = buildAlternatingStack(
-    [...redSuits],
-    [...blackSuits],
-    "red",
+  // Build one stack starting with red, one with black
+  const redFirstStack = buildAlternatingStack([...hearts], [...clubs], "red");
+  const blackFirstStack = buildAlternatingStack(
+    [...spades],
+    [...diamonds],
+    "black",
   );
 
-  // Set redFirstStack1 into Tableau1
-  redFirstStack1.forEach((card, i) => {
+  // Assign stacks to Tableau1 and Tableau2
+  redFirstStack.forEach((card, i) => {
     card.state = {
       ...withFaceUp(card.state),
       pile: PileId.Tableau1,
@@ -107,8 +106,20 @@ export function setupTableauDrag(deck: Deck): Deck {
     };
   });
 
-  // Set all remaining cards to PileId.None
-  const usedIds = new Set(redFirstStack1.map((c) => c.data.id));
+  blackFirstStack.forEach((card, i) => {
+    card.state = {
+      ...withFaceUp(card.state),
+      pile: PileId.Tableau2,
+      position: i,
+    };
+  });
+
+  // Collect all used card IDs
+  const usedIds = new Set(
+    [...redFirstStack, ...blackFirstStack].map((c) => c.data.id),
+  );
+
+  // Put the remaining cards into PileId.None
   const rest = deck.cards
     .filter((c) => !usedIds.has(c.data.id))
     .map((card) => ({
@@ -121,7 +132,7 @@ export function setupTableauDrag(deck: Deck): Deck {
     }));
 
   return {
-    cards: [...redFirstStack1, ...rest],
+    cards: [...redFirstStack, ...blackFirstStack, ...rest],
   };
 }
 

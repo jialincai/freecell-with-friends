@@ -10,105 +10,109 @@ import {
   CardMoveSequence,
   createCardMoveSequence,
 } from "@phaser/move/CardMoveSequence";
-import { createCardMove } from "../CardMove";
+import { CardMove, createCardMove } from "@phaser/move/CardMove";
 
 /**
- * Expands a simplified move sequence to include temporary intermediates states.
- * Assuming same pile card moves will occur by ascending position.
- * Undefined behavior if the move provided is not legal.
+ * Expands a simplified move sequence to include intermediate steps.
+ * Undefined error if move sequence is invalid.
  */
 export function expand(
   deck: Deck,
   cardMoves: CardMoveSequence,
 ): CardMoveSequence {
-  const [firstMove] = cardMoves.steps;
-  const { fromPile: source, toPile: target } = firstMove;
-
   const moveSize = cardMoves.steps.length;
+  const [first] = cardMoves.steps;
+
+  const emptyCells = filterEmptyPiles(deck, CELL_PILES).length;
+  const emptyTableaus = filterEmptyPiles(
+    deck,
+    TABLEAU_PILES.filter((p) => p !== first.toPile),
+  );
   const maxMoveSize = calculateMaxMoveSize(deck, []);
   const maxCellOnlyMoveSize = calculateMaxMoveSize(deck, TABLEAU_PILES);
-
-  console.log(`source: ${source}, target: ${target}`);
-  console.log(`moveSize: ${moveSize}, maxMoveSize: ${maxMoveSize}`);
+  const minTableaus = calculateMinTableaus(moveSize, emptyCells);
 
   if (moveSize > maxMoveSize) {
     throw new Error(
-      `Move size (${moveSize}) exceeds allowed max (${maxMoveSize})`,
+      `Move size (${moveSize}) exceeds allowed maximum (${maxMoveSize}).`,
+    );
+  }
+  if (minTableaus > emptyTableaus.length) {
+    throw new Error(
+      `Cannot expand move sequence: requires ${minTableaus} empty tableaus, but only ${emptyTableaus.length} available.`,
     );
   }
 
+  // Base Case
   if (moveSize <= maxCellOnlyMoveSize) {
-    return expandCellOnlyMove(deck, cardMoves);
+    return expandViaFreeCells(deck, cardMoves);
+  } else {
+    const temp = emptyTableaus[0];
+    return expandViaTempTableauRecursive(deck, cardMoves, temp);
   }
-
-  const emptyTableaus = filterEmptyPiles(
-    deck,
-    TABLEAU_PILES.filter((p) => p !== target),
-  );
-
-  if (moveSize <= calculateMaxMoveSize(deck, emptyTableaus.slice(1))) {
-    const tableau = emptyTableaus[0];
-
-    const moveToTemp = expand(
-      deck,
-      createCardMoveSequenceFromDeck(
-        deck,
-        source,
-        tableau,
-        maxCellOnlyMoveSize,
-      ),
-    );
-    const deckAfterTemp = applyCardMoves(deck, moveToTemp);
-
-    const moveRemaining = expand(
-      deckAfterTemp,
-      createCardMoveSequenceFromDeck(
-        deckAfterTemp,
-        source,
-        target,
-        moveSize - maxCellOnlyMoveSize,
-      ),
-    );
-    const deckAfterRemaining = applyCardMoves(deckAfterTemp, moveRemaining);
-
-    const moveTempToTarget = expand(
-      deckAfterRemaining,
-      createCardMoveSequenceFromDeck(
-        deckAfterRemaining,
-        tableau,
-        target,
-        maxCellOnlyMoveSize,
-      ),
-    );
-
-    return createCardMoveSequence([
-      ...moveToTemp.steps,
-      ...moveRemaining.steps,
-      ...moveTempToTarget.steps,
-    ]);
-  }
-
-  console.log("No expansion case matched.");
-  return cardMoves;
 }
 
-function expandCellOnlyMove(
+/**
+ * Recursively expands a move sequence using one temporary tableau pile.
+ */
+function expandViaTempTableauRecursive(
+  deck: Deck,
+  cardMoves: CardMoveSequence,
+  temp: PileId,
+): CardMoveSequence {
+  const [firstMove] = cardMoves.steps;
+  const moveSize = cardMoves.steps.length;
+  const cellLimit = calculateMaxMoveSize(deck, TABLEAU_PILES);
+
+  const firstPart = expand(
+    deck,
+    createCardMoveSequenceFromDeck(deck, firstMove.fromPile, temp, cellLimit),
+  );
+  const deckAfterFirst = applyCardMoves(deck, firstPart);
+
+  const secondPart = expand(
+    deckAfterFirst,
+    createCardMoveSequenceFromDeck(
+      deckAfterFirst,
+      firstMove.fromPile,
+      firstMove.toPile,
+      moveSize - cellLimit,
+    ),
+  );
+  const deckAfterSecond = applyCardMoves(deckAfterFirst, secondPart);
+
+  const thirdPart = expand(
+    deckAfterSecond,
+    createCardMoveSequenceFromDeck(
+      deckAfterSecond,
+      temp,
+      firstMove.toPile,
+      cellLimit,
+    ),
+  );
+
+  return createCardMoveSequence([
+    ...firstPart.steps,
+    ...secondPart.steps,
+    ...thirdPart.steps,
+  ]);
+}
+
+function expandViaFreeCells(
   deck: Deck,
   cardMoves: CardMoveSequence,
 ): CardMoveSequence {
-  const emptyCells = filterEmptyPiles(deck, CELL_PILES);
   const [top, ...children] = cardMoves.steps;
+
+  const empty = filterEmptyPiles(
+    deck,
+    [...CELL_PILES, ...TABLEAU_PILES].filter((p) => p !== top.toPile),
+  );
 
   const childrenToCells = [...children]
     .reverse()
     .map((step, i) =>
-      createCardMove(
-        step.card,
-        step.fromPile,
-        step.fromPosition,
-        emptyCells[i],
-        0,
-      ),
+      createCardMove(step.card, step.fromPile, step.fromPosition, empty[i], 0),
     );
 
   const topToTarget = createCardMove(
@@ -122,7 +126,7 @@ function expandCellOnlyMove(
   const childrenToTarget = children.map((step, i) =>
     createCardMove(
       step.card,
-      emptyCells[children.length - i - 1],
+      empty[children.length - i - 1],
       0,
       step.toPile,
       step.toPosition,
@@ -136,42 +140,58 @@ function expandCellOnlyMove(
   ]);
 }
 
+/**
+ * Calculates the number of empty tableau piles required to legally move a given number of cards.
+ */
+function calculateMinTableaus(moveSize: number, emptyCells: number): number {
+  return Math.ceil(Math.log2(moveSize / (emptyCells + 1)));
+}
+
+/**
+ * Generates a move sequence for the last N cards in a pile.
+ */
 function createCardMoveSequenceFromDeck(
   deck: Deck,
   fromPile: PileId,
   toPile: PileId,
-  count: number,
+  nCardsToMove: number,
 ): CardMoveSequence {
-  const fromCards = getCardsInPile(deck, fromPile);
-  const toCards = getCardsInPile(deck, toPile);
+  const from = getCardsInPile(deck, fromPile);
+  const to = getCardsInPile(deck, toPile);
 
-  const cardsToMove = fromCards.slice(-count); // get last N cards
-  const startFromPosition = fromCards.length - count;
-  const startToPosition = toCards.length;
+  const startFrom = from.length - nCardsToMove;
+  const startTo = to.length;
 
-  const steps = cardsToMove.map((card, i) =>
-    createCardMove(
-      card.data.id,
-      fromPile,
-      startFromPosition + i,
-      toPile,
-      startToPosition + i,
-    ),
-  );
+  const steps = from
+    .slice(-nCardsToMove)
+    .map((card, i) =>
+      createCardMove(
+        card.data.id,
+        fromPile,
+        startFrom + i,
+        toPile,
+        startTo + i,
+      ),
+    );
 
   return createCardMoveSequence(steps);
 }
 
+/**
+ * Reverses a move sequence for undo logic.
+ */
 export function deriveUndo(cardMoves: CardMoveSequence): CardMoveSequence {
   return createCardMoveSequence(
-    [...cardMoves.steps].reverse().map((move) => {
-      return {
-        card: move.card,
-        fromPile: move.toPile,
-        fromPosition: move.toPosition,
-        toPile: move.fromPile,
-        toPosition: move.fromPosition,
-      };
-    }),
+    [...cardMoves.steps]
+      .reverse()
+      .map((move) =>
+        createCardMove(
+          move.card,
+          move.toPile,
+          move.toPosition,
+          move.fromPile,
+          move.fromPosition,
+        ),
+      ),
   );
 }

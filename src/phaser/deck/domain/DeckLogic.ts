@@ -3,11 +3,9 @@ import { Deck } from "@phaser/deck/state/Deck";
 import { PileId, TABLEAU_PILES } from "@phaser/constants/table";
 import { withFaceUp, withPilePosition } from "@phaser/card/domain/CardLogic";
 import { CardMoveSequence } from "@phaser/move/CardMoveSequence";
+import { Rank, Suit } from "@phaser/constants/deck";
 
-export function applyCardMoves(
-  deck: Deck,
-  cardMoves: CardMoveSequence,
-): Deck {
+export function applyCardMoves(deck: Deck, cardMoves: CardMoveSequence): Deck {
   const updatedCards = cardMoves.steps.reduce((cards, move) => {
     return cards.map((card) => {
       if (card.data.id !== move.card) return card;
@@ -79,4 +77,77 @@ export function shuffleCards(deck: Deck, seed: number): Deck {
     ...deck,
     cards: shuffled.reverse(),
   };
+}
+
+// TODO remove setup TableauDrag function
+export function setupTableauDrag(deck: Deck): Deck {
+  const sorted = [...deck.cards].sort((a, b) => b.data.rank - a.data.rank);
+
+  // Group by suit
+  const hearts = sorted.filter((c) => c.data.suit === Suit.Hearts);
+  const diamonds = sorted.filter((c) => c.data.suit === Suit.Diamonds);
+  const spades = sorted.filter((c) => c.data.suit === Suit.Spades);
+  const clubs = sorted.filter((c) => c.data.suit === Suit.Clubs);
+
+  // Build red/black stack (starts with red)
+  const redSuits = [...hearts, ...diamonds];
+  const blackSuits = [...spades, ...clubs];
+  const redFirstStack1 = buildAlternatingStack(
+    [...redSuits],
+    [...blackSuits],
+    "red",
+  );
+
+  // Set redFirstStack1 into Tableau1
+  redFirstStack1.forEach((card, i) => {
+    card.state = {
+      ...withFaceUp(card.state),
+      pile: PileId.Tableau1,
+      position: i,
+    };
+  });
+
+  // Set all remaining cards to PileId.None
+  const usedIds = new Set(redFirstStack1.map((c) => c.data.id));
+  const rest = deck.cards
+    .filter((c) => !usedIds.has(c.data.id))
+    .map((card) => ({
+      ...card,
+      state: {
+        ...withFaceUp(card.state),
+        pile: PileId.None,
+        position: 0,
+      },
+    }));
+
+  return {
+    cards: [...redFirstStack1, ...rest],
+  };
+}
+
+function buildAlternatingStack(
+  redSuitCards: Card[],
+  blackSuitCards: Card[],
+  startingColor: "red" | "black",
+  maxLength = 13,
+): Card[] {
+  const stack: Card[] = [];
+  let rank = Rank.King;
+  let color = startingColor;
+
+  while (rank >= Rank.Ace && stack.length < maxLength) {
+    const source = (color === "red" ? redSuitCards : blackSuitCards).filter(
+      (card) => card.data.rank === rank && !stack.includes(card),
+    );
+
+    if (source.length > 0) {
+      const card = source[0];
+      stack.push(card);
+      color = color === "red" ? "black" : "red";
+    }
+
+    rank--;
+  }
+
+  return stack;
 }

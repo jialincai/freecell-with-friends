@@ -21,31 +21,35 @@ export function expand(
   deck: Deck,
   cardMoves: CardMoveSequence,
 ): CardMoveSequence {
-  const emptyCells = filterEmptyPiles(deck, CELL_PILES);
-  const emptyTableaus = filterEmptyPiles(deck, TABLEAU_PILES);
+  const [firstMove] = cardMoves.steps;
+  const { fromPile: source, toPile: target } = firstMove;
+
   const moveSize = cardMoves.steps.length;
   const maxMoveSize = calculateMaxMoveSize(deck, []);
   const maxCellOnlyMoveSize = calculateMaxMoveSize(deck, TABLEAU_PILES);
 
+  console.log(`source: ${source}, target: ${target}`);
+  console.log(`moveSize: ${moveSize}, maxMoveSize: ${maxMoveSize}`);
+
   if (moveSize > maxMoveSize) {
     throw new Error(
-      `Cannot expand move sequence: move size (${moveSize}) exceeds max move size (${maxMoveSize}).`,
+      `Move size (${moveSize}) exceeds allowed max (${maxMoveSize})`,
     );
   }
 
-  // 0 Tableaus required (Base case)
-  if (cardMoves.steps.length <= maxCellOnlyMoveSize) {
-    return handleBaseCase(deck, cardMoves);
-    // 1 Tableau required
-  } else if (
-    cardMoves.steps.length <= calculateMaxMoveSize(deck, TABLEAU_PILES.slice(1))
-  ) {
-    let workingDeck = deck;
-    const source = cardMoves.steps[0].fromPile;
-    const target = cardMoves.steps[0].toPile;
+  if (moveSize <= maxCellOnlyMoveSize) {
+    return expandCellOnlyMove(deck, cardMoves);
+  }
+
+  const emptyTableaus = filterEmptyPiles(
+    deck,
+    TABLEAU_PILES.filter((p) => p !== target),
+  );
+
+  if (moveSize <= calculateMaxMoveSize(deck, emptyTableaus.slice(1))) {
     const tableau = emptyTableaus[0];
 
-    const maxToTableau = expand(
+    const moveToTemp = expand(
       deck,
       createCardMoveSequenceFromDeck(
         deck,
@@ -54,24 +58,23 @@ export function expand(
         maxCellOnlyMoveSize,
       ),
     );
-    workingDeck = applyCardMoves(deck, maxToTableau);
+    const deckAfterTemp = applyCardMoves(deck, moveToTemp);
 
-    const remainingToTarget = expand(
-      deck,
+    const moveRemaining = expand(
+      deckAfterTemp,
       createCardMoveSequenceFromDeck(
-        deck,
+        deckAfterTemp,
         source,
         target,
         moveSize - maxCellOnlyMoveSize,
       ),
     );
-    workingDeck = applyCardMoves(deck, remainingToTarget);
+    const deckAfterRemaining = applyCardMoves(deckAfterTemp, moveRemaining);
 
-    // Move tableau to target
-    const tableauToTarget = expand(
-      deck,
+    const moveTempToTarget = expand(
+      deckAfterRemaining,
       createCardMoveSequenceFromDeck(
-        deck,
+        deckAfterRemaining,
         tableau,
         target,
         maxCellOnlyMoveSize,
@@ -79,14 +82,17 @@ export function expand(
     );
 
     return createCardMoveSequence([
-      ...maxToTableau.steps,
-      ...remainingToTarget.steps,
-      ...tableauToTarget.steps,
+      ...moveToTemp.steps,
+      ...moveRemaining.steps,
+      ...moveTempToTarget.steps,
     ]);
   }
+
+  console.log("No expansion case matched.");
+  return cardMoves;
 }
 
-function handleBaseCase(
+function expandCellOnlyMove(
   deck: Deck,
   cardMoves: CardMoveSequence,
 ): CardMoveSequence {

@@ -37,7 +37,7 @@ export default class GameState extends Phaser.Scene {
     // Create deck
     const deckModel = createDeck();
     this.deck = new DeckController(this, deckModel);
-    this.deck.shuffleCards(476);
+    // this.deck.shuffleCards(476); // TODO add shuffle back
     this.deck.dealCards();
 
     // Create piles

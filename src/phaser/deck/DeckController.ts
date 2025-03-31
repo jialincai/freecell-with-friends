@@ -5,6 +5,7 @@ import {
   dealCards,
   applyCardMoves,
   shuffleCards,
+  setupTableauDrag,
 } from "@phaser/deck/domain/DeckLogic";
 import { CardMoveSequence } from "@phaser/move/CardMoveSequence";
 import { CardId } from "@phaser/card/domain/CardId";
@@ -55,7 +56,9 @@ export class DeckController {
   }
 
   dealCards(): void {
-    this.model = dealCards(this.model);
+    // TODO: Revert to regular deal
+    // this.model = dealCards(this.model);
+    this.model = setupTableauDrag(this.model);
     this.cardControllers.forEach((c, i) => c.setModel(this.model.cards[i]));
   }
 

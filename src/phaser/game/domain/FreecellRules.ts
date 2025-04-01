@@ -52,30 +52,7 @@ export function canMoveCard(deck: Deck, card: Card): boolean {
   return DRAG_RULES[card.state.pile]?.(deck, card) ?? false;
 }
 
-/**
- * Calculate maximum number of cards that be moved according to the formula:
- * `maxMoveSize = (emptyCells + 1) * 2^emptyTableaus`
- *
- * You can specify any piles to ignore during this calculation.
- */
 export function calculateMaxMoveSize(
-  deck: Deck,
-  pilesToIgnore: PileId[] = [],
-): number {
-  const remainingCells = CELL_PILES.filter(
-    (pile) => !pilesToIgnore.includes(pile),
-  );
-  const remainingTableaus = TABLEAU_PILES.filter(
-    (pile) => !pilesToIgnore.includes(pile),
-  );
-
-  const emptyCells = filterEmptyPiles(deck, remainingCells).length;
-  const emptyTableaus = filterEmptyPiles(deck, remainingTableaus).length;
-
-  return (emptyCells + 1) << emptyTableaus;
-}
-
-export function calculateMaxMoveSizeSimple(
   emptyCells: number,
   emptyTableaus: number,
 ): number {
@@ -131,7 +108,12 @@ const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
       pileId,
       (deck: Deck, card: Card) => {
         const stack = getCardsStartingFrom(deck, card);
-        if (stack.length > calculateMaxMoveSize(deck, [pileId])) return false;
+        const emptyCells = filterEmptyPiles(deck, CELL_PILES);
+        const availableTableaus = filterEmptyPiles(
+          deck,
+          TABLEAU_PILES.filter((pile) => pile !== pileId),
+        );
+        if (stack.length > calculateMaxMoveSize(emptyCells.length, availableTableaus.length)) return false;
 
         const resultingPile = [...getCardsInPile(deck, pileId), ...stack];
         const activeSequence = resultingPile.slice(-stack.length - 1);
@@ -163,7 +145,12 @@ const DRAG_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
       pileId,
       (deck: Deck, card: Card) => {
         const stack = getCardsStartingFrom(deck, card);
-        if (stack.length > calculateMaxMoveSize(deck, [pileId])) return false;
+        const emptyCells = filterEmptyPiles(deck, CELL_PILES);
+        const availableTableaus = filterEmptyPiles(
+          deck,
+          TABLEAU_PILES.filter((pile) => pile !== pileId),
+        );
+        if (stack.length > calculateMaxMoveSize(emptyCells.length, availableTableaus.length)) return false;
 
         return isFollowingRules(
           stack.map((c) => c.data),

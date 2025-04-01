@@ -11,7 +11,7 @@ import {
 } from "@phaser/move/CardMoveSequence";
 import { createCardMove } from "@phaser/move/CardMove";
 import {
-  calculateMaxMoveSizeSimple,
+  calculateMaxMoveSize,
   calculateMinTempTableaus,
 } from "@phaser/game/domain/FreecellRules";
 
@@ -67,7 +67,7 @@ function expandWithTempTableau(
     moveSize,
     emptyCells.length,
   );
-  const cardsToTemp = calculateMaxMoveSizeSimple(
+  const cardsToTemp = calculateMaxMoveSize(
     emptyCells.length,
     minTempTableaus - 1,
   );

@@ -12,7 +12,7 @@ import {
 import { createCardMove } from "@phaser/move/CardMove";
 import {
   calculateMaxMoveSizeSimple,
-  calculateMinTempTableausSimple,
+  calculateMinTempTableaus,
 } from "@phaser/game/domain/FreecellRules";
 
 /**
@@ -63,7 +63,7 @@ function expandWithTempTableau(
   const [firstStep] = cardMoves.steps;
 
   const emptyCells = filterEmptyPiles(deck, CELL_PILES);
-  const minTempTableaus = calculateMinTempTableausSimple(
+  const minTempTableaus = calculateMinTempTableaus(
     moveSize,
     emptyCells.length,
   );
@@ -175,14 +175,16 @@ function createPileToPileCardMoveSequence(
         fromPile,
         startFromPosition + index,
         toPile,
-        startToPosition + index
-      )
+        startToPosition + index,
+      ),
     );
 
   return createCardMoveSequence(moveSteps);
 }
 
-export function deriveUndo(cardMoves: CardMoveSequence): CardMoveSequence {
+export function invertCardMoveSequence(
+  cardMoves: CardMoveSequence,
+): CardMoveSequence {
   return createCardMoveSequence(
     [...cardMoves.steps]
       .reverse()

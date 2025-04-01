@@ -82,23 +82,10 @@ export function calculateMaxMoveSizeSimple(
   return (emptyCells + 1) << emptyTableaus;
 }
 
-export function calculateMinTempTableausSimple(
+export function calculateMinTempTableaus(
   moveSize: number,
   emptyCells: number,
 ): number {
-  return Math.ceil(Math.log2(moveSize / (emptyCells + 1)));
-}
-
-/**
- * Calculates the minimum empty tableau piles
- * required to temporarily store cards according to the formula:
- * `requiredTableaus >= log2(moveSize / (emptyCells + 1))`
- */
-function calculateMinTempTableaus(
-  cardMoves: CardMoveSequence,
-  emptyCells: number,
-): number {
-  const moveSize = cardMoves.steps.length;
   return Math.ceil(Math.log2(moveSize / (emptyCells + 1)));
 }
 

@@ -123,7 +123,6 @@ function dropCardInNewPile(
       );
     }),
   );
-  deck.executeCardMoveSequence(moveSequence);
   moveHistory.push(moveSequence);
 }
 
@@ -157,6 +156,5 @@ function snapCardToFoundationPile(
       newPilePosition.position,
     ),
   ]);
-  deck.executeCardMoveSequence(moveSequence);
   moveHistory.push(moveSequence);
 }

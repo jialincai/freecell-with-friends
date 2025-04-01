@@ -1,7 +1,12 @@
 import { CardController } from "@phaser/card/CardController";
 import { PileId } from "@phaser/constants/table";
 import { Deck } from "@phaser/deck/state/Deck";
-import { dealCards, shuffleCards } from "@phaser/deck/domain/DeckLogic";
+import {
+  dealCards,
+  applyCardMoves,
+  shuffleCards,
+  setupTableauDrag,
+} from "@phaser/deck/domain/DeckLogic";
 import { CardMoveSequence } from "@phaser/move/CardMoveSequence";
 import { CardId } from "@phaser/card/domain/CardId";
 
@@ -30,10 +35,24 @@ export class DeckController {
   }
 
   executeCardMoveSequence(cardMoves: CardMoveSequence) {
-    cardMoves.steps.forEach((move) => {
-      const cardController = this.findCardControllerWithId(move.card);
-      cardController?.setPilePosition(move.toPile, move.toPosition);
-    });
+    this.model = applyCardMoves(this.model, cardMoves);
+    this.cardControllers.forEach((c, i) => c.setModel(this.model.cards[i]));
+  }
+
+  // TODO: This function is for debugging only.
+  // Please remove and replace with proper animations in the future.
+  async executeCardMoveSequenceWithDelay(
+    cardMoves: CardMoveSequence,
+    delayMs: number,
+  ) {
+    const wait = (ms: number) =>
+      new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+    for (const { card, toPile, toPosition } of cardMoves.steps) {
+      this.getCardControllerWithId(card)?.setPilePosition(toPile, toPosition);
+
+      await wait(delayMs);
+    }
   }
 
   dealCards(): void {
@@ -46,7 +65,7 @@ export class DeckController {
     this.cardControllers.forEach((c, i) => c.setModel(this.model.cards[i]));
   }
 
-  private findCardControllerWithId(cardId: CardId): CardController | undefined {
+  private getCardControllerWithId(cardId: CardId): CardController | undefined {
     return this.cardControllers.find(
       (controller) => controller.model.data.id === cardId,
     );

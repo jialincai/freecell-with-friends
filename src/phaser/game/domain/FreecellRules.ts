@@ -13,10 +13,12 @@ import {
   isSameSuit,
 } from "@phaser/card/domain/CardComparison";
 import {
+  filterEmptyPiles,
   getCardsInPile,
   getCardsStartingFrom,
 } from "@phaser/deck/domain/DeckLogic";
 import { Deck } from "@phaser/deck/state/Deck";
+import { CardMoveSequence } from "@phaser/move/CardMoveSequence";
 
 export function mapValidDropPiles(
   deck: Deck,
@@ -50,20 +52,18 @@ export function canMoveCard(deck: Deck, card: Card): boolean {
   return DRAG_RULES[card.state.pile]?.(deck, card) ?? false;
 }
 
-/**
- * Calculates how many cards can be moved according to formula:
- * maxMoveSize = (emptyCells + 1) * 2^emptyTableaus
- */
-function calculateMaxMoveSize(deck: Deck, excludePile: PileId): number {
-  const emptyCells = CELL_PILES.filter(
-    (id) => getCardsInPile(deck, id).length === 0,
-  ).length;
+export function calculateMaxMoveSize(
+  emptyCells: number,
+  emptyTableaus: number,
+): number {
+  return (emptyCells + 1) << emptyTableaus;
+}
 
-  const emptyTableaus = TABLEAU_PILES.filter(
-    (id) => id !== excludePile && getCardsInPile(deck, id).length === 0,
-  ).length;
-
-  return (emptyCells + 1) * 2 ** emptyTableaus;
+export function calculateMinTempTableaus(
+  moveSize: number,
+  emptyCells: number,
+): number {
+  return Math.ceil(Math.log2(moveSize / (emptyCells + 1)));
 }
 
 const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
@@ -108,7 +108,12 @@ const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
       pileId,
       (deck: Deck, card: Card) => {
         const stack = getCardsStartingFrom(deck, card);
-        if (stack.length > calculateMaxMoveSize(deck, pileId)) return false;
+        const emptyCells = filterEmptyPiles(deck, CELL_PILES);
+        const availableTableaus = filterEmptyPiles(
+          deck,
+          TABLEAU_PILES.filter((pile) => pile !== pileId),
+        );
+        if (stack.length > calculateMaxMoveSize(emptyCells.length, availableTableaus.length)) return false;
 
         const resultingPile = [...getCardsInPile(deck, pileId), ...stack];
         const activeSequence = resultingPile.slice(-stack.length - 1);
@@ -140,7 +145,12 @@ const DRAG_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
       pileId,
       (deck: Deck, card: Card) => {
         const stack = getCardsStartingFrom(deck, card);
-        if (stack.length > calculateMaxMoveSize(deck, pileId)) return false;
+        const emptyCells = filterEmptyPiles(deck, CELL_PILES);
+        const availableTableaus = filterEmptyPiles(
+          deck,
+          TABLEAU_PILES.filter((pile) => pile !== pileId),
+        );
+        if (stack.length > calculateMaxMoveSize(emptyCells.length, availableTableaus.length)) return false;
 
         return isFollowingRules(
           stack.map((c) => c.data),

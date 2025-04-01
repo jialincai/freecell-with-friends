@@ -5,114 +5,116 @@ import {
   applyCardMoves,
 } from "@phaser/deck/domain/DeckLogic";
 import { Deck } from "@phaser/deck/state/Deck";
-import { calculateMaxMoveSize } from "@phaser/game/domain/FreecellRules";
 import {
   CardMoveSequence,
   createCardMoveSequence,
 } from "@phaser/move/CardMoveSequence";
 import { CardMove, createCardMove } from "@phaser/move/CardMove";
+import { calculateMaxMoveSize, calculateMaxMoveSizeSimple, calculateMinTempTableausSimple } from "@phaser/game/domain/FreecellRules";
 
 /**
  * Expands a simplified move sequence to include intermediate steps.
- * Undefined error if move sequence is invalid.
+ *
+ * A simplified move sequence has the following attributes
+ * 1) Doesn't exceed maximum number of movable cards.
+ * 1) N number of cards from the bottom of one pile moved to another pile.
+ * 2) Cards moved in descending position order.
+ *
+ * This function yeilds undefined behavior if move sequence
+ * does not adhere to these rules.
  */
 export function expand(
   deck: Deck,
   cardMoves: CardMoveSequence,
 ): CardMoveSequence {
   const moveSize = cardMoves.steps.length;
-  const [first] = cardMoves.steps;
+  const [firstStep] = cardMoves.steps;
 
-  const emptyCells = filterEmptyPiles(deck, CELL_PILES).length;
-  const emptyTableaus = filterEmptyPiles(
+  const emptyCells = filterEmptyPiles(deck, CELL_PILES);
+  if (moveSize <= emptyCells.length + 1) {
+    return expandViaCells(deck, cardMoves);
+  }
+
+  console.log("attempting recursion");
+  const tempTableaus = filterEmptyPiles(
     deck,
-    TABLEAU_PILES.filter((p) => p !== first.toPile),
+    TABLEAU_PILES.filter((pile) => pile !== firstStep.toPile),
   );
-  const maxMoveSize = calculateMaxMoveSize(deck, []);
-  const maxCellOnlyMoveSize = calculateMaxMoveSize(deck, TABLEAU_PILES);
-  const minTableaus = calculateMinTableaus(moveSize, emptyCells);
-
-  if (moveSize > maxMoveSize) {
-    throw new Error(
-      `Move size (${moveSize}) exceeds allowed maximum (${maxMoveSize}).`,
-    );
-  }
-  if (minTableaus > emptyTableaus.length) {
-    throw new Error(
-      `Cannot expand move sequence: requires ${minTableaus} empty tableaus, but only ${emptyTableaus.length} available.`,
-    );
-  }
-
-  // Base Case
-  if (moveSize <= maxCellOnlyMoveSize) {
-    return expandViaFreeCells(deck, cardMoves);
-  } else {
-    const temp = emptyTableaus[0];
-    return expandViaTempTableauRecursive(deck, cardMoves, temp);
-  }
+  return expandViaTempTableauPilesRecursive(deck, cardMoves, tempTableaus[0]);
 }
 
-/**
- * Recursively expands a move sequence using one temporary tableau pile.
- */
-function expandViaTempTableauRecursive(
+function expandViaTempTableauPilesRecursive(
   deck: Deck,
   cardMoves: CardMoveSequence,
   temp: PileId,
 ): CardMoveSequence {
-  const [firstMove] = cardMoves.steps;
   const moveSize = cardMoves.steps.length;
-  const cellLimit = calculateMaxMoveSize(deck, TABLEAU_PILES);
+  const [firstStep] = cardMoves.steps;
 
-  const firstPart = expand(
+  const emptyCells = filterEmptyPiles(deck, CELL_PILES);
+  const tempTableaus = filterEmptyPiles(
     deck,
-    createCardMoveSequenceFromDeck(deck, firstMove.fromPile, temp, cellLimit),
+    TABLEAU_PILES.filter((pile) => pile !== firstStep.toPile),
   );
-  const deckAfterFirst = applyCardMoves(deck, firstPart);
+  const minTableau = calculateMinTempTableausSimple(moveSize, emptyCells.length);
+  const subOne = calculateMaxMoveSizeSimple(emptyCells.length, minTableau - 1);
 
-  const secondPart = expand(
-    deckAfterFirst,
+  const sourceToTempTableau = expand(
+    deck,
     createCardMoveSequenceFromDeck(
-      deckAfterFirst,
-      firstMove.fromPile,
-      firstMove.toPile,
-      moveSize - cellLimit,
+      deck,
+      firstStep.fromPile,
+      temp,
+      subOne,
     ),
   );
-  const deckAfterSecond = applyCardMoves(deckAfterFirst, secondPart);
+  const deckAfterSourceToTempTableau = applyCardMoves(deck, sourceToTempTableau);
 
-  const thirdPart = expand(
-    deckAfterSecond,
+  const sourceToTarget = expand(
+    deckAfterSourceToTempTableau,
     createCardMoveSequenceFromDeck(
-      deckAfterSecond,
+      deckAfterSourceToTempTableau,
+      firstStep.fromPile,
+      firstStep.toPile,
+      moveSize - subOne,
+    ),
+  );
+  const deckAfterSourceToTarget = applyCardMoves(deckAfterSourceToTempTableau, sourceToTarget);
+
+  const tempTableauToTarget = expand(
+    deckAfterSourceToTarget,
+    createCardMoveSequenceFromDeck(
+      deckAfterSourceToTarget,
       temp,
-      firstMove.toPile,
-      cellLimit,
+      firstStep.toPile,
+      subOne,
     ),
   );
 
   return createCardMoveSequence([
-    ...firstPart.steps,
-    ...secondPart.steps,
-    ...thirdPart.steps,
+    ...sourceToTempTableau.steps,
+    ...sourceToTarget.steps,
+    ...tempTableauToTarget.steps,
   ]);
 }
 
-function expandViaFreeCells(
+function expandViaCells(
   deck: Deck,
   cardMoves: CardMoveSequence,
 ): CardMoveSequence {
   const [top, ...children] = cardMoves.steps;
-
-  const empty = filterEmptyPiles(
-    deck,
-    [...CELL_PILES, ...TABLEAU_PILES].filter((p) => p !== top.toPile),
-  );
+  const emptyCells = filterEmptyPiles(deck, CELL_PILES);
 
   const childrenToCells = [...children]
     .reverse()
     .map((step, i) =>
-      createCardMove(step.card, step.fromPile, step.fromPosition, empty[i], 0),
+      createCardMove(
+        step.card,
+        step.fromPile,
+        step.fromPosition,
+        emptyCells[i],
+        0,
+      ),
     );
 
   const topToTarget = createCardMove(
@@ -126,7 +128,7 @@ function expandViaFreeCells(
   const childrenToTarget = children.map((step, i) =>
     createCardMove(
       step.card,
-      empty[children.length - i - 1],
+      emptyCells[children.length - i - 1],
       0,
       step.toPile,
       step.toPosition,
@@ -138,13 +140,6 @@ function expandViaFreeCells(
     topToTarget,
     ...childrenToTarget,
   ]);
-}
-
-/**
- * Calculates the number of empty tableau piles required to legally move a given number of cards.
- */
-function calculateMinTableaus(moveSize: number, emptyCells: number): number {
-  return Math.ceil(Math.log2(moveSize / (emptyCells + 1)));
 }
 
 /**

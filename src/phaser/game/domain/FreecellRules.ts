@@ -75,11 +75,17 @@ export function calculateMaxMoveSize(
   return (emptyCells + 1) << emptyTableaus;
 }
 
-export function calculateMaxMoveSizeSimple(emptyCells: number, emptyTableaus: number): number {
+export function calculateMaxMoveSizeSimple(
+  emptyCells: number,
+  emptyTableaus: number,
+): number {
   return (emptyCells + 1) << emptyTableaus;
 }
 
-export function calculateMinTempTableausSimple(moveSize: number, emptyCells: number): number {
+export function calculateMinTempTableausSimple(
+  moveSize: number,
+  emptyCells: number,
+): number {
   return Math.ceil(Math.log2(moveSize / (emptyCells + 1)));
 }
 

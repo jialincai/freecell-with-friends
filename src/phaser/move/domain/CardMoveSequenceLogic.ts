@@ -9,19 +9,30 @@ import {
   CardMoveSequence,
   createCardMoveSequence,
 } from "@phaser/move/CardMoveSequence";
-import { CardMove, createCardMove } from "@phaser/move/CardMove";
-import { calculateMaxMoveSize, calculateMaxMoveSizeSimple, calculateMinTempTableausSimple } from "@phaser/game/domain/FreecellRules";
+import { createCardMove } from "@phaser/move/CardMove";
+import {
+  calculateMaxMoveSizeSimple,
+  calculateMinTempTableausSimple,
+} from "@phaser/game/domain/FreecellRules";
 
 /**
- * Expands a simplified move sequence to include intermediate steps.
+ * Expands a simplified move sequence into intermediate steps using free cells
+ * and potentially a temporary tableau pile when required.
  *
- * A simplified move sequence has the following attributes
- * 1) Doesn't exceed maximum number of movable cards.
- * 1) N number of cards from the bottom of one pile moved to another pile.
- * 2) Cards moved in descending position order.
+ * Assumptions for a valid simplified sequence:
+ * 1. The number of cards to move does not exceed the maximum legal move size.
+ * 2. Cards are moved from the bottom of one pile to another.
+ * 3. Cards are ordered by ascending position (topmost card is last).
  *
- * This function yeilds undefined behavior if move sequence
- * does not adhere to these rules.
+ * Recursively expands the move using this strategy:
+ * - If the move fits within free cells only, spread children into cells, move top, and reassemble.
+ * - Otherwise, calculate how many cards can be moved with one fewer tableau pile (approaching base case).
+ *   Recursively split the move into three parts:
+ *   1. Move the largest chunk that can be handled with one fewer tableau to a temporary tableau.
+ *   2. Move the remaining cards to the target.
+ *   3. Move the cards from the temporary tableau to the target.
+ *
+ * Undefined behavior occurs if the input sequence violates the assumptions.
  */
 export function expand(
   deck: Deck,
@@ -32,80 +43,82 @@ export function expand(
 
   const emptyCells = filterEmptyPiles(deck, CELL_PILES);
   if (moveSize <= emptyCells.length + 1) {
-    return expandViaCells(deck, cardMoves);
+    return expandWithFreeCells(deck, cardMoves);
   }
 
-  console.log("attempting recursion");
-  const tempTableaus = filterEmptyPiles(
+  const availableTableaus = filterEmptyPiles(
     deck,
     TABLEAU_PILES.filter((pile) => pile !== firstStep.toPile),
   );
-  return expandViaTempTableauPilesRecursive(deck, cardMoves, tempTableaus[0]);
+
+  return expandWithTempTableau(deck, cardMoves, availableTableaus[0]);
 }
 
-function expandViaTempTableauPilesRecursive(
+function expandWithTempTableau(
   deck: Deck,
   cardMoves: CardMoveSequence,
-  temp: PileId,
+  tempTableau: PileId,
 ): CardMoveSequence {
   const moveSize = cardMoves.steps.length;
   const [firstStep] = cardMoves.steps;
 
   const emptyCells = filterEmptyPiles(deck, CELL_PILES);
-  const tempTableaus = filterEmptyPiles(
-    deck,
-    TABLEAU_PILES.filter((pile) => pile !== firstStep.toPile),
+  const minTempTableaus = calculateMinTempTableausSimple(
+    moveSize,
+    emptyCells.length,
   );
-  const minTableau = calculateMinTempTableausSimple(moveSize, emptyCells.length);
-  const subOne = calculateMaxMoveSizeSimple(emptyCells.length, minTableau - 1);
+  const cardsToTemp = calculateMaxMoveSizeSimple(
+    emptyCells.length,
+    minTempTableaus - 1,
+  );
 
-  const sourceToTempTableau = expand(
+  const moveToTemp = expand(
     deck,
     createCardMoveSequenceFromDeck(
       deck,
       firstStep.fromPile,
-      temp,
-      subOne,
+      tempTableau,
+      cardsToTemp,
     ),
   );
-  const deckAfterSourceToTempTableau = applyCardMoves(deck, sourceToTempTableau);
+  const deckAfterTemp = applyCardMoves(deck, moveToTemp);
 
-  const sourceToTarget = expand(
-    deckAfterSourceToTempTableau,
+  const moveToTarget = expand(
+    deckAfterTemp,
     createCardMoveSequenceFromDeck(
-      deckAfterSourceToTempTableau,
+      deckAfterTemp,
       firstStep.fromPile,
       firstStep.toPile,
-      moveSize - subOne,
+      moveSize - cardsToTemp,
     ),
   );
-  const deckAfterSourceToTarget = applyCardMoves(deckAfterSourceToTempTableau, sourceToTarget);
+  const deckAfterTarget = applyCardMoves(deckAfterTemp, moveToTarget);
 
-  const tempTableauToTarget = expand(
-    deckAfterSourceToTarget,
+  const moveFromTemp = expand(
+    deckAfterTarget,
     createCardMoveSequenceFromDeck(
-      deckAfterSourceToTarget,
-      temp,
+      deckAfterTarget,
+      tempTableau,
       firstStep.toPile,
-      subOne,
+      cardsToTemp,
     ),
   );
 
   return createCardMoveSequence([
-    ...sourceToTempTableau.steps,
-    ...sourceToTarget.steps,
-    ...tempTableauToTarget.steps,
+    ...moveToTemp.steps,
+    ...moveToTarget.steps,
+    ...moveFromTemp.steps,
   ]);
 }
 
-function expandViaCells(
+function expandWithFreeCells(
   deck: Deck,
   cardMoves: CardMoveSequence,
 ): CardMoveSequence {
-  const [top, ...children] = cardMoves.steps;
+  const [topCardMove, ...restMoves] = cardMoves.steps;
   const emptyCells = filterEmptyPiles(deck, CELL_PILES);
 
-  const childrenToCells = [...children]
+  const moveChildrenToCells = [...restMoves]
     .reverse()
     .map((step, i) =>
       createCardMove(
@@ -117,18 +130,18 @@ function expandViaCells(
       ),
     );
 
-  const topToTarget = createCardMove(
-    top.card,
-    top.fromPile,
-    top.fromPosition,
-    top.toPile,
-    top.toPosition,
+  const moveTopCard = createCardMove(
+    topCardMove.card,
+    topCardMove.fromPile,
+    topCardMove.fromPosition,
+    topCardMove.toPile,
+    topCardMove.toPosition,
   );
 
-  const childrenToTarget = children.map((step, i) =>
+  const moveChildrenToTarget = restMoves.map((step, i) =>
     createCardMove(
       step.card,
-      emptyCells[children.length - i - 1],
+      emptyCells[restMoves.length - i - 1],
       0,
       step.toPile,
       step.toPosition,
@@ -136,15 +149,12 @@ function expandViaCells(
   );
 
   return createCardMoveSequence([
-    ...childrenToCells,
-    topToTarget,
-    ...childrenToTarget,
+    ...moveChildrenToCells,
+    moveTopCard,
+    ...moveChildrenToTarget,
   ]);
 }
 
-/**
- * Generates a move sequence for the last N cards in a pile.
- */
 function createCardMoveSequenceFromDeck(
   deck: Deck,
   fromPile: PileId,
@@ -172,9 +182,6 @@ function createCardMoveSequenceFromDeck(
   return createCardMoveSequence(steps);
 }
 
-/**
- * Reverses a move sequence for undo logic.
- */
 export function deriveUndo(cardMoves: CardMoveSequence): CardMoveSequence {
   return createCardMoveSequence(
     [...cardMoves.steps]

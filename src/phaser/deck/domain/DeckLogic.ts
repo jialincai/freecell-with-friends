@@ -79,7 +79,8 @@ export function shuffleCards(deck: Deck, seed: number): Deck {
   };
 }
 
-// TODO remove setup TableauDrag function
+// TODO: This function is for debugging only.
+// Please remove this function or move into a test in the future.
 export function setupTableauDrag(deck: Deck): Deck {
   const sorted = [...deck.cards].sort((a, b) => b.data.rank - a.data.rank);
 
@@ -136,6 +137,8 @@ export function setupTableauDrag(deck: Deck): Deck {
   };
 }
 
+// TODO: This function is for debugging only. It's a helper for setupTableauDrag.
+// Please remove this function or move into a test in the future.
 function buildAlternatingStack(
   redSuitCards: Card[],
   blackSuitCards: Card[],

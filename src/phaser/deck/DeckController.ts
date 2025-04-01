@@ -56,9 +56,7 @@ export class DeckController {
   }
 
   dealCards(): void {
-    // TODO: Revert to regular deal
-    // this.model = dealCards(this.model);
-    this.model = setupTableauDrag(this.model);
+    this.model = dealCards(this.model);
     this.cardControllers.forEach((c, i) => c.setModel(this.model.cards[i]));
   }
 

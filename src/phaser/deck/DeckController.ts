@@ -2,7 +2,6 @@ import { CardController } from "@phaser/card/CardController";
 import { PileId } from "@phaser/constants/table";
 import { Deck } from "@phaser/deck/state/Deck";
 import {
-  dealCards,
   applyCardMoves,
   shuffleCards,
   setupTableauDrag,
@@ -50,13 +49,15 @@ export class DeckController {
 
     for (const { card, toPile, toPosition } of cardMoves.steps) {
       this.getCardControllerWithId(card)?.setPilePosition(toPile, toPosition);
-
+      console.log(`Moving card ${card} to ${toPile}:${toPosition}`);
       await wait(delayMs);
     }
   }
 
   dealCards(): void {
-    this.model = dealCards(this.model);
+    // TODO uncomment dealCards
+    // this.model = dealCards(this.model);
+    this.model = setupTableauDrag(this.model);
     this.cardControllers.forEach((c, i) => c.setModel(this.model.cards[i]));
   }
 

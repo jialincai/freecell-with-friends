@@ -2,7 +2,7 @@ import * as Phaser from "phaser";
 
 import { PubSubStack } from "@utils/Function";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@phaser/constants/screen";
-import { FOUNDATION_PILES, PileId } from "@phaser/constants/table";
+import { PileId } from "@phaser/constants/table";
 import { setupCardInteraction } from "@phaser/game/input/CardInteraction";
 import { setupHoverHighlight } from "@phaser/game/input/HoverHighlight";
 import { DeckController } from "@phaser/deck/DeckController";
@@ -14,6 +14,11 @@ import {
   invertCardMoveSequence,
   expand,
 } from "@phaser/move/domain/CardMoveSequenceLogic";
+import {
+  areFoundationPilesFull,
+  createCardMoveSequenceForAutoComplete,
+  isDeckReadyForAutoComplete,
+} from "../domain/FreecellRules";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -40,7 +45,7 @@ export default class GameState extends Phaser.Scene {
     // Create deck
     const deckModel = createDeck();
     this.deck = new DeckController(this, deckModel);
-    this.deck.shuffleCards(476);
+    // this.deck.shuffleCards(476);
     this.deck.dealCards();
 
     // Create piles
@@ -121,13 +126,15 @@ export default class GameState extends Phaser.Scene {
   }
 
   public update(): void {
-    // Win condition
-    const cardsOnFoundation = FOUNDATION_PILES.reduce(
-      (acc: number, pile: PileId) =>
-        acc + this.deck.getCardsInPile(pile).length,
-      0,
-    );
-    if (cardsOnFoundation === 52) {
+    // Autocomplete
+    if (isDeckReadyForAutoComplete(this.deck.model)) {
+      const autoCompleteSequence = createCardMoveSequenceForAutoComplete(
+        this.deck.model,
+      );
+      this.deck.executeCardMoveSequenceWithDelay(autoCompleteSequence, 10000);
+    }
+
+    if (areFoundationPilesFull(this.deck.model)) {
       this.winText.setVisible(true);
     }
   }

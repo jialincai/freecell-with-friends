@@ -13,11 +13,18 @@ import {
   isSameSuit,
 } from "@phaser/card/domain/CardComparison";
 import {
+  applyCardMoves,
   filterEmptyPiles,
+  filterNonEmptyPiles,
   getCardsInPile,
   getCardsStartingFrom,
 } from "@phaser/deck/domain/DeckLogic";
 import { Deck } from "@phaser/deck/state/Deck";
+import {
+  CardMoveSequence,
+  createCardMoveSequence,
+} from "@phaser/move/CardMoveSequence";
+import { CardMove, createCardMove } from "@phaser/move/CardMove";
 
 export function mapValidDropPiles(
   deck: Deck,
@@ -51,6 +58,82 @@ export function calculateMinTempTableaus(
   emptyCells: number,
 ): number {
   return Math.ceil(Math.log2(moveSize / (emptyCells + 1)));
+}
+
+export function isDeckReadyForAutoComplete(deck: Deck): boolean {
+  const allTableausOrdered = TABLEAU_PILES.every((pile) => {
+    const pileCards = getCardsInPile(deck, pile).map((card) => card.data);
+    return isFollowingRules(pileCards, [isDescending, isDifferentColor]);
+  });
+
+  return allTableausOrdered;
+}
+
+export function areFoundationPilesFull(deck: Deck): boolean {
+  const totalCardsOnFoundations = FOUNDATION_PILES.reduce(
+    (count, pile) => count + getCardsInPile(deck, pile).length,
+    0,
+  );
+
+  return totalCardsOnFoundations === 52;
+}
+
+export function createCardMoveSequenceForAutoComplete(
+  deck: Deck,
+): CardMoveSequence {
+  let currentDeck: Deck = {
+    cards: deck.cards.map((card) => ({
+      ...card,
+      state: { ...card.state },
+      data: { ...card.data },
+    })),
+  };
+  const moves: CardMove[] = [];
+
+  while (!areFoundationPilesFull(currentDeck)) {
+    const pilesWithCards = filterNonEmptyPiles(currentDeck, [
+      ...TABLEAU_PILES,
+      ...CELL_PILES,
+    ]);
+    let moveMade = false;
+
+    for (const pile of pilesWithCards) {
+      const pileCards = getCardsInPile(currentDeck, pile);
+      const topCard = pileCards[pileCards.length - 1];
+      if (!topCard) continue;
+
+      for (const foundation of FOUNDATION_PILES) {
+        const canDrop = DROP_RULES[foundation]?.(currentDeck, topCard);
+        if (canDrop) {
+          const foundationPosition = getCardsInPile(
+            currentDeck,
+            foundation,
+          ).length;
+          const move = createCardMove(
+            topCard.data.id,
+            pile,
+            topCard.state.position,
+            foundation,
+            foundationPosition,
+          );
+
+          moves.push(move);
+          currentDeck = applyCardMoves(
+            currentDeck,
+            createCardMoveSequence([move]),
+          );
+          moveMade = true;
+          break;
+        }
+      }
+
+      if (moveMade) break;
+    }
+
+    if (!moveMade) break;
+  }
+
+  return createCardMoveSequence(moves);
 }
 
 const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
@@ -100,7 +183,11 @@ const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
           deck,
           TABLEAU_PILES.filter((pile) => pile !== pileId),
         );
-        if (stack.length > calculateMaxMoveSize(emptyCells.length, availableTableaus.length)) return false;
+        if (
+          stack.length >
+          calculateMaxMoveSize(emptyCells.length, availableTableaus.length)
+        )
+          return false;
 
         const resultingPile = [...getCardsInPile(deck, pileId), ...stack];
         const activeSequence = resultingPile.slice(-stack.length - 1);
@@ -137,7 +224,11 @@ const DRAG_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
           deck,
           TABLEAU_PILES.filter((pile) => pile !== pileId),
         );
-        if (stack.length > calculateMaxMoveSize(emptyCells.length, availableTableaus.length)) return false;
+        if (
+          stack.length >
+          calculateMaxMoveSize(emptyCells.length, availableTableaus.length)
+        )
+          return false;
 
         return isFollowingRules(
           stack.map((c) => c.data),

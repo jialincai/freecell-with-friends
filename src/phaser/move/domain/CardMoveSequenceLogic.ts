@@ -74,7 +74,7 @@ function expandWithTempTableau(
 
   const moveToTemp = expand(
     deck,
-    createCardMoveSequenceFromDeck(
+    createPileToPileCardMoveSequence(
       deck,
       firstStep.fromPile,
       tempTableau,
@@ -85,7 +85,7 @@ function expandWithTempTableau(
 
   const moveToTarget = expand(
     deckAfterTemp,
-    createCardMoveSequenceFromDeck(
+    createPileToPileCardMoveSequence(
       deckAfterTemp,
       firstStep.fromPile,
       firstStep.toPile,
@@ -96,7 +96,7 @@ function expandWithTempTableau(
 
   const moveFromTemp = expand(
     deckAfterTarget,
-    createCardMoveSequenceFromDeck(
+    createPileToPileCardMoveSequence(
       deckAfterTarget,
       tempTableau,
       firstStep.toPile,
@@ -155,31 +155,31 @@ function expandWithFreeCells(
   ]);
 }
 
-function createCardMoveSequenceFromDeck(
+function createPileToPileCardMoveSequence(
   deck: Deck,
   fromPile: PileId,
   toPile: PileId,
-  nCardsToMove: number,
+  numCardsToMove: number,
 ): CardMoveSequence {
-  const from = getCardsInPile(deck, fromPile);
-  const to = getCardsInPile(deck, toPile);
+  const sourcePileCards = getCardsInPile(deck, fromPile);
+  const destinationPileCards = getCardsInPile(deck, toPile);
 
-  const startFrom = from.length - nCardsToMove;
-  const startTo = to.length;
+  const startFromPosition = sourcePileCards.length - numCardsToMove;
+  const startToPosition = destinationPileCards.length;
 
-  const steps = from
-    .slice(-nCardsToMove)
-    .map((card, i) =>
+  const moveSteps = sourcePileCards
+    .slice(-numCardsToMove)
+    .map((card, index) =>
       createCardMove(
         card.data.id,
         fromPile,
-        startFrom + i,
+        startFromPosition + index,
         toPile,
-        startTo + i,
-      ),
+        startToPosition + index
+      )
     );
 
-  return createCardMoveSequence(steps);
+  return createCardMoveSequence(moveSteps);
 }
 
 export function deriveUndo(cardMoves: CardMoveSequence): CardMoveSequence {

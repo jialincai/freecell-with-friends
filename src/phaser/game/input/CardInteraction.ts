@@ -6,7 +6,6 @@ import { DeckController } from "@phaser/deck/DeckController";
 import { PileView } from "@phaser/pile/PileView";
 import {
   canMoveCard,
-  calculateNewPilePosition,
   filterValidDropPiles,
 } from "@phaser/game/domain/FreecellRules";
 import { createCardMove } from "@phaser/move/CardMove";
@@ -14,6 +13,7 @@ import {
   CardMoveSequence,
   createCardMoveSequence,
 } from "@phaser/move/CardMoveSequence";
+import { calculateNewPilePosition } from "@phaser/deck/domain/DeckLogic";
 
 export function setupCardInteraction(
   deckController: DeckController,

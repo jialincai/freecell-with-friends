@@ -5,6 +5,18 @@ import { withFaceUp, withPilePosition } from "@phaser/card/domain/CardLogic";
 import { CardMoveSequence } from "@phaser/move/CardMoveSequence";
 import { Rank, Suit } from "@phaser/constants/deck";
 
+export function calculateNewPilePosition(
+  deck: Deck,
+  cards: Card[],
+  pileId: PileId,
+): Array<{ pile: PileId; position: number }> {
+  const startPosition = getCardsInPile(deck, pileId).length;
+  return cards.map((_, i) => ({
+    pile: pileId,
+    position: startPosition + i,
+  }));
+}
+
 export function applyCardMoves(deck: Deck, cardMoves: CardMoveSequence): Deck {
   const updatedCards = cardMoves.steps.reduce((cards, move) => {
     return cards.map((card) => {

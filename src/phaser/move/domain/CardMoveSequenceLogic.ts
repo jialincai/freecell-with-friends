@@ -164,32 +164,33 @@ function expandWithFreeCells(
 export function createAutocompleteCardMoveSequence(
   deck: Deck,
 ): CardMoveSequence {
-  let deckState = structuredClone(deck);
-  const moveList = [];
+  let deckState: Deck = structuredClone(deck);
+  const moveList: CardMove[] = [];
 
   while (!areFoundationsFull(deckState)) {
-    const pilesWithCards = filterNonEmptyPiles(deckState, [
+    const movablePiles = filterNonEmptyPiles(deckState, [
       ...TABLEAU_PILES,
       ...CELL_PILES,
     ]);
 
-    for (const sourcePileId of pilesWithCards) {
+    for (const sourcePileId of movablePiles) {
       const sourceCards = getCardsInPile(deckState, sourcePileId);
-      const topCard = sourceCards[sourceCards.length - 1];
+      const bottom = sourceCards.at(-1);
+      if (!bottom) continue;
 
-      const dropTarget = filterValidDropPiles(
-        deck,
-        topCard,
+      const destinationFoundation = filterValidDropPiles(
+        deckState,
+        bottom,
         FOUNDATION_PILES,
       )?.[0];
-      if (dropTarget) continue;
+      if (!destinationFoundation) continue;
 
       const move = createCardMove(
-        topCard.data.id,
+        bottom.data.id,
         sourcePileId,
-        topCard.state.position,
-        dropTarget,
-        getCardsInPile(deckState, dropTarget).length,
+        bottom.state.position,
+        destinationFoundation,
+        getCardsInPile(deckState, destinationFoundation).length,
       );
 
       moveList.push(move);

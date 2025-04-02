@@ -53,6 +53,11 @@ export function filterEmptyPiles(deck: Deck, piles: PileId[]) {
   });
 }
 
+export function filterNonEmptyPiles(deck: Deck, piles: PileId[]) {
+  const empty = filterEmptyPiles(deck, piles);
+  return piles.filter((pile) => !empty.includes(pile));
+}
+
 export function dealCards(deck: Deck): Deck {
   const cards = deck.cards.map((card, index) => {
     const pile = TABLEAU_PILES[index % 8];
@@ -96,45 +101,34 @@ export function shuffleCards(deck: Deck, seed: number): Deck {
 export function setupTableauDrag(deck: Deck): Deck {
   const sorted = [...deck.cards].sort((a, b) => b.data.rank - a.data.rank);
 
-  // Group by suit
+  // Group cards by suit
   const hearts = sorted.filter((c) => c.data.suit === Suit.Hearts);
   const diamonds = sorted.filter((c) => c.data.suit === Suit.Diamonds);
   const spades = sorted.filter((c) => c.data.suit === Suit.Spades);
   const clubs = sorted.filter((c) => c.data.suit === Suit.Clubs);
 
-  // Build one stack starting with red, one with black
-  const redFirstStack = buildAlternatingStack([...hearts], [...clubs], "red");
-  const blackFirstStack = buildAlternatingStack(
-    [...spades],
-    [...diamonds],
-    "black",
-  );
+  // Build four distinct alternating stacks (each King-to-Ace) for 4 tableau piles
+  const stack1 = buildAlternatingColorStack([...spades], [...hearts]); // starts black
+  const stack2 = buildAlternatingColorStack([...clubs], [...diamonds]); // starts black
+  const stack3 = buildAlternatingColorStack([...hearts], [...spades]); // starts red
+  const stack4 = buildAlternatingColorStack([...diamonds], [...clubs]); // starts red
 
-  // Assign stacks to Tableau1 and Tableau2
-  redFirstStack.forEach((card, i) => {
-    card.state = {
-      ...withFaceUp(card.state),
-      pile: PileId.Tableau1,
-      position: i,
-    };
+  const tableauStacks = [stack1, stack2, stack3, stack4];
+
+  tableauStacks.forEach((stack, i) => {
+    stack.forEach((card, pos) => {
+      card.state = {
+        ...withFaceUp(card.state),
+        pile: TABLEAU_PILES[i],
+        position: pos,
+      };
+    });
   });
 
-  blackFirstStack.forEach((card, i) => {
-    card.state = {
-      ...withFaceUp(card.state),
-      pile: PileId.Tableau2,
-      position: i,
-    };
-  });
+  const usedIds = new Set(tableauStacks.flat().map((card) => card.data.id));
 
-  // Collect all used card IDs
-  const usedIds = new Set(
-    [...redFirstStack, ...blackFirstStack].map((c) => c.data.id),
-  );
-
-  // Put the remaining cards into PileId.None
   const rest = deck.cards
-    .filter((c) => !usedIds.has(c.data.id))
+    .filter((card) => !usedIds.has(card.data.id))
     .map((card) => ({
       ...card,
       state: {
@@ -145,34 +139,30 @@ export function setupTableauDrag(deck: Deck): Deck {
     }));
 
   return {
-    cards: [...redFirstStack, ...blackFirstStack, ...rest],
+    cards: [...tableauStacks.flat(), ...rest],
   };
 }
 
-// TODO: This function is for debugging only. It's a helper for setupTableauDrag.
+// TODO: This function is for debugging only.
 // Please remove this function or move into a test in the future.
-function buildAlternatingStack(
-  redSuitCards: Card[],
-  blackSuitCards: Card[],
-  startingColor: "red" | "black",
-  maxLength = 13,
+function buildAlternatingColorStack(
+  primaryColor: Card[],
+  alternateColor: Card[],
 ): Card[] {
   const stack: Card[] = [];
   let rank = Rank.King;
-  let color = startingColor;
+  let usePrimary = true;
 
-  while (rank >= Rank.Ace && stack.length < maxLength) {
-    const source = (color === "red" ? redSuitCards : blackSuitCards).filter(
-      (card) => card.data.rank === rank && !stack.includes(card),
-    );
+  while (rank >= Rank.Ace && stack.length < 13) {
+    const source = usePrimary ? primaryColor : alternateColor;
+    const card = source.find((c) => c.data.rank === rank && !stack.includes(c));
 
-    if (source.length > 0) {
-      const card = source[0];
+    if (card) {
       stack.push(card);
-      color = color === "red" ? "black" : "red";
+      rank--;
     }
 
-    rank--;
+    usePrimary = !usePrimary;
   }
 
   return stack;

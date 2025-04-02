@@ -53,6 +53,24 @@ export function calculateMinTempTableaus(
   return Math.ceil(Math.log2(moveSize / (emptyCells + 1)));
 }
 
+export function areAllTableausOrdered(deck: Deck): boolean {
+  const areAllTableausOrdered = TABLEAU_PILES.every((pileId) => {
+    const cardsInPile = getCardsInPile(deck, pileId).map((card) => card.data);
+    return isFollowingRules(cardsInPile, [isDescending, isDifferentColor]);
+  });
+
+  return areAllTableausOrdered;
+}
+
+export function areFoundationsFull(deck: Deck): boolean {
+  const cardCount = FOUNDATION_PILES.reduce(
+    (sum, pileId) => sum + getCardsInPile(deck, pileId).length,
+    0,
+  );
+
+  return cardCount === 52;
+}
+
 const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
   Object.fromEntries([
     /**

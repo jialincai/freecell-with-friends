@@ -14,7 +14,12 @@ import { CardMoveSequence } from "@phaser/move/CardMoveSequence";
 import {
   invertCardMoveSequence,
   expand,
+  createAutocompleteCardMoveSequence,
 } from "@phaser/move/domain/CardMoveSequenceLogic";
+import {
+  areFoundationsFull,
+  areAllTableausOrdered,
+} from "@phaser/game/domain/FreecellRules";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -41,7 +46,7 @@ export default class GameState extends Phaser.Scene {
     // Create deck
     const deckModel = createDeck();
     this.deck = new DeckController(this, deckModel);
-    this.deck.shuffleCards(476);
+    // this.deck.shuffleCards(476);
     this.deck.dealCards();
 
     // Create piles
@@ -134,13 +139,18 @@ export default class GameState extends Phaser.Scene {
   }
 
   public update(): void {
-    // Win condition
-    const cardsOnFoundation = FOUNDATION_PILES.reduce(
-      (acc: number, pile: PileId) =>
-        acc + this.deck.getCardsInPile(pile).length,
-      0,
-    );
-    if (cardsOnFoundation === 52) {
+    if (areAllTableausOrdered(this.deck.model)) {
+      const autoCompleteSequence = createAutocompleteCardMoveSequence(
+        this.deck.model,
+      );
+      this.deck.executeCardMoveSequenceWithTweens(
+        autoCompleteSequence,
+        this,
+        TWEEN_DURATION,
+      );
+    }
+
+    if (areFoundationsFull(this.deck.model)) {
       this.winText.setVisible(true);
     }
   }

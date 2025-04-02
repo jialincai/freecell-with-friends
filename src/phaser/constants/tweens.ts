@@ -1,1 +1,1 @@
-export const TWEEN_DURATION = 60;
+export const TWEEN_DURATION = 90;

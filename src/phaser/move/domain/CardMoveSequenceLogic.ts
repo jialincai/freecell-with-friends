@@ -1,8 +1,14 @@
-import { CELL_PILES, PileId, TABLEAU_PILES } from "@phaser/constants/table";
+import {
+  CELL_PILES,
+  FOUNDATION_PILES,
+  PileId,
+  TABLEAU_PILES,
+} from "@phaser/constants/table";
 import {
   filterEmptyPiles,
   getCardsInPile,
   applyCardMoves,
+  filterNonEmptyPiles,
 } from "@phaser/deck/domain/DeckLogic";
 import { Deck } from "@phaser/deck/state/Deck";
 import {
@@ -11,8 +17,10 @@ import {
 } from "@phaser/move/CardMoveSequence";
 import { createCardMove } from "@phaser/move/CardMove";
 import {
+  areFoundationsFull,
   calculateMaxMoveSize,
   calculateMinTempTableaus,
+  filterValidDropPiles,
 } from "@phaser/game/domain/FreecellRules";
 
 /**
@@ -69,6 +77,7 @@ function expandWithTempTableau(
     minTempTableaus - 1,
   );
 
+  let deckState: Deck = structuredClone(deck);
   const moveToTemp = expand(
     deck,
     createPileToPileCardMoveSequence(
@@ -78,23 +87,23 @@ function expandWithTempTableau(
       cardsToTemp,
     ),
   );
-  const deckAfterTemp = applyCardMoves(deck, moveToTemp);
+  deckState = applyCardMoves(deckState, moveToTemp);
 
   const moveToTarget = expand(
-    deckAfterTemp,
+    deckState,
     createPileToPileCardMoveSequence(
-      deckAfterTemp,
+      deckState,
       firstStep.fromPile,
       firstStep.toPile,
       moveSize - cardsToTemp,
     ),
   );
-  const deckAfterTarget = applyCardMoves(deckAfterTemp, moveToTarget);
+  deckState = applyCardMoves(deckState, moveToTarget);
 
   const moveFromTemp = expand(
-    deckAfterTarget,
+    deckState,
     createPileToPileCardMoveSequence(
-      deckAfterTarget,
+      deckState,
       tempTableau,
       firstStep.toPile,
       cardsToTemp,
@@ -150,6 +159,53 @@ function expandWithFreeCells(
     moveTopCard,
     ...moveChildrenToTarget,
   ]);
+}
+
+/**
+ * Creates a sequence of card moves that transfers all cards to foundation piles in the correct order.
+ *
+ * Assumes the deck is in a state where all tableau piles are in descending, alternating-color order,
+ * and that no further player interaction is required (i.e., auto-completable).
+ */
+export function createAutocompleteCardMoveSequence(
+  deck: Deck,
+): CardMoveSequence {
+  let deckState = structuredClone(deck);
+  const moveList = [];
+
+  while (!areFoundationsFull(deckState)) {
+    const movablePiles = filterNonEmptyPiles(deckState, [
+      ...TABLEAU_PILES,
+      ...CELL_PILES,
+    ]);
+
+    for (const sourcePileId of movablePiles) {
+      const sourceCards = getCardsInPile(deckState, sourcePileId);
+      const bottom = sourceCards.at(-1);
+      if (!bottom) continue;
+
+      const destinationFoundation = filterValidDropPiles(
+        deckState,
+        bottom,
+        FOUNDATION_PILES,
+      )?.[0];
+      if (!destinationFoundation) continue;
+
+      const move = createCardMove(
+        bottom.data.id,
+        sourcePileId,
+        bottom.state.position,
+        destinationFoundation,
+        getCardsInPile(deckState, destinationFoundation).length,
+      );
+
+      moveList.push(move);
+      deckState = applyCardMoves(deckState, createCardMoveSequence([move]));
+      break; // Apply one move per loop iteration
+    }
+  }
+
+  return createCardMoveSequence(moveList);
 }
 
 function createPileToPileCardMoveSequence(

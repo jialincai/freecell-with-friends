@@ -106,7 +106,7 @@ function dropCardInNewPile(
   const dropTarget = filterValidDropPiles(deck.model, card.model, [
     pileId,
   ])?.[0];
-  if (dropTarget) return;
+  if (!dropTarget) return;
 
   const dragChildren = deck.getCardsStartingFrom(card);
   const newPilePositions = getNextCardPositionsInPile(

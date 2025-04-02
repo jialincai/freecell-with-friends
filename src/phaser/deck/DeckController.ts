@@ -76,8 +76,7 @@ export class DeckController {
   }
 
   dealCards(): void {
-    // TODO uncomment dealCards
-    // this.model = dealCards(this.model);
+    this.model = dealCards(this.model);
     this.model = setupTableauDrag(this.model);
     this.cardControllers.forEach((c, i) => c.setModel(this.model.cards[i]));
   }

@@ -143,6 +143,8 @@ export function setupTableauDrag(deck: Deck): Deck {
   };
 }
 
+// TODO: This function is for debugging only.
+// Please remove this function or move into a test in the future.
 function buildAlternatingColorStack(
   primaryColor: Card[],
   alternateColor: Card[],

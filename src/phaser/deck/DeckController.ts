@@ -41,12 +41,13 @@ export class DeckController {
     this.cardControllers.forEach((c, i) => c.setModel(this.model.cards[i]));
   }
 
-  async executeCardMoveSequenceWithTween(
+  async executeCardMoveSequenceWithTweens(
     cardMoves: CardMoveSequence,
     scene: Phaser.Scene,
     tweenDuration: number,
   ): Promise<void> {
-    for (const step of cardMoves.steps) {
+    for (let i = 0; i < cardMoves.steps.length; i++) {
+      const step = cardMoves.steps[i];
       const controller = this.getCardControllerWithId(step.card);
       if (!controller) continue;
 
@@ -57,6 +58,8 @@ export class DeckController {
       });
 
       await new Promise<void>((resolve) => {
+        controller.view.setDepth(100 + i);
+
         scene.tweens.add({
           targets: controller.view,
           x: targetPosition.x,

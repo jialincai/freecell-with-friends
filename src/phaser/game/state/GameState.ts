@@ -3,6 +3,7 @@ import * as Phaser from "phaser";
 import { PubSubStack } from "@utils/Function";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@phaser/constants/screen";
 import { FOUNDATION_PILES, PileId } from "@phaser/constants/table";
+import { TWEEN_DURATION } from "@phaser/constants/tweens";
 import { setupCardInteraction } from "@phaser/game/input/CardInteraction";
 import { setupHoverHighlight } from "@phaser/game/input/HoverHighlight";
 import { DeckController } from "@phaser/deck/DeckController";
@@ -66,21 +67,25 @@ export default class GameState extends Phaser.Scene {
   }
 
   public createCommandListeners(): void {
-    // Do commands
     this.moveHistory.subscribe("push", (move) => {
-      if (
+      console.log(move.steps.length);
+
+      const isSimpleDirectMove =
         move.steps.length === 1 &&
-        !FOUNDATION_PILES.includes(move.steps[0].toPile)
-      ) {
+        !FOUNDATION_PILES.includes(move.steps[0].toPile);
+
+      if (isSimpleDirectMove) {
         this.deck.executeCardMoveSequence(move);
-      } else {
-        const expandedMove = expand(this.deck.model, move);
-        // this.deck.executeCardMoveSequence(move);
-        this.deck.executeCardMoveSequenceWithTween(expandedMove, this, 150);
+        return;
       }
+      const expandedSequence = expand(this.deck.model, move);
+      this.deck.executeCardMoveSequenceWithTweens(
+        expandedSequence,
+        this,
+        TWEEN_DURATION,
+      );
     });
 
-    // Undo commands
     this.moveHistory.subscribe("pop", (move) => {
       const undo = invertCardMoveSequence(move);
       this.deck.executeCardMoveSequence(undo);

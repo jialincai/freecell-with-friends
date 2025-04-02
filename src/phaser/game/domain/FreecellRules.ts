@@ -18,7 +18,6 @@ import {
   getCardsStartingFrom,
 } from "@phaser/deck/domain/DeckLogic";
 import { Deck } from "@phaser/deck/state/Deck";
-import { CardMoveSequence } from "@phaser/move/CardMoveSequence";
 
 export function mapValidDropPiles(
   deck: Deck,
@@ -34,18 +33,6 @@ export function filterValidDropPiles(
   piles: PileId[],
 ): PileId[] {
   return piles.filter((id) => DROP_RULES[id]?.(deck, card) ?? false);
-}
-
-export function calculateNewPilePosition(
-  deck: Deck,
-  cards: Card[],
-  pileId: PileId,
-): Array<{ pile: PileId; position: number }> {
-  const startPosition = getCardsInPile(deck, pileId).length;
-  return cards.map((_, i) => ({
-    pile: pileId,
-    position: startPosition + i,
-  }));
 }
 
 export function canMoveCard(deck: Deck, card: Card): boolean {
@@ -113,7 +100,11 @@ const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
           deck,
           TABLEAU_PILES.filter((pile) => pile !== pileId),
         );
-        if (stack.length > calculateMaxMoveSize(emptyCells.length, availableTableaus.length)) return false;
+        if (
+          stack.length >
+          calculateMaxMoveSize(emptyCells.length, availableTableaus.length)
+        )
+          return false;
 
         const resultingPile = [...getCardsInPile(deck, pileId), ...stack];
         const activeSequence = resultingPile.slice(-stack.length - 1);
@@ -150,7 +141,11 @@ const DRAG_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
           deck,
           TABLEAU_PILES.filter((pile) => pile !== pileId),
         );
-        if (stack.length > calculateMaxMoveSize(emptyCells.length, availableTableaus.length)) return false;
+        if (
+          stack.length >
+          calculateMaxMoveSize(emptyCells.length, availableTableaus.length)
+        )
+          return false;
 
         return isFollowingRules(
           stack.map((c) => c.data),

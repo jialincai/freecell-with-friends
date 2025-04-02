@@ -144,7 +144,7 @@ export default class GameState extends Phaser.Scene {
       const autoCompleteSequence = createCardMoveSequenceForAutoComplete(
         this.deck.model,
       );
-      this.deck.executeCardMoveSequenceWithDelay(autoCompleteSequence, 10000);
+      this.deck.executeCardMoveSequenceWithTweens(autoCompleteSequence, this, TWEEN_DURATION);
     }
 
     if (areFoundationPilesFull(this.deck.model)) {

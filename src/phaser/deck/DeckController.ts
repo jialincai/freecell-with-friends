@@ -3,6 +3,7 @@ import { PileId } from "@phaser/constants/table";
 import { Deck } from "@phaser/deck/state/Deck";
 import {
   applyCardMoves,
+  setupTableauDrag,
   shuffleCards,
 } from "@phaser/deck/domain/DeckLogic";
 import {

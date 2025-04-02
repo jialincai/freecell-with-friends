@@ -3,6 +3,7 @@ import { PileId } from "@phaser/constants/table";
 import { Deck } from "@phaser/deck/state/Deck";
 import {
   applyCardMoves,
+  dealCards,
   setupTableauDrag,
   shuffleCards,
 } from "@phaser/deck/domain/DeckLogic";
@@ -77,7 +78,6 @@ export class DeckController {
 
   dealCards(): void {
     this.model = dealCards(this.model);
-    this.model = setupTableauDrag(this.model);
     this.cardControllers.forEach((c, i) => c.setModel(this.model.cards[i]));
   }
 

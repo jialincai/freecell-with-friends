@@ -103,7 +103,8 @@ function dropCardInNewPile(
   moveHistory: PubSubStack<CardMoveSequence>,
 ): void {
   const pileId = target.name as PileId;
-  if (!filterValidDropPiles(deck.model, card.model, [pileId]).length) return;
+  const dropTarget = filterValidDropPiles(deck.model, card.model, [pileId])?.[0];
+  if (dropTarget) return;
 
   const dragChildren = deck.getCardsStartingFrom(card);
   const newPilePositions = getNextCardPositionsInPile(

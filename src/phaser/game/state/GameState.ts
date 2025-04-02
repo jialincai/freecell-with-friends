@@ -14,12 +14,12 @@ import { CardMoveSequence } from "@phaser/move/CardMoveSequence";
 import {
   invertCardMoveSequence,
   expand,
+  createAutocompleteCardMoveSequence,
 } from "@phaser/move/domain/CardMoveSequenceLogic";
 import {
   areFoundationsFull,
-  createAutocompleteCardMoveSequence,
   areAllTableausOrdered,
-} from "../domain/FreecellRules";
+} from "@phaser/game/domain/FreecellRules";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,

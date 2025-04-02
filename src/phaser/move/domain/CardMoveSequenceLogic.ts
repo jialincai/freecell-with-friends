@@ -15,7 +15,7 @@ import {
   CardMoveSequence,
   createCardMoveSequence,
 } from "@phaser/move/CardMoveSequence";
-import { CardMove, createCardMove } from "@phaser/move/CardMove";
+import { createCardMove } from "@phaser/move/CardMove";
 import {
   areFoundationsFull,
   calculateMaxMoveSize,
@@ -164,8 +164,8 @@ function expandWithFreeCells(
 export function createAutocompleteCardMoveSequence(
   deck: Deck,
 ): CardMoveSequence {
-  let deckState: Deck = structuredClone(deck);
-  const moveList: CardMove[] = [];
+  let deckState = structuredClone(deck);
+  const moveList = [];
 
   while (!areFoundationsFull(deckState)) {
     const pilesWithCards = filterNonEmptyPiles(deckState, [

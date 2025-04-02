@@ -13,18 +13,11 @@ import {
   isSameSuit,
 } from "@phaser/card/domain/CardComparison";
 import {
-  applyCardMoves,
   filterEmptyPiles,
-  filterNonEmptyPiles,
   getCardsInPile,
   getCardsStartingFrom,
 } from "@phaser/deck/domain/DeckLogic";
 import { Deck } from "@phaser/deck/state/Deck";
-import {
-  CardMoveSequence,
-  createCardMoveSequence,
-} from "@phaser/move/CardMoveSequence";
-import { CardMove, createCardMove } from "@phaser/move/CardMove";
 
 export function mapValidDropPiles(
   deck: Deck,
@@ -76,42 +69,6 @@ export function areFoundationsFull(deck: Deck): boolean {
   );
 
   return cardCount === 52;
-}
-
-export function createCardMoveSequenceForAutocomplete(deck: Deck): CardMoveSequence {
-  let deckState: Deck = structuredClone(deck);
-  const moveList: CardMove[] = [];
-
-  while (!areFoundationsFull(deckState)) {
-    const movablePiles = filterNonEmptyPiles(deckState, [...TABLEAU_PILES, ...CELL_PILES]);
-
-    for (const sourcePileId of movablePiles) {
-      const sourceCards = getCardsInPile(deckState, sourcePileId);
-      const topCard = sourceCards.at(-1);
-      if (!topCard) continue;
-
-      const destinationFoundation = FOUNDATION_PILES.find(foundationId =>
-        DROP_RULES[foundationId](deckState, topCard),
-      );
-      if (!destinationFoundation) continue;
-
-      const targetIndex = getCardsInPile(deckState, destinationFoundation).length;
-
-      const move = createCardMove(
-        topCard.data.id,
-        sourcePileId,
-        topCard.state.position,
-        destinationFoundation,
-        targetIndex,
-      );
-
-      moveList.push(move);
-      deckState = applyCardMoves(deckState, createCardMoveSequence([move]));
-      break; // Apply one move per loop iteration
-    }
-  }
-
-  return createCardMoveSequence(moveList);
 }
 
 const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =

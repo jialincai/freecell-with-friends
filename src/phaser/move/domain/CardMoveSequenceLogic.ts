@@ -1,18 +1,26 @@
-import { CELL_PILES, PileId, TABLEAU_PILES } from "@phaser/constants/table";
+import {
+  CELL_PILES,
+  FOUNDATION_PILES,
+  PileId,
+  TABLEAU_PILES,
+} from "@phaser/constants/table";
 import {
   filterEmptyPiles,
   getCardsInPile,
   applyCardMoves,
+  filterNonEmptyPiles,
 } from "@phaser/deck/domain/DeckLogic";
 import { Deck } from "@phaser/deck/state/Deck";
 import {
   CardMoveSequence,
   createCardMoveSequence,
 } from "@phaser/move/CardMoveSequence";
-import { createCardMove } from "@phaser/move/CardMove";
+import { CardMove, createCardMove } from "@phaser/move/CardMove";
 import {
+  areFoundationsFull,
   calculateMaxMoveSize,
   calculateMinTempTableaus,
+  filterValidDropPiles,
 } from "@phaser/game/domain/FreecellRules";
 
 /**
@@ -150,6 +158,46 @@ function expandWithFreeCells(
     moveTopCard,
     ...moveChildrenToTarget,
   ]);
+}
+
+export function createAutocompleteCardMoveSequence(
+  deck: Deck,
+): CardMoveSequence {
+  let deckState: Deck = structuredClone(deck);
+  const moveList: CardMove[] = [];
+
+  while (!areFoundationsFull(deckState)) {
+    const pilesWithCards = filterNonEmptyPiles(deckState, [
+      ...TABLEAU_PILES,
+      ...CELL_PILES,
+    ]);
+
+    for (const sourcePileId of pilesWithCards) {
+      const sourceCards = getCardsInPile(deckState, sourcePileId);
+      const topCard = sourceCards[sourceCards.length - 1];
+
+      const dropTarget = filterValidDropPiles(
+        deck,
+        topCard,
+        FOUNDATION_PILES,
+      )?.[0];
+      if (dropTarget) continue;
+
+      const move = createCardMove(
+        topCard.data.id,
+        sourcePileId,
+        topCard.state.position,
+        dropTarget,
+        getCardsInPile(deckState, dropTarget).length,
+      );
+
+      moveList.push(move);
+      deckState = applyCardMoves(deckState, createCardMoveSequence([move]));
+      break; // Apply one move per loop iteration
+    }
+  }
+
+  return createCardMoveSequence(moveList);
 }
 
 function createPileToPileCardMoveSequence(

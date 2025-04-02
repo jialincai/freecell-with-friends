@@ -55,7 +55,7 @@ export function filterEmptyPiles(deck: Deck, piles: PileId[]) {
 
 export function filterNonEmptyPiles(deck: Deck, piles: PileId[]) {
   const empty = filterEmptyPiles(deck, piles);
-  return piles.filter(pile => !empty.includes(pile));
+  return piles.filter((pile) => !empty.includes(pile));
 }
 
 export function dealCards(deck: Deck): Deck {

@@ -60,7 +60,7 @@ export function calculateMinTempTableaus(
   return Math.ceil(Math.log2(moveSize / (emptyCells + 1)));
 }
 
-export function isDeckReadyForAutoComplete(deck: Deck): boolean {
+export function areAllTableausOrdered(deck: Deck): boolean {
   const areAllTableausOrdered = TABLEAU_PILES.every((pileId) => {
     const cardsInPile = getCardsInPile(deck, pileId).map((card) => card.data);
     return isFollowingRules(cardsInPile, [isDescending, isDifferentColor]);
@@ -69,7 +69,7 @@ export function isDeckReadyForAutoComplete(deck: Deck): boolean {
   return areAllTableausOrdered;
 }
 
-export function areFoundationPilesFull(deck: Deck): boolean {
+export function areFoundationsFull(deck: Deck): boolean {
   const cardCount = FOUNDATION_PILES.reduce(
     (sum, pileId) => sum + getCardsInPile(deck, pileId).length,
     0,
@@ -82,7 +82,7 @@ export function createCardMoveSequenceForAutoComplete(deck: Deck): CardMoveSeque
   let deckState: Deck = structuredClone(deck);
   const moveList: CardMove[] = [];
 
-  while (!areFoundationPilesFull(deckState)) {
+  while (!areFoundationsFull(deckState)) {
     const movablePiles = filterNonEmptyPiles(deckState, [...TABLEAU_PILES, ...CELL_PILES]);
 
     for (const sourcePileId of movablePiles) {

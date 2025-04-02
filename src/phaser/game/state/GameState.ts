@@ -68,8 +68,16 @@ export default class GameState extends Phaser.Scene {
   public createCommandListeners(): void {
     // Do commands
     this.moveHistory.subscribe("push", (move) => {
-      const expandedMove = expand(this.deck.model, move);
-      this.deck.executeCardMoveSequenceWithDelay(expandedMove, 150);
+      if (
+        move.steps.length === 1 &&
+        !FOUNDATION_PILES.includes(move.steps[0].toPile)
+      ) {
+        this.deck.executeCardMoveSequence(move);
+      } else {
+        const expandedMove = expand(this.deck.model, move);
+        // this.deck.executeCardMoveSequence(move);
+        this.deck.executeCardMoveSequenceWithTween(expandedMove, this, 150);
+      }
     });
 
     // Undo commands

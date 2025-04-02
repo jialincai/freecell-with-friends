@@ -37,14 +37,14 @@ export class CardView extends Phaser.GameObjects.Image {
     this.setPosition(x, y);
   }
 
-  private getSpriteIndex(suit: Suit, value: number): number {
-    return SUIT_IMAGE_INDEX[suit] * SPRITE_CARD_WIDTH + value - 1;
-  }
-
-  private getCardWorldPosition(state: CardState): { x: number; y: number } {
+  getCardWorldPosition(state: CardState): { x: number; y: number } {
     const { pile, position } = state;
     const base = PILE_POSITIONS[pile];
     const yOffset = TABLEAU_PILES.includes(pile) ? position * STACK_OFFSET : 0;
     return { x: base.x, y: base.y + yOffset };
+  }
+
+  private getSpriteIndex(suit: Suit, value: number): number {
+    return SUIT_IMAGE_INDEX[suit] * SPRITE_CARD_WIDTH + value - 1;
   }
 }

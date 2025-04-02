@@ -18,7 +18,6 @@ import {
   getCardsStartingFrom,
 } from "@phaser/deck/domain/DeckLogic";
 import { Deck } from "@phaser/deck/state/Deck";
-import { CardMoveSequence } from "@phaser/move/CardMoveSequence";
 
 export function mapValidDropPiles(
   deck: Deck,
@@ -113,7 +112,11 @@ const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
           deck,
           TABLEAU_PILES.filter((pile) => pile !== pileId),
         );
-        if (stack.length > calculateMaxMoveSize(emptyCells.length, availableTableaus.length)) return false;
+        if (
+          stack.length >
+          calculateMaxMoveSize(emptyCells.length, availableTableaus.length)
+        )
+          return false;
 
         const resultingPile = [...getCardsInPile(deck, pileId), ...stack];
         const activeSequence = resultingPile.slice(-stack.length - 1);
@@ -150,7 +153,11 @@ const DRAG_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =
           deck,
           TABLEAU_PILES.filter((pile) => pile !== pileId),
         );
-        if (stack.length > calculateMaxMoveSize(emptyCells.length, availableTableaus.length)) return false;
+        if (
+          stack.length >
+          calculateMaxMoveSize(emptyCells.length, availableTableaus.length)
+        )
+          return false;
 
         return isFollowingRules(
           stack.map((c) => c.data),

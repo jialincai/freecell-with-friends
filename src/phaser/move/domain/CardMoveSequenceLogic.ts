@@ -63,10 +63,7 @@ function expandWithTempTableau(
   const [firstStep] = cardMoves.steps;
 
   const emptyCells = filterEmptyPiles(deck, CELL_PILES);
-  const minTempTableaus = calculateMinTempTableaus(
-    moveSize,
-    emptyCells.length,
-  );
+  const minTempTableaus = calculateMinTempTableaus(moveSize, emptyCells.length);
   const cardsToTemp = calculateMaxMoveSize(
     emptyCells.length,
     minTempTableaus - 1,

@@ -5,9 +5,11 @@ import {
   dealCards,
   applyCardMoves,
   shuffleCards,
-  setupTableauDrag,
 } from "@phaser/deck/domain/DeckLogic";
-import { CardMoveSequence } from "@phaser/move/CardMoveSequence";
+import {
+  CardMoveSequence,
+  createCardMoveSequence,
+} from "@phaser/move/CardMoveSequence";
 import { CardId } from "@phaser/card/domain/CardId";
 
 export class DeckController {
@@ -39,19 +41,34 @@ export class DeckController {
     this.cardControllers.forEach((c, i) => c.setModel(this.model.cards[i]));
   }
 
-  // TODO: This function is for debugging only.
-  // Please remove and replace with proper animations in the future.
-  async executeCardMoveSequenceWithDelay(
+  async executeCardMoveSequenceWithTween(
     cardMoves: CardMoveSequence,
-    delayMs: number,
-  ) {
-    const wait = (ms: number) =>
-      new Promise<void>((resolve) => setTimeout(resolve, ms));
+    scene: Phaser.Scene,
+    tweenDuration: number,
+  ): Promise<void> {
+    for (const step of cardMoves.steps) {
+      const controller = this.getCardControllerWithId(step.card);
+      if (!controller) continue;
 
-    for (const { card, toPile, toPosition } of cardMoves.steps) {
-      this.getCardControllerWithId(card)?.setPilePosition(toPile, toPosition);
+      const targetPosition = controller.view.getCardWorldPosition({
+        pile: step.toPile,
+        position: step.toPosition,
+        flipped: true,
+      });
 
-      await wait(delayMs);
+      await new Promise<void>((resolve) => {
+        scene.tweens.add({
+          targets: controller.view,
+          x: targetPosition.x,
+          y: targetPosition.y,
+          duration: tweenDuration,
+          ease: "Cubic",
+          onComplete: () => {
+            this.executeCardMoveSequence(createCardMoveSequence([step]));
+            resolve();
+          },
+        });
+      });
     }
   }
 

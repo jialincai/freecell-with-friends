@@ -17,7 +17,7 @@ import {
 } from "@phaser/move/domain/CardMoveSequenceLogic";
 import {
   areFoundationsFull,
-  createCardMoveSequenceForAutoComplete,
+  createCardMoveSequenceForAutocomplete,
   areAllTableausOrdered,
 } from "../domain/FreecellRules";
 
@@ -140,7 +140,7 @@ export default class GameState extends Phaser.Scene {
 
   public update(): void {
     if (areAllTableausOrdered(this.deck.model)) {
-      const autoCompleteSequence = createCardMoveSequenceForAutoComplete(
+      const autoCompleteSequence = createCardMoveSequenceForAutocomplete(
         this.deck.model,
       );
       this.deck.executeCardMoveSequenceWithTweens(autoCompleteSequence, this, TWEEN_DURATION);

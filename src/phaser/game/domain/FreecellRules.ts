@@ -78,7 +78,7 @@ export function areFoundationsFull(deck: Deck): boolean {
   return cardCount === 52;
 }
 
-export function createCardMoveSequenceForAutoComplete(deck: Deck): CardMoveSequence {
+export function createAutocompleteSequence(deck: Deck): CardMoveSequence {
   let deckState: Deck = structuredClone(deck);
   const moveList: CardMove[] = [];
 

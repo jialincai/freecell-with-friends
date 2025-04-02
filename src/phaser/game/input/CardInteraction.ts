@@ -13,7 +13,7 @@ import {
   CardMoveSequence,
   createCardMoveSequence,
 } from "@phaser/move/CardMoveSequence";
-import { calculateNewPilePosition } from "@phaser/deck/domain/DeckLogic";
+import { getNextCardPositionsInPile } from "@phaser/deck/domain/DeckLogic";
 
 export function setupCardInteraction(
   deckController: DeckController,
@@ -106,10 +106,10 @@ function dropCardInNewPile(
   if (!filterValidDropPiles(deck.model, card.model, [pileId]).length) return;
 
   const dragChildren = deck.getCardsStartingFrom(card);
-  const newPilePositions = calculateNewPilePosition(
+  const newPilePositions = getNextCardPositionsInPile(
     deck.model,
-    dragChildren.map((c) => c.model),
     pileId,
+    dragChildren.length,
   );
 
   const moveSequence = createCardMoveSequence(
@@ -141,10 +141,10 @@ function snapCardToFoundationPile(
   )[0];
   if (!targetFoundationPile) return;
 
-  const [newPilePosition] = calculateNewPilePosition(
+  const [newPilePosition] = getNextCardPositionsInPile(
     deck.model,
-    [card.model],
     targetFoundationPile,
+    1,
   );
 
   const moveSequence = createCardMoveSequence([

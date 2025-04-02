@@ -69,5 +69,5 @@ export const NUM_VALUES = 13;
 
 export const SPRITE_CARD_WIDTH = 14;
 export const CARD_BACK_INDEX = 27;
-export const STACK_OFFSET = 20;
+export const STACK_OFFSET = 30;
 export const STACK_DRAG_OFFSET = 30;

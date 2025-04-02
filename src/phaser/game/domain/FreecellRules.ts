@@ -61,79 +61,57 @@ export function calculateMinTempTableaus(
 }
 
 export function isDeckReadyForAutoComplete(deck: Deck): boolean {
-  const allTableausOrdered = TABLEAU_PILES.every((pile) => {
-    const pileCards = getCardsInPile(deck, pile).map((card) => card.data);
-    return isFollowingRules(pileCards, [isDescending, isDifferentColor]);
+  const areAllTableausOrdered = TABLEAU_PILES.every((pileId) => {
+    const cardsInPile = getCardsInPile(deck, pileId).map((card) => card.data);
+    return isFollowingRules(cardsInPile, [isDescending, isDifferentColor]);
   });
 
-  return allTableausOrdered;
+  return areAllTableausOrdered;
 }
 
 export function areFoundationPilesFull(deck: Deck): boolean {
-  const totalCardsOnFoundations = FOUNDATION_PILES.reduce(
-    (count, pile) => count + getCardsInPile(deck, pile).length,
+  const cardCount = FOUNDATION_PILES.reduce(
+    (sum, pileId) => sum + getCardsInPile(deck, pileId).length,
     0,
   );
 
-  return totalCardsOnFoundations === 52;
+  return cardCount === 52;
 }
 
-export function createCardMoveSequenceForAutoComplete(
-  deck: Deck,
-): CardMoveSequence {
-  let currentDeck: Deck = {
-    cards: deck.cards.map((card) => ({
-      ...card,
-      state: { ...card.state },
-      data: { ...card.data },
-    })),
-  };
-  const moves: CardMove[] = [];
+export function createCardMoveSequenceForAutoComplete(deck: Deck): CardMoveSequence {
+  let deckState: Deck = structuredClone(deck);
+  const moveList: CardMove[] = [];
 
-  while (!areFoundationPilesFull(currentDeck)) {
-    const pilesWithCards = filterNonEmptyPiles(currentDeck, [
-      ...TABLEAU_PILES,
-      ...CELL_PILES,
-    ]);
-    let moveMade = false;
+  while (!areFoundationPilesFull(deckState)) {
+    const movablePiles = filterNonEmptyPiles(deckState, [...TABLEAU_PILES, ...CELL_PILES]);
 
-    for (const pile of pilesWithCards) {
-      const pileCards = getCardsInPile(currentDeck, pile);
-      const topCard = pileCards[pileCards.length - 1];
+    for (const sourcePileId of movablePiles) {
+      const sourceCards = getCardsInPile(deckState, sourcePileId);
+      const topCard = sourceCards.at(-1);
       if (!topCard) continue;
 
-      for (const foundation of FOUNDATION_PILES) {
-        const canDrop = DROP_RULES[foundation]?.(currentDeck, topCard);
-        if (canDrop) {
-          const foundationPosition = getCardsInPile(
-            currentDeck,
-            foundation,
-          ).length;
-          const move = createCardMove(
-            topCard.data.id,
-            pile,
-            topCard.state.position,
-            foundation,
-            foundationPosition,
-          );
+      const destinationFoundation = FOUNDATION_PILES.find(foundationId =>
+        DROP_RULES[foundationId](deckState, topCard),
+      );
+      if (!destinationFoundation) continue;
 
-          moves.push(move);
-          currentDeck = applyCardMoves(
-            currentDeck,
-            createCardMoveSequence([move]),
-          );
-          moveMade = true;
-          break;
-        }
-      }
+      const targetIndex = getCardsInPile(deckState, destinationFoundation).length;
 
-      if (moveMade) break;
+      const move = createCardMove(
+        topCard.data.id,
+        sourcePileId,
+        topCard.state.position,
+        destinationFoundation,
+        targetIndex,
+      );
+
+      moveList.push(move);
+      deckState = applyCardMoves(deckState, createCardMoveSequence([move]));
+      break; // Apply one move per loop iteration
     }
-
-    if (!moveMade) break;
   }
 
-  return createCardMoveSequence(moves);
+  return createCardMoveSequence(moveList);
 }
 
 const DROP_RULES: Record<PileId, (deck: Deck, card: Card) => boolean> =

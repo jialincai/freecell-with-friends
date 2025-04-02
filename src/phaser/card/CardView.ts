@@ -1,16 +1,11 @@
 import * as Phaser from "phaser";
 
-import {
-  CARD_BACK_INDEX,
-  CARD_DIMENSIONS,
-  STACK_OFFSET,
-  SPRITE_CARD_WIDTH,
-  SUIT_IMAGE_INDEX,
-  Suit,
-} from "@phaser/constants/deck";
-import { PILE_POSITIONS, TABLEAU_PILES } from "@phaser/constants/table";
+import { CARD_BACK_INDEX, CARD_DIMENSIONS } from "@phaser/constants/deck";
 import { Card } from "@phaser/card/state/Card";
-import { CardState } from "@phaser/card/state/CardState";
+import {
+  getCardWorldPosition,
+  getSpriteIndex,
+} from "@phaser/card/domain/CardViewLogic";
 
 export class CardView extends Phaser.GameObjects.Image {
   constructor(scene: Phaser.Scene, model: Card) {
@@ -26,25 +21,14 @@ export class CardView extends Phaser.GameObjects.Image {
     const { suit, rank } = model.data;
     const { position, flipped } = model.state;
 
-    const frame = flipped ? this.getSpriteIndex(suit, rank) : CARD_BACK_INDEX;
+    const frame = flipped ? getSpriteIndex(suit, rank) : CARD_BACK_INDEX;
     this.setTexture("img_cards", frame);
 
     if (flipped) this.setInteractive();
     else this.disableInteractive();
 
     this.setDepth(position + 10);
-    const { x, y } = this.getCardWorldPosition(model.state);
+    const { x, y } = getCardWorldPosition(model.state);
     this.setPosition(x, y);
-  }
-
-  getCardWorldPosition(state: CardState): { x: number; y: number } {
-    const { pile, position } = state;
-    const base = PILE_POSITIONS[pile];
-    const yOffset = TABLEAU_PILES.includes(pile) ? position * STACK_OFFSET : 0;
-    return { x: base.x, y: base.y + yOffset };
-  }
-
-  private getSpriteIndex(suit: Suit, value: number): number {
-    return SUIT_IMAGE_INDEX[suit] * SPRITE_CARD_WIDTH + value - 1;
   }
 }

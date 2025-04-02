@@ -59,7 +59,6 @@ export class DeckController {
 
       await new Promise<void>((resolve) => {
         controller.view.setDepth(100 + i);
-
         scene.tweens.add({
           targets: controller.view,
           x: targetPosition.x,

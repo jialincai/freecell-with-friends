@@ -77,6 +77,7 @@ function expandWithTempTableau(
     minTempTableaus - 1,
   );
 
+  let deckState: Deck = structuredClone(deck);
   const moveToTemp = expand(
     deck,
     createPileToPileCardMoveSequence(
@@ -86,23 +87,23 @@ function expandWithTempTableau(
       cardsToTemp,
     ),
   );
-  const deckAfterTemp = applyCardMoves(deck, moveToTemp);
+  deckState = applyCardMoves(deckState, moveToTemp);
 
   const moveToTarget = expand(
-    deckAfterTemp,
+    deckState,
     createPileToPileCardMoveSequence(
-      deckAfterTemp,
+      deckState,
       firstStep.fromPile,
       firstStep.toPile,
       moveSize - cardsToTemp,
     ),
   );
-  const deckAfterTarget = applyCardMoves(deckAfterTemp, moveToTarget);
+  deckState = applyCardMoves(deckState, moveToTarget);
 
   const moveFromTemp = expand(
-    deckAfterTarget,
+    deckState,
     createPileToPileCardMoveSequence(
-      deckAfterTarget,
+      deckState,
       tempTableau,
       firstStep.toPile,
       cardsToTemp,

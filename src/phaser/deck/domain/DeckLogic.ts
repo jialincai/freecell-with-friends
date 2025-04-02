@@ -35,6 +35,18 @@ export function getCardsStartingFrom(deck: Deck, target: Card): Card[] {
   );
 }
 
+export function getNextCardPositionsInPile(
+  deck: Deck,
+  pileId: PileId,
+  count: number,
+): Array<{ pile: PileId; position: number }> {
+  const start = getCardsInPile(deck, pileId).length;
+  return Array.from({ length: count }, (_, i) => ({
+    pile: pileId,
+    position: start + i,
+  }));
+}
+
 export function filterEmptyPiles(deck: Deck, piles: PileId[]) {
   return piles.filter((pile) => {
     return getCardsInPile(deck, pile).length === 0;

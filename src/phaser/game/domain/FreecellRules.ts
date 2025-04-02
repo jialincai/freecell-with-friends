@@ -35,18 +35,6 @@ export function filterValidDropPiles(
   return piles.filter((id) => DROP_RULES[id]?.(deck, card) ?? false);
 }
 
-export function calculateNewPilePosition(
-  deck: Deck,
-  cards: Card[],
-  pileId: PileId,
-): Array<{ pile: PileId; position: number }> {
-  const startPosition = getCardsInPile(deck, pileId).length;
-  return cards.map((_, i) => ({
-    pile: pileId,
-    position: startPosition + i,
-  }));
-}
-
 export function canMoveCard(deck: Deck, card: Card): boolean {
   return DRAG_RULES[card.state.pile]?.(deck, card) ?? false;
 }

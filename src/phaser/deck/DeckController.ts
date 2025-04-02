@@ -11,6 +11,7 @@ import {
   createCardMoveSequence,
 } from "@phaser/move/CardMoveSequence";
 import { CardId } from "@phaser/card/domain/CardId";
+import { getCardWorldPosition } from "@phaser/card/domain/CardViewLogic";
 
 export class DeckController {
   public model: Deck;
@@ -51,7 +52,7 @@ export class DeckController {
       const controller = this.getCardControllerWithId(step.card);
       if (!controller) continue;
 
-      const targetPosition = controller.view.getCardWorldPosition({
+      const targetPosition = getCardWorldPosition({
         pile: step.toPile,
         position: step.toPosition,
         flipped: true,

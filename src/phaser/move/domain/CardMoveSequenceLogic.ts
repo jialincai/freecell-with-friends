@@ -161,11 +161,17 @@ function expandWithFreeCells(
   ]);
 }
 
+/**
+ * Creates a sequence of card moves that transfers all cards to foundation piles in the correct order.
+ *
+ * Assumes the deck is in a state where all tableau piles are in descending, alternating-color order,
+ * and that no further player interaction is required (i.e., auto-completable).
+ */
 export function createAutocompleteCardMoveSequence(
   deck: Deck,
 ): CardMoveSequence {
-  let deckState: Deck = structuredClone(deck);
-  const moveList: CardMove[] = [];
+  let deckState = structuredClone(deck);
+  const moveList = [];
 
   while (!areFoundationsFull(deckState)) {
     const movablePiles = filterNonEmptyPiles(deckState, [

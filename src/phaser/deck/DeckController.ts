@@ -4,7 +4,6 @@ import { Deck } from "@phaser/deck/state/Deck";
 import {
   applyCardMoves,
   dealCards,
-  setupTableauDrag,
   shuffleCards,
 } from "@phaser/deck/domain/DeckLogic";
 import {

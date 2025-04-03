@@ -33,6 +33,10 @@ export default class GameState extends Phaser.Scene {
   private deck!: DeckController;
   private piles!: PileController[];
 
+  private effectiveStartTime!: number;
+  private pausedStartTime!: number;
+
+  private timerText!: Phaser.GameObjects.Text;
   private winText!: Phaser.GameObjects.Text;
 
   public constructor() {
@@ -59,22 +63,23 @@ export default class GameState extends Phaser.Scene {
       return pile;
     });
 
+    // Setup game timer
+    this.createTimer();
+
     // Create UI
     this.createButtons();
     this.createText();
 
-    // Setup player move history tracking
-    this.createCommandListeners();
-
     // Setup interactions
     setupCardInteraction(this.deck, this.moveHistory);
     setupHoverHighlight(this.deck, this.piles);
+
+    // Setup player move history tracking
+    this.createCommandListeners();
   }
 
   public createCommandListeners(): void {
     this.moveHistory.subscribe("push", (move) => {
-      console.log(move.steps.length);
-
       const isSimpleDirectMove =
         move.steps.length === 1 &&
         !FOUNDATION_PILES.includes(move.steps[0].toPile);
@@ -94,6 +99,20 @@ export default class GameState extends Phaser.Scene {
     this.moveHistory.subscribe("pop", (move) => {
       const undo = invertCardMoveSequence(move);
       this.deck.executeCardMoveSequence(undo);
+    });
+  }
+
+  public createTimer(): void {
+    this.pausedStartTime = 0;
+    this.effectiveStartTime = Date.now();
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        this.pausedStartTime = Date.now();
+      } else {
+        const pausedDuration = Date.now() - this.pausedStartTime;
+        this.effectiveStartTime += pausedDuration;
+      }
     });
   }
 
@@ -130,6 +149,16 @@ export default class GameState extends Phaser.Scene {
   }
 
   public createText(): void {
+    this.timerText = this.add.text(
+      this.cameras.main.width - 150,
+      12,
+      "Time: 0:00",
+      {
+        color: "#FFF",
+        fontSize: "24px",
+      },
+    );
+
     this.winText = this.add
       .text(20, this.cameras.main.height - 40, "You Win!", {
         color: "#FFF",
@@ -139,6 +168,13 @@ export default class GameState extends Phaser.Scene {
   }
 
   public update(): void {
+    const elapsed = Date.now() - this.effectiveStartTime;
+    const minutes = Math.floor(elapsed / 60000);
+    const seconds = Math.floor((elapsed % 60000) / 1000)
+      .toString()
+      .padStart(2, "0");
+    this.timerText.setText(`Time: ${minutes}:${seconds}`);
+
     if (areAllTableausOrdered(this.deck.model)) {
       const autoCompleteSequence = createAutocompleteCardMoveSequence(
         this.deck.model,

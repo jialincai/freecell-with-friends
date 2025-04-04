@@ -1,5 +1,4 @@
 import { PubSubStack } from "@utils/Function";
-import { STACK_DRAG_OFFSET } from "@phaser/constants/deck";
 import { FOUNDATION_PILES, PileId } from "@phaser/constants/table";
 import { CardController } from "@phaser/card/CardController";
 import { DeckController } from "@phaser/deck/DeckController";
@@ -14,6 +13,7 @@ import {
   createCardMoveSequence,
 } from "@phaser/move/CardMoveSequence";
 import { getNextCardPositionsInPile } from "@phaser/deck/domain/DeckLogic";
+import { STACK_DRAG_OFFSET } from "@phaser/constants/dimensions";
 
 export function setupCardInteraction(
   deckController: DeckController,

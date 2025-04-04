@@ -1,11 +1,11 @@
 import {
   SPRITE_CARD_WIDTH,
-  STACK_OFFSET,
   Suit,
   SUIT_IMAGE_INDEX,
 } from "@phaser/constants/deck";
 import { PILE_POSITIONS, TABLEAU_PILES } from "@phaser/constants/table";
 import { CardState } from "@phaser/card/state/CardState";
+import { STACK_OFFSET } from "@phaser/constants/dimensions";
 
 export function getCardWorldPosition(state: CardState): {
   x: number;

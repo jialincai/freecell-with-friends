@@ -1,4 +1,4 @@
-import { CARD_DIMENSIONS } from "./deck";
+import { BORDER_PAD, CARD_DIMENSIONS, PILE_OFFSET } from "./dimensions";
 
 /**
  * Define the constants for the table.
@@ -58,32 +58,40 @@ export const FOUNDATION_PILES = [
 ];
 
 /**
- * Offsets for card positions
- */
-const PILE_OFFSET = CARD_DIMENSIONS.width + 10;
-
-/**
  * Positions of piles on screen
  */
+const CARD_CENTER_X = (col: number) =>
+  BORDER_PAD +
+  CARD_DIMENSIONS.width / 2 +
+  col * (CARD_DIMENSIONS.width + PILE_OFFSET);
+
+// Optionally, center Y positions vertically
+const TOP_PILE_Y = 120;
+const BOTTOM_PILE_Y = 280;
+
 export const PILE_POSITIONS: Record<PileId, Phaser.Math.Vector2> = {
-  [PileId.Cell1]: new Phaser.Math.Vector2(80, 120),
-  [PileId.Cell2]: new Phaser.Math.Vector2(80 + PILE_OFFSET, 120),
-  [PileId.Cell3]: new Phaser.Math.Vector2(80 + 2 * PILE_OFFSET, 120),
-  [PileId.Cell4]: new Phaser.Math.Vector2(80 + 3 * PILE_OFFSET, 120),
+  // Cells
+  [PileId.Cell1]: new Phaser.Math.Vector2(CARD_CENTER_X(0), TOP_PILE_Y),
+  [PileId.Cell2]: new Phaser.Math.Vector2(CARD_CENTER_X(1), TOP_PILE_Y),
+  [PileId.Cell3]: new Phaser.Math.Vector2(CARD_CENTER_X(2), TOP_PILE_Y),
+  [PileId.Cell4]: new Phaser.Math.Vector2(CARD_CENTER_X(3), TOP_PILE_Y),
 
-  [PileId.Foundation1]: new Phaser.Math.Vector2(80 + 4 * PILE_OFFSET, 120),
-  [PileId.Foundation2]: new Phaser.Math.Vector2(80 + 5 * PILE_OFFSET, 120),
-  [PileId.Foundation3]: new Phaser.Math.Vector2(80 + 6 * PILE_OFFSET, 120),
-  [PileId.Foundation4]: new Phaser.Math.Vector2(80 + 7 * PILE_OFFSET, 120),
+  // Foundations
+  [PileId.Foundation1]: new Phaser.Math.Vector2(CARD_CENTER_X(4), TOP_PILE_Y),
+  [PileId.Foundation2]: new Phaser.Math.Vector2(CARD_CENTER_X(5), TOP_PILE_Y),
+  [PileId.Foundation3]: new Phaser.Math.Vector2(CARD_CENTER_X(6), TOP_PILE_Y),
+  [PileId.Foundation4]: new Phaser.Math.Vector2(CARD_CENTER_X(7), TOP_PILE_Y),
 
-  [PileId.Tableau1]: new Phaser.Math.Vector2(80, 280),
-  [PileId.Tableau2]: new Phaser.Math.Vector2(80 + PILE_OFFSET, 280),
-  [PileId.Tableau3]: new Phaser.Math.Vector2(80 + 2 * PILE_OFFSET, 280),
-  [PileId.Tableau4]: new Phaser.Math.Vector2(80 + 3 * PILE_OFFSET, 280),
-  [PileId.Tableau5]: new Phaser.Math.Vector2(80 + 4 * PILE_OFFSET, 280),
-  [PileId.Tableau6]: new Phaser.Math.Vector2(80 + 5 * PILE_OFFSET, 280),
-  [PileId.Tableau7]: new Phaser.Math.Vector2(80 + 6 * PILE_OFFSET, 280),
-  [PileId.Tableau8]: new Phaser.Math.Vector2(80 + 7 * PILE_OFFSET, 280),
+  // Tableaus
+  [PileId.Tableau1]: new Phaser.Math.Vector2(CARD_CENTER_X(0), BOTTOM_PILE_Y),
+  [PileId.Tableau2]: new Phaser.Math.Vector2(CARD_CENTER_X(1), BOTTOM_PILE_Y),
+  [PileId.Tableau3]: new Phaser.Math.Vector2(CARD_CENTER_X(2), BOTTOM_PILE_Y),
+  [PileId.Tableau4]: new Phaser.Math.Vector2(CARD_CENTER_X(3), BOTTOM_PILE_Y),
+  [PileId.Tableau5]: new Phaser.Math.Vector2(CARD_CENTER_X(4), BOTTOM_PILE_Y),
+  [PileId.Tableau6]: new Phaser.Math.Vector2(CARD_CENTER_X(5), BOTTOM_PILE_Y),
+  [PileId.Tableau7]: new Phaser.Math.Vector2(CARD_CENTER_X(6), BOTTOM_PILE_Y),
+  [PileId.Tableau8]: new Phaser.Math.Vector2(CARD_CENTER_X(7), BOTTOM_PILE_Y),
 
+  // Fallback
   [PileId.None]: new Phaser.Math.Vector2(0, 0),
 };

@@ -1,9 +1,9 @@
 import * as Phaser from "phaser";
 
-import InitState from "./InitState";
+import InitState from "@phaser/InitState";
 import GameState from "@phaser/game/state/GameState";
-import PreInitState from "./PreInitState";
-import { SCREEN_DIMENSIONS } from "./constants/dimensions";
+import PreInitState from "@phaser/PreInitState";
+import { SCREEN_DIMENSIONS } from "@phaser/constants/dimensions";
 
 const config: Phaser.Types.Core.GameConfig = {
   antialias: false,

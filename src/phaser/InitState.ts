@@ -1,9 +1,9 @@
 import * as Phaser from "phaser";
 
 // Card images
-import { images, spritesheets } from "./constants/assets";
-import { baseURL } from "./constants/loading";
-import { SCREEN_DIMENSIONS } from "./constants/dimensions";
+import { images, spritesheets } from "@phaser/constants/assets";
+import { baseURL } from "@phaser/constants/loading";
+import { SCREEN_DIMENSIONS } from "@phaser/constants/dimensions";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,

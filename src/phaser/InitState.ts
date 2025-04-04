@@ -1,9 +1,9 @@
 import * as Phaser from "phaser";
 
 // Card images
-import { images, spritesheets } from "./constants/assets";
-import { baseURL } from "./constants/loading";
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from "./constants/screen";
+import { images, spritesheets } from "@phaser/constants/assets";
+import { baseURL } from "@phaser/constants/loading";
+import { SCREEN_DIMENSIONS } from "@phaser/constants/dimensions";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -22,7 +22,11 @@ export default class InitState extends Phaser.Scene {
     this.load.baseURL = baseURL;
 
     // Background
-    this.add.image(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, "img_load");
+    this.add.image(
+      SCREEN_DIMENSIONS.width / 2,
+      SCREEN_DIMENSIONS.height / 2,
+      "img_load",
+    );
 
     const progressBox = this.add.graphics();
     progressBox.fillStyle(0xaaaaaa, 0.8);

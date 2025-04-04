@@ -1,7 +1,6 @@
 import * as Phaser from "phaser";
 
 import { PubSubStack } from "@utils/Function";
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@phaser/constants/screen";
 import { FOUNDATION_PILES, PileId } from "@phaser/constants/table";
 import { TWEEN_DURATION } from "@phaser/constants/tweens";
 import { setupCardInteraction } from "@phaser/game/input/CardInteraction";
@@ -20,6 +19,7 @@ import {
   areFoundationsFull,
   areAllTableausOrdered,
 } from "@phaser/game/domain/FreecellRules";
+import { BORDER_PAD, SCREEN_DIMENSIONS } from "@phaser/constants/dimensions";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -45,7 +45,11 @@ export default class GameState extends Phaser.Scene {
 
   public create(): void {
     // Add background
-    this.add.image(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, "img_background");
+    this.add.image(
+      SCREEN_DIMENSIONS.width / 2,
+      SCREEN_DIMENSIONS.height / 2,
+      "img_background",
+    );
 
     // Create deck
     const deckModel = createDeck();
@@ -117,50 +121,68 @@ export default class GameState extends Phaser.Scene {
   }
 
   public createButtons(): void {
-    // Redeal Button
-    this.add.graphics().fillStyle(0xffffff, 1).fillRect(10, 10, 80, 18);
-    this.add
-      .text(12, 12, "Redeal", { color: "#000" })
-      .setInteractive()
-      .on("pointerdown", () => {
-        this.deck.dealCards();
-        this.winText.setVisible(false);
+    const BUTTON_WIDTH = 100;
+    const BUTTON_HEIGHT = 18;
+    const BUTTON_MARGIN = 10;
+    const BUTTON_Y = 10;
+    const START_X = BORDER_PAD;
+
+    const buttonConfigs = [
+      {
+        label: "Redeal",
+        onClick: () => {
+          this.deck.dealCards();
+          this.winText.setVisible(false);
+        },
+      },
+      {
+        label: "New Deal",
+        onClick: () => {
+          this.deck.shuffleCards(476);
+          this.deck.dealCards();
+          this.winText.setVisible(false);
+        },
+      },
+      {
+        label: "Undo",
+        onClick: () => {
+          this.moveHistory.pop();
+        },
+      },
+    ];
+
+    buttonConfigs.forEach(({ label, onClick }, index) => {
+      const x = START_X + index * (BUTTON_WIDTH + BUTTON_MARGIN);
+
+      // Draw button background
+      this.add
+        .graphics()
+        .fillStyle(0xffffff, 1)
+        .fillRect(x, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT);
+
+      // Add centered text
+      const text = this.add.text(0, 0, label, {
+        color: "#000",
       });
 
-    // New Deal Button
-    this.add.graphics().fillStyle(0xffffff, 1).fillRect(100, 10, 80, 18);
-    this.add
-      .text(102, 12, "New Deal", { color: "#000" })
-      .setInteractive()
-      .on("pointerdown", () => {
-        this.deck.shuffleCards(476);
-        this.deck.dealCards();
-        this.winText.setVisible(false);
-      });
+      // Center the text inside the button
+      text.setX(x + BUTTON_WIDTH / 2 - text.width / 2);
+      text.setY(BUTTON_Y + BUTTON_HEIGHT / 2 - text.height / 2);
 
-    // Undo Button
-    this.add.graphics().fillStyle(0xffffff, 1).fillRect(190, 10, 80, 18);
-    this.add
-      .text(192, 12, "Undo", { color: "#000" })
-      .setInteractive()
-      .on("pointerdown", () => {
-        this.moveHistory.pop();
-      });
+      text.setInteractive().on("pointerdown", onClick);
+    });
   }
 
   public createText(): void {
-    this.timerText = this.add.text(
-      this.cameras.main.width - 150,
-      12,
-      "Time: 0:00",
-      {
+    this.timerText = this.add
+      .text(this.cameras.main.width - BORDER_PAD, 12, "Time: 0:00", {
         color: "#FFF",
         fontSize: "24px",
-      },
-    );
+      })
+      .setOrigin(1, 0);
 
     this.winText = this.add
-      .text(20, this.cameras.main.height - 40, "You Win!", {
+      .text(BORDER_PAD, this.cameras.main.height - 40, "You Win!", {
         color: "#FFF",
         fontSize: "24px",
       })

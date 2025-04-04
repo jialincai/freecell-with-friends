@@ -21,6 +21,10 @@ export const STACK_OFFSET = CARD_DIMENSIONS.height / 2;
 export const STACK_DRAG_OFFSET = CARD_DIMENSIONS.height / 2;
 export const PILE_OFFSET = 5;
 
+// Pile Y positions
+export const TOP_PILE_Y = 120;
+export const BOTTOM_PILE_Y = 280;
+
 /**
  * Active board dimensions
  * height -- 13 cards

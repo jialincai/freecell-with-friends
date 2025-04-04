@@ -1,4 +1,10 @@
-import { BORDER_PAD, CARD_DIMENSIONS, PILE_OFFSET } from "./dimensions";
+import {
+  BORDER_PAD,
+  BOTTOM_PILE_Y,
+  CARD_DIMENSIONS,
+  PILE_OFFSET,
+  TOP_PILE_Y,
+} from "@phaser/constants/dimensions";
 
 /**
  * Define the constants for the table.
@@ -64,10 +70,6 @@ const CARD_CENTER_X = (col: number) =>
   BORDER_PAD +
   CARD_DIMENSIONS.width / 2 +
   col * (CARD_DIMENSIONS.width + PILE_OFFSET);
-
-// Optionally, center Y positions vertically
-const TOP_PILE_Y = 120;
-const BOTTOM_PILE_Y = 280;
 
 export const PILE_POSITIONS: Record<PileId, Phaser.Math.Vector2> = {
   // Cells

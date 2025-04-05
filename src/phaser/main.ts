@@ -1,22 +1,23 @@
 import * as Phaser from "phaser";
-
 import InitState from "@phaser/InitState";
 import GameState from "@phaser/game/state/GameState";
 import PreInitState from "@phaser/PreInitState";
-import { SCREEN_DIMENSIONS } from "@phaser/constants/dimensions";
 
-const config: Phaser.Types.Core.GameConfig = {
-  antialias: false,
-  antialiasGL: false,
-  backgroundColor: "#000",
-  height: SCREEN_DIMENSIONS.height,
-  parent: "game-container",
-  scene: [PreInitState, InitState, GameState],
-  type: Phaser.AUTO,
-  width: SCREEN_DIMENSIONS.width,
-  scale: {
-    mode: Phaser.Scale.FIT,
-  },
+export const initializeGame = (container: HTMLElement): Phaser.Game => {
+  const config: Phaser.Types.Core.GameConfig = {
+    type: Phaser.AUTO,
+    parent: container,
+    backgroundColor: "#000",
+    antialias: false,
+    antialiasGL: false,
+    width: container.clientWidth,
+    height: container.clientHeight,
+    scene: [PreInitState, InitState, GameState],
+    scale: {
+      mode: Phaser.Scale.WIDTH_CONTROLS_HEIGHT,
+      // autoCenter: Phaser.Scale.CENTER_BOTH,
+    },
+  };
+
+  return new Phaser.Game(config);
 };
-
-export const initializeGame = () => new Phaser.Game(config);

@@ -1,4 +1,4 @@
-import { PhaserGame } from "@components/PhasorWindow";
+import { PhaserGame } from "@components/PhasorGame";
 
 const FreecellGame: React.FC = () => {
   return (

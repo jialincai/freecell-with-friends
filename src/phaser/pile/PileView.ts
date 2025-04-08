@@ -2,6 +2,7 @@ import * as Phaser from "phaser";
 import { PILE_POSITIONS, TABLEAU_PILES } from "@phaser/constants/table";
 import { Pile } from "@phaser/pile/state/Pile";
 import { CARD_DIMENSIONS, STACK_OFFSET } from "@phaser/constants/dimensions";
+import { BORDER_COLOR } from "@phaser/constants/colors";
 
 export class PileView extends Phaser.GameObjects.Rectangle {
   constructor(scene: Phaser.Scene, model: Pile) {
@@ -16,7 +17,7 @@ export class PileView extends Phaser.GameObjects.Rectangle {
     );
 
     this.setName(model.data.id);
-    this.setStrokeStyle(1, 0xffffff);
+    this.setStrokeStyle(1, BORDER_COLOR);
 
     const addHeight = TABLEAU_PILES.includes(model.data.id)
       ? STACK_OFFSET * 10

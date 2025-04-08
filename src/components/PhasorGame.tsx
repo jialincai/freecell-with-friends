@@ -1,6 +1,7 @@
 "use client";
 
-import { forwardRef, useLayoutEffect, useRef } from "react";
+import { forwardRef, useEffect, useLayoutEffect, useRef } from "react";
+import "@styles/PhasorGame.module.css";
 
 export interface IRefPhaserGame {
   game: Phaser.Game | null;
@@ -9,31 +10,33 @@ export interface IRefPhaserGame {
 
 export const PhaserGame = forwardRef<IRefPhaserGame>(
   function PhaserGame(_, ref) {
-    const game = useRef<Phaser.Game | null>(null);
+    const containerId = "game-container";
+    const containerRef = useRef<HTMLDivElement | null>(null);
+    const gameRef = useRef<Phaser.Game | null>(null);
 
     useLayoutEffect(() => {
-      if (game.current === null) {
+      if (gameRef.current === null) {
         const loadGame = async () => {
-          const StartGame = (await import("phaser/main")).default;
-          StartGame("game-container");
+          const { default: StartGame } = await import("phaser/main");
+          gameRef.current = StartGame(containerId);
         };
         loadGame();
 
         if (typeof ref === "function") {
-          ref({ game: game.current, scene: null });
+          ref({ game: gameRef.current, scene: null });
         } else if (ref) {
-          ref.current = { game: game.current, scene: null };
+          ref.current = { game: gameRef.current, scene: null };
         }
       }
 
       return () => {
-        if (game.current) {
-          game.current.destroy(true);
-          game.current = null;
+        if (gameRef.current) {
+          gameRef.current.destroy(true);
+          gameRef.current = null;
         }
       };
     }, [ref]);
 
-    return <div id="game-container"></div>;
+    return <div id={containerId} ref={containerRef}></div>;
   },
 );

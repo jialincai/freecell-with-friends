@@ -2,8 +2,8 @@
  * Screen dimensions
  */
 export const SCREEN_DIMENSIONS = {
-  height: 900,
-  width: 900,
+  height: 1185,
+  width: 715,
 };
 
 /**

@@ -1,11 +1,14 @@
-import React from "react";
-import PhasorWindow from "@components/PhasorWindow";
+"use client";
+
+import { IRefPhaserGame, PhaserGame } from "@components/PhasorGame";
+import { useRef } from "react";
 
 const FreecellGame: React.FC = () => {
+  const phaserRef = useRef<IRefPhaserGame | null>(null);
+
   return (
     <div>
-      <h1>Phasor Sandbox</h1>
-      <PhasorWindow />
+      <PhaserGame ref={phaserRef} />
     </div>
   );
 };

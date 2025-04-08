@@ -20,6 +20,7 @@ import {
   areAllTableausOrdered,
 } from "@phaser/game/domain/FreecellRules";
 import { BORDER_PAD, SCREEN_DIMENSIONS } from "@phaser/constants/dimensions";
+import { BUTTON_COLOR, TEXT_COLOR } from "@phaser/constants/colors";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -44,13 +45,6 @@ export default class GameState extends Phaser.Scene {
   }
 
   public create(): void {
-    // Add background
-    this.add.image(
-      SCREEN_DIMENSIONS.width / 2,
-      SCREEN_DIMENSIONS.height / 2,
-      "img_background",
-    );
-
     // Create deck
     const deckModel = createDeck();
     this.deck = new DeckController(this, deckModel);
@@ -121,8 +115,8 @@ export default class GameState extends Phaser.Scene {
   }
 
   public createButtons(): void {
-    const BUTTON_WIDTH = 100;
-    const BUTTON_HEIGHT = 18;
+    const BUTTON_WIDTH = 120;
+    const BUTTON_HEIGHT = 24;
     const BUTTON_MARGIN = 10;
     const BUTTON_Y = 10;
     const START_X = BORDER_PAD;
@@ -157,12 +151,13 @@ export default class GameState extends Phaser.Scene {
       // Draw button background
       this.add
         .graphics()
-        .fillStyle(0xffffff, 1)
+        .fillStyle(BUTTON_COLOR, 1)
         .fillRect(x, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT);
 
       // Add centered text
       const text = this.add.text(0, 0, label, {
-        color: "#000",
+        color: TEXT_COLOR.toString(16),
+        fontSize: "24px",
       });
 
       // Center the text inside the button
@@ -176,14 +171,14 @@ export default class GameState extends Phaser.Scene {
   public createText(): void {
     this.timerText = this.add
       .text(this.cameras.main.width - BORDER_PAD, 12, "Time: 0:00", {
-        color: "#FFF",
+        color: TEXT_COLOR.toString(16),
         fontSize: "24px",
       })
       .setOrigin(1, 0);
 
     this.winText = this.add
       .text(BORDER_PAD, this.cameras.main.height - 40, "You Win!", {
-        color: "#FFF",
+        color: TEXT_COLOR.toString(16),
         fontSize: "24px",
       })
       .setVisible(false);

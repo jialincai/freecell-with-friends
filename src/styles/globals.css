@@ -5,6 +5,7 @@
 @layer base {
   body {
     @apply font-sans m-0 p-0;
+    background-color: #3E5641;
   }
 
   h1 {

@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 
-import { PubSubStack } from "@utils/Function";
+import { getHexColorString, PubSubStack } from "@utils/Function";
 import { FOUNDATION_PILES, PileId } from "@phaser/constants/table";
 import { TWEEN_DURATION } from "@phaser/constants/tweens";
 import { setupCardInteraction } from "@phaser/game/input/CardInteraction";
@@ -20,7 +20,7 @@ import {
   areAllTableausOrdered,
 } from "@phaser/game/domain/FreecellRules";
 import { BORDER_PAD } from "@phaser/constants/dimensions";
-import { BUTTON_COLOR, TEXT_COLOR } from "@phaser/constants/colors";
+import { BUTTON_COLOR, BUTTON_TEXT_COLOR, TEXT_COLOR } from "@phaser/constants/colors";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -166,7 +166,7 @@ export default class GameState extends Phaser.Scene {
 
       // Add centered text
       const text = this.add.text(0, 0, label, {
-        color: TEXT_COLOR.toString(16),
+        color: getHexColorString(BUTTON_TEXT_COLOR),
         fontSize: "24px",
       });
 
@@ -181,14 +181,14 @@ export default class GameState extends Phaser.Scene {
   private createText(): void {
     this.timerText = this.add
       .text(this.cameras.main.width - BORDER_PAD, 12, "Time: 0:00", {
-        color: TEXT_COLOR.toString(16),
+        color: getHexColorString(TEXT_COLOR),
         fontSize: "24px",
       })
       .setOrigin(1, 0);
 
     this.winText = this.add
       .text(BORDER_PAD, this.cameras.main.height - 40, "You Win!", {
-        color: TEXT_COLOR.toString(16),
+        color: getHexColorString(TEXT_COLOR),
         fontSize: "24px",
       })
       .setVisible(false);

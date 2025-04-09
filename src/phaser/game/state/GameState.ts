@@ -76,7 +76,7 @@ export default class GameState extends Phaser.Scene {
     this.createCommandListeners();
   }
 
-  public createCommandListeners(): void {
+  private createCommandListeners(): void {
     this.moveHistory.subscribe("push", (move) => {
       const isSimpleDirectMove =
         move.steps.length === 1 &&
@@ -100,7 +100,7 @@ export default class GameState extends Phaser.Scene {
     });
   }
 
-  public createTimer(): void {
+  private createTimer(): void {
     this.pausedStartTime = 0;
     this.effectiveStartTime = Date.now();
 
@@ -114,7 +114,16 @@ export default class GameState extends Phaser.Scene {
     });
   }
 
-  public createButtons(): void {
+  private updateTimer(): void {
+    const elapsedMs = Date.now() - this.effectiveStartTime;
+    const minutes = Math.floor(elapsedMs / 60000);
+    const seconds = Math.floor((elapsedMs % 60000) / 1000)
+      .toString()
+      .padStart(2, "0");
+    this.timerText.setText(`Time: ${minutes}:${seconds}`);
+  }
+
+  private createButtons(): void {
     const BUTTON_WIDTH = 120;
     const BUTTON_HEIGHT = 24;
     const BUTTON_MARGIN = 10;
@@ -169,7 +178,7 @@ export default class GameState extends Phaser.Scene {
     });
   }
 
-  public createText(): void {
+  private createText(): void {
     this.timerText = this.add
       .text(this.cameras.main.width - BORDER_PAD, 12, "Time: 0:00", {
         color: TEXT_COLOR.toString(16),
@@ -186,26 +195,21 @@ export default class GameState extends Phaser.Scene {
   }
 
   public update(): void {
-    const elapsed = Date.now() - this.effectiveStartTime;
-    const minutes = Math.floor(elapsed / 60000);
-    const seconds = Math.floor((elapsed % 60000) / 1000)
-      .toString()
-      .padStart(2, "0");
-    this.timerText.setText(`Time: ${minutes}:${seconds}`);
-
     if (areAllTableausOrdered(this.deck.model)) {
-      const autoCompleteSequence = createAutocompleteCardMoveSequence(
-        this.deck.model,
-      );
+      const sequence = createAutocompleteCardMoveSequence(this.deck.model);
       this.deck.executeCardMoveSequenceWithTweens(
-        autoCompleteSequence,
+        sequence,
         this,
         TWEEN_DURATION,
       );
+      return;
     }
 
     if (areFoundationsFull(this.deck.model)) {
       this.winText.setVisible(true);
+      return;
     }
+
+    this.updateTimer();
   }
 }

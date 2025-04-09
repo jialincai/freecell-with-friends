@@ -126,6 +126,7 @@ export default class GameState extends Phaser.Scene {
         label: "Redeal",
         onClick: () => {
           this.deck.dealCards();
+          this.moveHistory.clear();
           this.winText.setVisible(false);
         },
       },

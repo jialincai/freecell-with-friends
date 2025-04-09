@@ -19,6 +19,11 @@ export class PubSubStack<T> {
     if (item) this.events.emit("pop", item);
   }
 
+  clear(): void {
+    this.items = [];
+    this.events.emit("clear");
+  }
+
   subscribe(event: string, listener: (item: T) => void): void {
     this.events.on(event, listener);
   }

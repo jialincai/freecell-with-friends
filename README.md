@@ -47,3 +47,18 @@ npm run lint:fix
 ```
 
 Make sure to fix any remaining issues manually if they cannot be auto-fixed.
+
+### Deployment
+
+To deploy the game as a static website:
+
+1. Build the project:
+
+   ```bash
+   npm run build
+   ```
+
+   This will generate an `/out` folder containing your static site.
+
+1. Upload the contents of the `/out` folder to your hosting platform.
+Ensure that `index.html` is located at the root of your hosted directory.

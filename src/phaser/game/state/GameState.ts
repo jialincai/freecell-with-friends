@@ -19,7 +19,7 @@ import {
   areFoundationsFull,
   areAllTableausOrdered,
 } from "@phaser/game/domain/FreecellRules";
-import { BORDER_PAD, SCREEN_DIMENSIONS } from "@phaser/constants/dimensions";
+import { BORDER_PAD } from "@phaser/constants/dimensions";
 import { BUTTON_COLOR, TEXT_COLOR } from "@phaser/constants/colors";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
@@ -126,6 +126,7 @@ export default class GameState extends Phaser.Scene {
         label: "Redeal",
         onClick: () => {
           this.deck.dealCards();
+          this.moveHistory.clear();
           this.winText.setVisible(false);
         },
       },

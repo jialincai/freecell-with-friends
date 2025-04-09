@@ -58,8 +58,10 @@ export function setupCardInteraction(
       },
     );
 
-    cardController.view.on("pointerdown", () => {
+    cardController.view.on("pointerup", (pointer: Phaser.Input.Pointer) => {
       if (!isMovable()) return;
+      if (pointer.getDistance() > 1) return;
+
       snapCardToFoundationPile(deckController, cardController, moveHistory);
     });
   });

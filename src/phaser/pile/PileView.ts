@@ -3,7 +3,7 @@ import { PILE_POSITIONS, TABLEAU_PILES } from "@phaser/constants/table";
 import { Pile } from "@phaser/pile/state/Pile";
 import {
   CARD_DIMENSIONS,
-  PILE_CORNER_RADIUS,
+  RECT_CORNER_RADIUS,
   PILE_LINE_WIDTH,
   PILE_SCALE,
   STACK_OFFSET,
@@ -59,14 +59,14 @@ export class PileView extends Phaser.GameObjects.Graphics {
       -height / 2,
       width,
       height,
-      PILE_CORNER_RADIUS,
+      RECT_CORNER_RADIUS,
     );
     this.strokeRoundedRect(
       -width / 2,
       -height / 2,
       width,
       height,
-      PILE_CORNER_RADIUS,
+      RECT_CORNER_RADIUS,
     );
   }
 }

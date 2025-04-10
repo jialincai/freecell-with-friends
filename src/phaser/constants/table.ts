@@ -1,5 +1,5 @@
 import {
-  BORDER_PAD,
+  BORDER_PAD_DIMENSIONS,
   BOTTOM_PILE_Y,
   CARD_DIMENSIONS,
   PILE_OFFSET,
@@ -67,7 +67,7 @@ export const FOUNDATION_PILES = [
  * Positions of piles on screen
  */
 const CARD_CENTER_X = (col: number) =>
-  BORDER_PAD +
+  BORDER_PAD_DIMENSIONS.width +
   CARD_DIMENSIONS.width / 2 +
   col * (CARD_DIMENSIONS.width + PILE_OFFSET);
 

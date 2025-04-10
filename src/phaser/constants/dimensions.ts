@@ -2,35 +2,44 @@
  * Screen dimensions
  */
 export const SCREEN_DIMENSIONS = {
-  height: 1185,
-  width: 715,
+  height: 1000,
+  width: 565,
 };
 
 /**
  * Card dimensions (10:7 height width).
  */
 export const CARD_DIMENSIONS = {
-  height: 120,
-  width: 84,
+  height: 100,
+  width: 68,
 };
+
+/**
+ * Button dimensions
+ */
+export const BUTTON_DIMENSIONS = {
+  height: 24,
+  width: 120,
+};
+export const BUTTON_MARGIN = 30;
 
 /**
  * Pile dimensions
  */
 export const PILE_LINE_WIDTH = 2;
-export const PILE_CORNER_RADIUS = 8;
-export const PILE_SCALE = 0.98;
+export const RECT_CORNER_RADIUS = 8;
+export const PILE_SCALE = 0.95;
 
 /**
  * Offsets between cards and piles
  */
 export const STACK_OFFSET = CARD_DIMENSIONS.height / 3;
 export const STACK_DRAG_OFFSET = CARD_DIMENSIONS.height / 2;
-export const PILE_OFFSET = 5;
+export const PILE_OFFSET = 2;
 
 // Pile Y positions
 export const TOP_PILE_Y = 120;
-export const BOTTOM_PILE_Y = 280;
+export const BOTTOM_PILE_Y = 260;
 
 /**
  * Active board dimensions
@@ -43,5 +52,7 @@ export const BOARD_DIMENSIONS = {
 };
 
 /** Padding game board */
-export const BORDER_PAD =
-  (SCREEN_DIMENSIONS.width - BOARD_DIMENSIONS.width) / 2;
+export const BORDER_PAD_DIMENSIONS = {
+  height: 12,
+  width: (SCREEN_DIMENSIONS.width - BOARD_DIMENSIONS.width) / 2,
+};

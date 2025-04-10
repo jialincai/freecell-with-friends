@@ -29,6 +29,10 @@ export class PubSubStack<T> {
   }
 }
 
+export function getHexColorString(hex: number): string {
+  return `#${hex.toString(16).padStart(6, "0")}`;
+}
+
 export interface Command {
   do(): void;
   undo(): void;

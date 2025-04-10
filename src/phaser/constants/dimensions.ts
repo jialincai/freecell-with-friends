@@ -15,6 +15,13 @@ export const CARD_DIMENSIONS = {
 };
 
 /**
+ * Pile dimensions
+ */
+export const PILE_LINE_WIDTH = 2;
+export const PILE_CORNER_RADIUS = 8;
+export const PILE_SCALE = 0.98;
+
+/**
  * Offsets between cards and piles
  */
 export const STACK_OFFSET = CARD_DIMENSIONS.height / 2;

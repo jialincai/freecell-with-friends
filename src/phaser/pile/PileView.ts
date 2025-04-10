@@ -1,33 +1,36 @@
 import * as Phaser from "phaser";
 import { PILE_POSITIONS, TABLEAU_PILES } from "@phaser/constants/table";
 import { Pile } from "@phaser/pile/state/Pile";
-import { CARD_DIMENSIONS, STACK_OFFSET } from "@phaser/constants/dimensions";
+import {
+  CARD_DIMENSIONS,
+  PILE_CORNER_RADIUS,
+  PILE_LINE_WIDTH,
+  PILE_SCALE,
+  STACK_OFFSET,
+} from "@phaser/constants/dimensions";
 import { BORDER_COLOR } from "@phaser/constants/colors";
 
-export class PileView extends Phaser.GameObjects.Rectangle {
+export class PileView extends Phaser.GameObjects.Graphics {
   constructor(scene: Phaser.Scene, model: Pile) {
-    super(
-      scene,
-      PILE_POSITIONS[model.data.id].x,
-      PILE_POSITIONS[model.data.id].y,
-      CARD_DIMENSIONS.width,
-      CARD_DIMENSIONS.height,
-      0x000000,
-      0,
-    );
+    super(scene);
 
-    this.setName(model.data.id);
-    this.setStrokeStyle(1, BORDER_COLOR);
+    const { width, height } = CARD_DIMENSIONS;
+    const pileId = model.data.id;
+    const position = PILE_POSITIONS[pileId];
+    const isTableau = TABLEAU_PILES.includes(pileId);
+    const addHeight = isTableau ? STACK_OFFSET * 10 : 0;
 
-    const addHeight = TABLEAU_PILES.includes(model.data.id)
-      ? STACK_OFFSET * 10
-      : 0;
+    this.setName(pileId);
+    this.setPosition(position.x, position.y);
+
+    this.drawPile(0x000000, 0); // Initial transparent fill
+
     this.setInteractive(
       new Phaser.Geom.Rectangle(
-        0,
-        0,
-        CARD_DIMENSIONS.width,
-        CARD_DIMENSIONS.height + addHeight,
+        -width / 2,
+        -height / 2,
+        width,
+        height + addHeight,
       ),
       Phaser.Geom.Rectangle.Contains,
       true,
@@ -37,10 +40,33 @@ export class PileView extends Phaser.GameObjects.Rectangle {
   }
 
   setTint(tint: number): void {
-    this.setFillStyle(tint, 0.75);
+    this.drawPile(tint, 0.75);
   }
 
   clearTint(): void {
-    this.setFillStyle(0x000000, 0);
+    this.drawPile(0x000000, 0);
+  }
+
+  private drawPile(fillColor: number, fillAlpha: number): void {
+    const width = CARD_DIMENSIONS.width * PILE_SCALE;
+    const height = CARD_DIMENSIONS.height * PILE_SCALE;
+
+    this.clear();
+    this.lineStyle(PILE_LINE_WIDTH, BORDER_COLOR, 1);
+    this.fillStyle(fillColor, fillAlpha);
+    this.fillRoundedRect(
+      -width / 2,
+      -height / 2,
+      width,
+      height,
+      PILE_CORNER_RADIUS,
+    );
+    this.strokeRoundedRect(
+      -width / 2,
+      -height / 2,
+      width,
+      height,
+      PILE_CORNER_RADIUS,
+    );
   }
 }

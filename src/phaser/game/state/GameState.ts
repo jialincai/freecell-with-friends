@@ -199,7 +199,7 @@ export default class GameState extends Phaser.Scene {
         this.cameras.main.height - FONT_SIZE + BORDER_PAD_DIMENSIONS.height,
         "You Win!",
         {
-          color: getHexColorString(TEXT_COLOR),
+          color: getHexColorString(TEXT_COLOR), // TODO: Keep font DRY.
           fontSize: FONT_SIZE,
           fontFamily: FONT_FAMILY,
         },

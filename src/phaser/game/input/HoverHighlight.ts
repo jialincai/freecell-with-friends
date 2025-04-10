@@ -7,6 +7,7 @@ import { CardController } from "@phaser/card/CardController";
 import { DeckController } from "@phaser/deck/DeckController";
 import { PileController } from "@phaser/pile/PileController";
 import { PileView } from "@phaser/pile/PileView";
+import { HIGHLIGHT_COLOR } from "@phaser/constants/colors";
 
 export function setupHoverHighlight(
   deckController: DeckController,
@@ -54,9 +55,9 @@ function setHighlight(
     const view = deckController.cardControllers.find(
       (c) => c.model === bottom,
     )?.view;
-    view?.setTint(0x4a90e2);
+    view?.setTint(HIGHLIGHT_COLOR);
   } else {
-    pileView.setTint(0x4a90e2);
+    pileView.setTint(HIGHLIGHT_COLOR);
   }
 }
 

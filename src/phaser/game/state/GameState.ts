@@ -48,7 +48,7 @@ export default class GameState extends Phaser.Scene {
     // Create deck
     const deckModel = createDeck();
     this.deck = new DeckController(this, deckModel);
-    this.deck.shuffleCards(476);
+    this.deck.shuffleCards(this.dateToSeed(new Date()));
     this.deck.dealCards();
 
     // Create piles
@@ -114,15 +114,6 @@ export default class GameState extends Phaser.Scene {
     });
   }
 
-  private updateTimer(): void {
-    const elapsedMs = Date.now() - this.effectiveStartTime;
-    const minutes = Math.floor(elapsedMs / 60000);
-    const seconds = Math.floor((elapsedMs % 60000) / 1000)
-      .toString()
-      .padStart(2, "0");
-    this.timerText.setText(`Time: ${minutes}:${seconds}`);
-  }
-
   private createButtons(): void {
     const BUTTON_WIDTH = 120;
     const BUTTON_HEIGHT = 24;
@@ -136,14 +127,6 @@ export default class GameState extends Phaser.Scene {
         onClick: () => {
           this.deck.dealCards();
           this.moveHistory.clear();
-          this.winText.setVisible(false);
-        },
-      },
-      {
-        label: "New Deal",
-        onClick: () => {
-          this.deck.shuffleCards(476);
-          this.deck.dealCards();
           this.winText.setVisible(false);
         },
       },
@@ -194,6 +177,25 @@ export default class GameState extends Phaser.Scene {
       .setVisible(false);
   }
 
+  // Pure funcitons we may want to rehome someday.
+  // Game state should only contain stateful logic.
+  private formatElapsedTime(elapsedMs: number): string {
+    const minutes = Math.floor(elapsedMs / 60000);
+    const seconds = Math.floor((elapsedMs % 60000) / 1000)
+      .toString()
+      .padStart(2, "0");
+    return `Time: ${minutes}:${seconds}`;
+  }
+
+  private dateToSeed(date: Date): number {
+    const [year, month, day] = date
+      .toISOString()
+      .split("T")[0]
+      .split("-")
+      .map(Number);
+    return year * 10000 + month * 100 + day;
+  }
+
   public update(): void {
     if (areAllTableausOrdered(this.deck.model)) {
       const sequence = createAutocompleteCardMoveSequence(this.deck.model);
@@ -210,6 +212,7 @@ export default class GameState extends Phaser.Scene {
       return;
     }
 
-    this.updateTimer();
+    const elapsedMs = Date.now() - this.effectiveStartTime;
+    this.timerText.setText(this.formatElapsedTime(elapsedMs));
   }
 }

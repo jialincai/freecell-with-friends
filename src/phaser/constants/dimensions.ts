@@ -24,7 +24,7 @@ export const PILE_SCALE = 0.98;
 /**
  * Offsets between cards and piles
  */
-export const STACK_OFFSET = CARD_DIMENSIONS.height / 2;
+export const STACK_OFFSET = CARD_DIMENSIONS.height / 3;
 export const STACK_DRAG_OFFSET = CARD_DIMENSIONS.height / 2;
 export const PILE_OFFSET = 5;
 

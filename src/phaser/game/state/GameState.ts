@@ -19,8 +19,19 @@ import {
   areFoundationsFull,
   areAllTableausOrdered,
 } from "@phaser/game/domain/FreecellRules";
-import { BORDER_PAD } from "@phaser/constants/dimensions";
-import { BUTTON_COLOR, BUTTON_TEXT_COLOR, TEXT_COLOR } from "@phaser/constants/colors";
+import {
+  BORDER_PAD_DIMENSIONS,
+  BUTTON_DIMENSIONS,
+  BUTTON_MARGIN,
+  RECT_CORNER_RADIUS,
+} from "@phaser/constants/dimensions";
+import {
+  BUTTON_COLOR,
+  BUTTON_TEXT_COLOR,
+  TEXT_COLOR,
+} from "@phaser/constants/colors";
+import { Maven_Pro } from "next/font/google";
+import { FONT_FAMILY, FONT_SIZE } from "@phaser/constants/fonts";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -115,12 +126,6 @@ export default class GameState extends Phaser.Scene {
   }
 
   private createButtons(): void {
-    const BUTTON_WIDTH = 120;
-    const BUTTON_HEIGHT = 24;
-    const BUTTON_MARGIN = 10;
-    const BUTTON_Y = 10;
-    const START_X = BORDER_PAD;
-
     const buttonConfigs = [
       {
         label: "Redeal",
@@ -139,23 +144,36 @@ export default class GameState extends Phaser.Scene {
     ];
 
     buttonConfigs.forEach(({ label, onClick }, index) => {
-      const x = START_X + index * (BUTTON_WIDTH + BUTTON_MARGIN);
+      const x =
+        BORDER_PAD_DIMENSIONS.width +
+        index * (BUTTON_DIMENSIONS.width + BUTTON_MARGIN);
 
       // Draw button background
       this.add
         .graphics()
         .fillStyle(BUTTON_COLOR, 1)
-        .fillRect(x, BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT);
+        .fillRoundedRect(
+          x,
+          BORDER_PAD_DIMENSIONS.height,
+          BUTTON_DIMENSIONS.width,
+          BUTTON_DIMENSIONS.height,
+          RECT_CORNER_RADIUS,
+        );
 
       // Add centered text
       const text = this.add.text(0, 0, label, {
         color: getHexColorString(BUTTON_TEXT_COLOR),
-        fontSize: "24px",
+        fontSize: FONT_SIZE,
+        fontFamily: FONT_FAMILY,
       });
 
       // Center the text inside the button
-      text.setX(x + BUTTON_WIDTH / 2 - text.width / 2);
-      text.setY(BUTTON_Y + BUTTON_HEIGHT / 2 - text.height / 2);
+      text.setX(x + BUTTON_DIMENSIONS.width / 2 - text.width / 2);
+      text.setY(
+        BORDER_PAD_DIMENSIONS.height +
+          BUTTON_DIMENSIONS.height / 2 -
+          text.height / 2,
+      );
 
       text.setInteractive().on("pointerdown", onClick);
     });
@@ -163,21 +181,33 @@ export default class GameState extends Phaser.Scene {
 
   private createText(): void {
     this.timerText = this.add
-      .text(this.cameras.main.width - BORDER_PAD, 12, "Time: 0:00", {
-        color: getHexColorString(TEXT_COLOR),
-        fontSize: "24px",
-      })
+      .text(
+        this.cameras.main.width - BORDER_PAD_DIMENSIONS.width,
+        BORDER_PAD_DIMENSIONS.height,
+        "Time: 0:00",
+        {
+          color: getHexColorString(TEXT_COLOR),
+          fontSize: FONT_SIZE,
+          fontFamily: FONT_FAMILY,
+        },
+      )
       .setOrigin(1, 0);
 
     this.winText = this.add
-      .text(BORDER_PAD, this.cameras.main.height - 40, "You Win!", {
-        color: getHexColorString(TEXT_COLOR),
-        fontSize: "24px",
-      })
+      .text(
+        BORDER_PAD_DIMENSIONS.width,
+        this.cameras.main.height - FONT_SIZE + BORDER_PAD_DIMENSIONS.height,
+        "You Win!",
+        {
+          color: getHexColorString(TEXT_COLOR),
+          fontSize: FONT_SIZE,
+          fontFamily: FONT_FAMILY,
+        },
+      )
       .setVisible(false);
   }
 
-  // Pure funcitons we may want to rehome someday.
+  // TODO: Pure funcitons we may want to rehome someday.
   // Game state should only contain stateful logic.
   private formatElapsedTime(elapsedMs: number): string {
     const minutes = Math.floor(elapsedMs / 60000);

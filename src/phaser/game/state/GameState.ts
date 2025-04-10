@@ -193,7 +193,7 @@ export default class GameState extends Phaser.Scene {
       .split("T")[0]
       .split("-")
       .map(Number);
-    return year * 10000 + month * 100 + day; // e.g., 20250409
+    return year * 10000 + month * 100 + day;
   }
 
   public update(): void {

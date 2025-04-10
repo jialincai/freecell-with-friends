@@ -9,8 +9,6 @@ const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   parent: "game-container",
   backgroundColor: BACKGROUND_COLOR,
-  antialias: false,
-  antialiasGL: false,
   width: SCREEN_DIMENSIONS.width,
   height: SCREEN_DIMENSIONS.height,
   scene: [PreInitState, InitState, GameState],

@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inconsolata } from "next/font/google";
 import "@styles/globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const inconsolata = Inconsolata({
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
   title: "Freecell Game",
@@ -18,12 +20,8 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="icon" href="/favicon.ico" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400;700&display=swap"
-          rel="stylesheet"
-        />
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={inconsolata.className}>{children}</body>
     </html>
   );
 }

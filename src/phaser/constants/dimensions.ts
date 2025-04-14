@@ -2,24 +2,24 @@
  * Screen dimensions
  */
 export const SCREEN_DIMENSIONS = {
-  height: 1000,
-  width: 565,
+  height: 3250,
+  width: 1625,
 };
 
 /**
  * Card dimensions (10:7 height width).
  */
 export const CARD_DIMENSIONS = {
-  height: 100,
-  width: 68,
+  height: 280,
+  width: 200,
 };
 
 /**
  * Button dimensions
  */
 export const BUTTON_DIMENSIONS = {
-  height: 24,
-  width: 120,
+  height: 60,
+  width: 240,
 };
 export const BUTTON_MARGIN = 30;
 
@@ -33,13 +33,13 @@ export const PILE_SCALE = 0.95;
 /**
  * Offsets between cards and piles
  */
-export const STACK_OFFSET = CARD_DIMENSIONS.height / 3;
-export const STACK_DRAG_OFFSET = CARD_DIMENSIONS.height / 2;
+export const STACK_OFFSET = CARD_DIMENSIONS.height / 2;
+export const STACK_DRAG_OFFSET = CARD_DIMENSIONS.height / 1.5;
 export const PILE_OFFSET = 2;
 
 // Pile Y positions
-export const TOP_PILE_Y = 120;
-export const BOTTOM_PILE_Y = 260;
+export const TOP_PILE_Y = 240;
+export const BOTTOM_PILE_Y = 580;
 
 /**
  * Active board dimensions

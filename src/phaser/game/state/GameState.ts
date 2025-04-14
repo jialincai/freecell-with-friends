@@ -30,7 +30,6 @@ import {
   BUTTON_TEXT_COLOR,
   TEXT_COLOR,
 } from "@phaser/constants/colors";
-import { Maven_Pro } from "next/font/google";
 import { FONT_FAMILY, FONT_SIZE } from "@phaser/constants/fonts";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {

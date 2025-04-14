@@ -1,2 +1,2 @@
 export const FONT_FAMILY = "Maven Pro";
-export const FONT_SIZE = 60;
+export const FONT_SIZE = 75;

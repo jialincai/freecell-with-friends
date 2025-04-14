@@ -18,8 +18,8 @@ export const CARD_DIMENSIONS = {
  * Button dimensions
  */
 export const BUTTON_DIMENSIONS = {
-  height: 60,
-  width: 240,
+  height: 75,
+  width: 300,
 };
 export const BUTTON_MARGIN = 30;
 

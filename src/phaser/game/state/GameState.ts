@@ -132,6 +132,7 @@ export default class GameState extends Phaser.Scene {
     });
   }
 
+  // TODO: Refactor to generalize and DRY up.
   private createButtons(): void {
     const buttonConfigs = [
       {

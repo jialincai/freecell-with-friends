@@ -34,6 +34,7 @@ import {
   BUTTON_COLOR,
   BUTTON_TEXT_COLOR,
   HIGHLIGHT_COLOR,
+  RED,
   TEXT_COLOR,
 } from "@phaser/constants/colors";
 import { FONT_FAMILY, FONT_SIZE } from "@phaser/constants/fonts";
@@ -149,7 +150,7 @@ export default class GameState extends Phaser.Scene {
       },
       {
         label: "Nudge",
-        onClick: () => {
+        onClick: (text: Phaser.GameObjects.Text) => {
           const sourcePiles = [...TABLEAU_PILES, ...CELL_PILES];
           // NOTE: Target groups are ordered by priority —
           // the most likely useful hint (FOUNDATION) is checked first,
@@ -174,7 +175,13 @@ export default class GameState extends Phaser.Scene {
             return;
           }
 
-          console.log("No valid moves available.");
+          // Warning if no moves are available
+          text.setColor(getHexColorString(RED));
+          text.setStyle({ fontStyle: "bold" });
+          this.time.delayedCall(800, () => {
+            text.setColor(getHexColorString(BUTTON_TEXT_COLOR));
+            text.setStyle({ fontStyle: "normal" });
+          });
         },
       },
     ];
@@ -211,7 +218,7 @@ export default class GameState extends Phaser.Scene {
           text.height / 2,
       );
 
-      text.setInteractive().on("pointerdown", onClick);
+      text.setInteractive().on("pointerdown", () => onClick(text));
     });
   }
 

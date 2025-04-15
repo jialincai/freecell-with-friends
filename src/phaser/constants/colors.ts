@@ -4,3 +4,4 @@ export const TEXT_COLOR = 0xffffff;
 export const BUTTON_TEXT_COLOR = 0x101418;
 export const BUTTON_COLOR = 0xffffff;
 export const HIGHLIGHT_COLOR = 0x3366cc;
+export const RED = 0xb80c09;

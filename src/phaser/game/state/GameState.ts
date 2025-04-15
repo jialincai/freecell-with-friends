@@ -1,7 +1,12 @@
 import * as Phaser from "phaser";
 
 import { getHexColorString, PubSubStack } from "@utils/Function";
-import { FOUNDATION_PILES, PileId } from "@phaser/constants/table";
+import {
+  CELL_PILES,
+  FOUNDATION_PILES,
+  PileId,
+  TABLEAU_PILES,
+} from "@phaser/constants/table";
 import { TWEEN_DURATION } from "@phaser/constants/tweens";
 import { setupCardInteraction } from "@phaser/game/input/CardInteraction";
 import { setupHoverHighlight } from "@phaser/game/input/HoverHighlight";
@@ -28,9 +33,11 @@ import {
 import {
   BUTTON_COLOR,
   BUTTON_TEXT_COLOR,
+  HIGHLIGHT_COLOR,
   TEXT_COLOR,
 } from "@phaser/constants/colors";
 import { FONT_FAMILY, FONT_SIZE } from "@phaser/constants/fonts";
+import { getSingleCardMoves } from "@phaser/move/domain/CardMoveLogic";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -138,6 +145,36 @@ export default class GameState extends Phaser.Scene {
         label: "Undo",
         onClick: () => {
           this.moveHistory.pop();
+        },
+      },
+      {
+        label: "Nudge",
+        onClick: () => {
+          const sourcePiles = [...TABLEAU_PILES, ...CELL_PILES];
+          // NOTE: Target groups are ordered by priority —
+          // the most likely useful hint (FOUNDATION) is checked first,
+          // followed by TABLEAU and then CELL piles.
+          const targetGroups = [FOUNDATION_PILES, TABLEAU_PILES, CELL_PILES];
+
+          for (const targetPiles of targetGroups) {
+            const [move] = getSingleCardMoves(
+              this.deck.model,
+              sourcePiles,
+              targetPiles,
+            );
+            if (!move) continue;
+
+            const source = this.deck.getCardsInPile(move.fromPile).at(-1);
+            const target =
+              this.deck.getCardsInPile(move.toPile).at(-1) ??
+              this.piles.find((p) => p.model.data.id === move.toPile);
+
+            source?.view.setTint(HIGHLIGHT_COLOR);
+            target?.view.setTint(HIGHLIGHT_COLOR);
+            return;
+          }
+
+          console.log("No valid moves available.");
         },
       },
     ];

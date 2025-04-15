@@ -30,6 +30,10 @@ export function setupHoverHighlight(
       removeHighlight(deckController, PileControllers);
     });
 
+    cardController.view.on("pointerdown", () => {
+      removeHighlight(deckController, PileControllers);
+    });
+
     cardController.view.on("pointerup", () => {
       removeHighlight(deckController, PileControllers);
     });

@@ -6,19 +6,10 @@ export type Stats = {
   state: StatsState;
 };
 
-export function createStats(
-  seed: number,
-  startTime: number,
-  pauseTime: number,
-): Stats {
+export function createStats(seed: number, startTime: number, pauseTime: number): Stats {
   return {
-    data: {
-      seed,
-    },
-    state: {
-      startTime,
-      pauseTime,
-    },
+    data: { seed },
+    state: { startTime, pauseTime },
   };
 }
 

@@ -1,4 +1,9 @@
-import { deserializeStats, serializeStats, Stats } from "@phaser/stats/state/Stats";
+import {
+  createStats,
+  deserializeStats,
+  serializeStats,
+  Stats,
+} from "@phaser/stats/state/Stats";
 import { StatsView } from "@phaser/stats/StatsView";
 import { withPauseTime, withStartTime } from "@phaser/stats/domain/StatsLogic";
 import { STORAGE_KEY } from "@phaser/constants/storage";
@@ -14,26 +19,12 @@ export class StatsController {
     this.view = new StatsView(scene, this.model);
     this.updateTimeDisplay();
 
-    document.addEventListener("visibilitychange", () => {
-      const now = Date.now();
-
-      if (document.hidden) {
-        this.model.state = withPauseTime(this.model.state, now);
-      } else {
-        const offset = now - this.model.state.pauseTime;
-        this.model.state = withStartTime(
-          this.model.state,
-          this.model.state.startTime + offset,
-        );
-      }
-
-      this.saveStats();
-    });
+    document.addEventListener("visibilitychange", this.handleVisibilityChange);
   }
 
   public updateTimeDisplay(): void {
-    const elapsed = Date.now() - this.model.state.startTime;
-    this.view.setTimerText(this.formatElapsedTime(elapsed));
+    const elapsedMs = Date.now() - this.model.state.startTime;
+    this.view.setTimerText(this.formatElapsedTime(elapsedMs));
     this.saveStats();
   }
 
@@ -43,13 +34,29 @@ export class StatsController {
 
   public loadStats(): void {
     const raw = localStorage.getItem(STORAGE_KEY);
-    const restored = raw ? deserializeStats(raw) : null;
-  
-    if (restored) {
-      this.model.data = restored.data;
-      this.model.state = restored.state;
-    }
+    const loadedStats = raw ? deserializeStats(raw) : null;
+
+    if (!loadedStats || loadedStats.data.seed !== this.model.data.seed) return;
+
+    this.model = createStats(
+      loadedStats.data.seed,
+      loadedStats.state.startTime,
+      loadedStats.state.pauseTime,
+    );
   }
+
+  private handleVisibilityChange = (): void => {
+    const now = Date.now();
+
+    this.model.state = document.hidden
+      ? withPauseTime(this.model.state, now)
+      : withStartTime(
+          this.model.state,
+          this.model.state.startTime + (now - this.model.state.pauseTime),
+        );
+
+    this.saveStats();
+  };
 
   private formatElapsedTime(ms: number): string {
     const minutes = Math.floor(ms / 60000);

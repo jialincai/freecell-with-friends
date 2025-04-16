@@ -1,11 +1,11 @@
+import { Stats } from "@phaser/stats/state/Stats";
+import { StatsView } from "@phaser/stats/StatsView";
 import {
-  createStats,
   deserializeStats,
   serializeStats,
-  Stats,
-} from "@phaser/stats/state/Stats";
-import { StatsView } from "@phaser/stats/StatsView";
-import { withPauseTime, withStartTime } from "@phaser/stats/domain/StatsLogic";
+  withPauseTime,
+  withStartTime,
+} from "@phaser/stats/domain/StatsLogic";
 import { STORAGE_KEY } from "@phaser/constants/storage";
 
 export class StatsController {
@@ -38,11 +38,7 @@ export class StatsController {
 
     if (!loadedStats || loadedStats.data.seed !== this.model.data.seed) return;
 
-    this.model = createStats(
-      loadedStats.data.seed,
-      loadedStats.state.startTime,
-      loadedStats.state.pauseTime,
-    );
+    this.model.state = loadedStats.state;
   }
 
   private handleVisibilityChange = (): void => {

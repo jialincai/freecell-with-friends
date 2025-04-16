@@ -39,6 +39,8 @@ import {
 } from "@phaser/constants/colors";
 import { FONT_FAMILY, FONT_SIZE } from "@phaser/constants/fonts";
 import { getSingleCardMoves } from "@phaser/move/domain/CardMoveLogic";
+import { StatsController } from "@phaser/stats/StatsController";
+import { createStats } from "@phaser/stats/state/Stats";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -52,10 +54,8 @@ export default class GameState extends Phaser.Scene {
   private deck!: DeckController;
   private piles!: PileController[];
 
-  private effectiveStartTime!: number;
-  private pausedStartTime!: number;
+  private stat!: StatsController;
 
-  private timerText!: Phaser.GameObjects.Text;
   private winText!: Phaser.GameObjects.Text;
 
   public constructor() {
@@ -63,10 +63,16 @@ export default class GameState extends Phaser.Scene {
   }
 
   public create(): void {
+    // Setup stat
+    this.stat = new StatsController(
+      this,
+      createStats(this.dateToSeed(new Date()), Date.now(), 0),
+    );
+
     // Create deck
     const deckModel = createDeck();
     this.deck = new DeckController(this, deckModel);
-    this.deck.shuffleCards(this.dateToSeed(new Date()));
+    this.deck.shuffleCards(this.stat.model.data.seed);
     this.deck.dealCards();
 
     // Create piles
@@ -78,9 +84,6 @@ export default class GameState extends Phaser.Scene {
 
       return pile;
     });
-
-    // Setup game timer
-    this.createTimer();
 
     // Create UI
     this.createButtons();
@@ -115,20 +118,6 @@ export default class GameState extends Phaser.Scene {
     this.moveHistory.subscribe("pop", (move) => {
       const undo = invertCardMoveSequence(move);
       this.deck.executeCardMoveSequence(undo);
-    });
-  }
-
-  private createTimer(): void {
-    this.pausedStartTime = 0;
-    this.effectiveStartTime = Date.now();
-
-    document.addEventListener("visibilitychange", () => {
-      if (document.hidden) {
-        this.pausedStartTime = Date.now();
-      } else {
-        const pausedDuration = Date.now() - this.pausedStartTime;
-        this.effectiveStartTime += pausedDuration;
-      }
     });
   }
 
@@ -224,19 +213,6 @@ export default class GameState extends Phaser.Scene {
   }
 
   private createText(): void {
-    this.timerText = this.add
-      .text(
-        this.cameras.main.width - BORDER_PAD_DIMENSIONS.width,
-        BORDER_PAD_DIMENSIONS.height,
-        "Time: 0:00",
-        {
-          color: getHexColorString(TEXT_COLOR),
-          fontSize: FONT_SIZE,
-          fontFamily: FONT_FAMILY,
-        },
-      )
-      .setOrigin(1, 0);
-
     this.winText = this.add
       .text(
         BORDER_PAD_DIMENSIONS.width,
@@ -253,14 +229,6 @@ export default class GameState extends Phaser.Scene {
 
   // TODO: Pure funcitons we may want to rehome someday.
   // Game state should only contain stateful logic.
-  private formatElapsedTime(elapsedMs: number): string {
-    const minutes = Math.floor(elapsedMs / 60000);
-    const seconds = Math.floor((elapsedMs % 60000) / 1000)
-      .toString()
-      .padStart(2, "0");
-    return `Time: ${minutes}:${seconds}`;
-  }
-
   private dateToSeed(date: Date): number {
     const [year, month, day] = date
       .toISOString()
@@ -286,7 +254,6 @@ export default class GameState extends Phaser.Scene {
       return;
     }
 
-    const elapsedMs = Date.now() - this.effectiveStartTime;
-    this.timerText.setText(this.formatElapsedTime(elapsedMs));
+    this.stat.updateTimeDisplay();
   }
 }

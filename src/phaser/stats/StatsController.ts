@@ -15,6 +15,7 @@ export class StatsController {
   constructor(scene: Phaser.Scene, model: Stats) {
     this.model = model;
     this.loadStats();
+    this.saveStats();
 
     this.view = new StatsView(scene, this.model);
     this.updateTimeDisplay();
@@ -25,7 +26,6 @@ export class StatsController {
   public updateTimeDisplay(): void {
     const elapsedMs = Date.now() - this.model.state.startTime;
     this.view.setTimerText(this.formatElapsedTime(elapsedMs));
-    this.saveStats();
   }
 
   public saveStats(): void {

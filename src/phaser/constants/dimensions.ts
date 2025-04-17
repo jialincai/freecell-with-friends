@@ -38,8 +38,8 @@ export const STACK_DRAG_OFFSET = CARD_DIMENSIONS.height / 1.5;
 export const PILE_OFFSET = 2;
 
 // Pile Y positions
-export const TOP_PILE_Y = 240;
-export const BOTTOM_PILE_Y = 580;
+export const TOP_PILE_Y = 300;
+export const BOTTOM_PILE_Y = 620;
 
 /**
  * Active board dimensions
@@ -53,6 +53,6 @@ export const BOARD_DIMENSIONS = {
 
 /** Padding game board */
 export const BORDER_PAD_DIMENSIONS = {
-  height: 12,
+  height: 48,
   width: (SCREEN_DIMENSIONS.width - BOARD_DIMENSIONS.width) / 2,
 };

@@ -6,6 +6,7 @@
   body {
     @apply font-sans m-0 p-0;
     background-color: #101418;
+    color: #ffffff;
   }
 
   h1 {

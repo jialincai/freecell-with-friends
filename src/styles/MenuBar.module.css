@@ -1,0 +1,22 @@
+.menuBar {
+    height: 6vh;
+    padding: 0 1rem;
+    border-bottom: #41454a 1px solid;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .helpButton {
+    padding: 0.5rem;
+  }
+
+  .helpButton:hover {
+    background-color: #26292D;
+    cursor: pointer;
+  }
+  
+  .helpIcon {
+    width: auto;
+    height: 100%;
+  }
+  

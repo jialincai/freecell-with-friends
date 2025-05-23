@@ -1,7 +1,8 @@
 import { HelpCircle, Trophy} from "lucide-react";
 import styles from "@styles/MenuBar.module.css";
 
-const MenuBar: React.FC = () => (
+const MenuBar = () => {
+  return (
     <div className={styles.menuBar}>
       <button className={styles.menuButton}>
         <Trophy className={styles.menuIcon} />
@@ -11,5 +12,6 @@ const MenuBar: React.FC = () => (
       </button>
     </div>
   );
+}
   
-  export default MenuBar;
+export default MenuBar;

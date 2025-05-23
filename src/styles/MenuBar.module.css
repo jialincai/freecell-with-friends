@@ -1,5 +1,5 @@
 .menuBar {
-    height: 6vh;
+    height: 5vh;
     padding: 0 0 0 1rem;
     border-bottom: #41454a 1px solid;
     display: flex;
@@ -7,7 +7,7 @@
   }
   
   .menuButton {
-    padding: 1rem;
+    padding: 0.75rem;
   }
 
   .menuButton:hover {

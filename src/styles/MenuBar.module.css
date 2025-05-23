@@ -1,22 +1,21 @@
 .menuBar {
     height: 6vh;
-    padding: 0 1rem;
+    padding: 0 0 0 1rem;
     border-bottom: #41454a 1px solid;
     display: flex;
     justify-content: flex-end;
   }
   
-  .helpButton {
-    padding: 0.5rem;
+  .menuButton {
+    padding: 1rem;
   }
 
-  .helpButton:hover {
+  .menuButton:hover {
     background-color: #26292D;
     cursor: pointer;
   }
   
-  .helpIcon {
+  .menuIcon {
     width: auto;
     height: 100%;
   }
-  

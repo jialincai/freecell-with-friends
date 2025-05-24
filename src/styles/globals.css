@@ -4,19 +4,18 @@
 
 @layer base {
   body {
-    @apply font-sans m-0 p-0;
-    background-color: #101418;
-    color: #ffffff;
+    @apply
+      font-sans
+      m-0 p-0
+      bg-darkBlue
+      text-white;
   }
 
-  h1 {
-    @apply text-center;
+  canvas {
+    @apply
+      block
+      mx-auto
+      w-full
+      h-screen;
   }
-}
-
-canvas {
-  display: block;
-  margin: 0 auto;
-  width: 100%;
-  height: 100vh;
 }

@@ -1,21 +1,24 @@
 .menuBar {
-    height: 5vh;
-    padding: 0 0 0 1rem;
-    border-bottom: #41454a 1px solid;
-    display: flex;
-    justify-content: flex-end;
-  }
-  
-  .menuButton {
-    padding: 0.75rem;
-  }
+  @apply
+    h-[5vh]
+    pl-4
+    border-b border-white
+    flex justify-end;
+}
 
-  .menuButton:hover {
-    background-color: #26292D;
-    cursor: pointer;
-  }
-  
-  .menuIcon {
-    width: auto;
-    height: 100%;
-  }
+.menuButton {
+  @apply
+    p-3;
+}
+
+.menuButton:hover {
+  @apply
+    bg-blue
+    cursor-pointer;
+}
+
+.menuIcon {
+  @apply
+    h-full
+    w-auto;
+}

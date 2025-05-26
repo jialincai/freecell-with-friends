@@ -1,9 +1,9 @@
 .menuBar {
   @apply
-    h-[5vh]
+    h-12
     pl-4
     border-b border-white
-    flex justify-end;
+    flex justify-end items-center;
 }
 
 .menuButton {
@@ -19,6 +19,6 @@
 
 .menuIcon {
   @apply
-    h-full
+    h-6
     w-auto;
 }

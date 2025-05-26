@@ -2,15 +2,17 @@
   @apply
     fixed inset-0 z-[1000]
     flex justify-center items-center
-    bg-black bg-opacity-75;
+    bg-white bg-opacity-5;
 }
 
 .modal {
   @apply
     relative
-    w-[50vw] max-w-[600px] min-w-[300px]
-    p-8 rounded-xl
-    bg-darkBlue shadow-lg;
+    w-full sm:w-1/2
+    max-w-[600px] min-w-[300px]
+    max-h-[100vh] overflow-y-auto
+    rounded-xl
+    bg-darkBlue;
 }
 
 .closeButton {
@@ -27,6 +29,6 @@
 
 .content {
   @apply
-    mt-8
+    p-6
     text-[0.95rem] leading-relaxed;
 }

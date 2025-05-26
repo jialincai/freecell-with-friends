@@ -14,6 +14,12 @@ const MenuBar = () => {
 
   return (
     <>
+      <Overlay hidden={!active} onClose={closeOverlay}>
+        {active === "stats" && <HelpContent />}
+        {active === "help" && <HelpContent />}
+        {active === "settings" && <HelpContent />}
+      </Overlay>
+      
       <div className={styles.menuBar}>
         <button
           className={styles.menuButton}
@@ -31,12 +37,6 @@ const MenuBar = () => {
           <Settings className={styles.menuIcon} />
         </button>
       </div>
-
-      <Overlay hidden={!active} onClose={closeOverlay}>
-        {active === "stats" && <HelpContent />}
-        {active === "help" && <HelpContent />}
-        {active === "settings" && <HelpContent />}
-      </Overlay>
     </>
   );
 };

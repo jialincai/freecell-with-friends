@@ -1,0 +1,19 @@
+.container {
+  @apply space-y-6 p-6 text-base leading-relaxed text-white;
+}
+
+.heading {
+  @apply text-2xl font-bold mb-2 text-blue text-center;
+}
+
+.image {
+  @apply mx-auto rounded-lg h-auto;
+  max-width: 100%;
+  width: auto;
+  image-rendering: auto;
+  background-color: transparent;
+}
+
+.footer {
+  @apply text-sm text-blue text-center pt-4;
+}

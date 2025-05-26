@@ -16,7 +16,6 @@ export default class PreInitState extends Phaser.Scene {
   public preload(): void {
     // Set base url
     this.load.baseURL = baseURL;
-    this.load.image("img_load", "img/loading.png");
   }
 
   public create(): void {

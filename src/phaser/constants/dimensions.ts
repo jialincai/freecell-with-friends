@@ -3,7 +3,7 @@
  */
 export const SCREEN_DIMENSIONS = {
   height: 3250,
-  width: 1625,
+  width: 1650,
 };
 
 /**
@@ -26,7 +26,7 @@ export const BUTTON_MARGIN = 30;
 /**
  * Pile dimensions
  */
-export const PILE_LINE_WIDTH = 2;
+export const PILE_LINE_WIDTH = 3;
 export const RECT_CORNER_RADIUS = 8;
 export const PILE_SCALE = 0.95;
 
@@ -35,11 +35,11 @@ export const PILE_SCALE = 0.95;
  */
 export const STACK_OFFSET = CARD_DIMENSIONS.height / 2;
 export const STACK_DRAG_OFFSET = CARD_DIMENSIONS.height / 1.5;
-export const PILE_OFFSET = 2;
+export const PILE_OFFSET = 5;
 
 // Pile Y positions
-export const TOP_PILE_Y = 320;
-export const BOTTOM_PILE_Y = 640;
+export const TOP_PILE_Y = 330;
+export const BOTTOM_PILE_Y = 650;
 
 /**
  * Active board dimensions

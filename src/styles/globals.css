@@ -18,4 +18,9 @@
       w-full
       h-screen;
   }
+
+  .scroll-lock {
+  @apply
+    overflow-hidden;
+}
 }

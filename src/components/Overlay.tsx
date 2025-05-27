@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { X } from "lucide-react";
 import styles from "@styles/Overlay.module.css";
 
@@ -10,6 +11,11 @@ type OverlayProps = {
 };
 
 const Overlay = ({ hidden, onClose, children }: OverlayProps) => {
+  useEffect(() => {
+    document.body.classList.toggle("scroll-lock", !hidden);
+    return () => document.body.classList.remove("scroll-lock");
+  }, [hidden]);
+
   if (hidden) return null;
 
   return (

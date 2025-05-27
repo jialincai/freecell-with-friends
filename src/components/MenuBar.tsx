@@ -19,7 +19,7 @@ const MenuBar = () => {
         {active === "help" && <HelpContent />}
         {/* {active === "settings" && <HelpContent />} */}
       </Overlay>
-      
+
       <div className={styles.menuBar}>
         {/* <button
           className={styles.menuButton}

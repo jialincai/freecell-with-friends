@@ -17,29 +17,34 @@ export default class InitState extends Phaser.Scene {
 
   // eslint-disable-next-line max-lines-per-function
   public preload(): void {
-  // Set base url
-  this.load.baseURL = baseURL;
+    // Set base url
+    this.load.baseURL = baseURL;
 
-  const { width, height } = this.cameras.main;
+    const { width, height } = this.cameras.main;
 
-  // Progress box (background of the progress bar)
-  const progressBox = this.add.graphics();
-  progressBox.fillStyle(0xaaaaaa, 0.8);
-  const barWidth = 600;
-  const barHeight = 100;
-  const barX = (width - barWidth) / 2;
-  const barY = height / 2;
-  progressBox.fillRect(barX, barY, barWidth, barHeight);
+    // Progress box (background of the progress bar)
+    const progressBox = this.add.graphics();
+    progressBox.fillStyle(0xaaaaaa, 0.8);
+    const barWidth = 600;
+    const barHeight = 100;
+    const barX = (width - barWidth) / 2;
+    const barY = height / 2;
+    progressBox.fillRect(barX, barY, barWidth, barHeight);
 
-  // Progress fill
-  const progressBar = this.add.graphics();
+    // Progress fill
+    const progressBar = this.add.graphics();
 
-  // Progress update
-  this.load.on("progress", (value: number) => {
-    progressBar.clear();
-    progressBar.fillStyle(0x000000, 1);
-    progressBar.fillRect(barX + 2, barY + 2, (barWidth - 4) * value, barHeight - 4);
-  });
+    // Progress update
+    this.load.on("progress", (value: number) => {
+      progressBar.clear();
+      progressBar.fillStyle(0x000000, 1);
+      progressBar.fillRect(
+        barX + 2,
+        barY + 2,
+        (barWidth - 4) * value,
+        barHeight - 4,
+      );
+    });
 
     this.load.on("complete", () => {
       progressBar.destroy();

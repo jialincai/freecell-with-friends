@@ -15,27 +15,27 @@ const MenuBar = () => {
   return (
     <>
       <Overlay hidden={!active} onClose={closeOverlay}>
-        {active === "stats" && <HelpContent />}
+        {/* {active === "stats" && <HelpContent />} */}
         {active === "help" && <HelpContent />}
-        {active === "settings" && <HelpContent />}
+        {/* {active === "settings" && <HelpContent />} */}
       </Overlay>
       
       <div className={styles.menuBar}>
-        <button
+        {/* <button
           className={styles.menuButton}
           onClick={() => setActive("stats")}
         >
           <Trophy className={styles.menuIcon} />
-        </button>
+        </button> */}
         <button className={styles.menuButton} onClick={() => setActive("help")}>
           <HelpCircle className={styles.menuIcon} />
         </button>
-        <button
+        {/* <button
           className={styles.menuButton}
           onClick={() => setActive("settings")}
         >
           <Settings className={styles.menuIcon} />
-        </button>
+        </button> */}
       </div>
     </>
   );

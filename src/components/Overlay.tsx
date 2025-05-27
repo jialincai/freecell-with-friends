@@ -1,5 +1,6 @@
 "use client";
 
+import { X } from "lucide-react";
 import styles from "@styles/Overlay.module.css";
 
 type OverlayProps = {
@@ -15,7 +16,7 @@ const Overlay = ({ hidden, onClose, children }: OverlayProps) => {
     <div className={styles.overlay}>
       <div className={styles.modal}>
         <button onClick={onClose} className={styles.closeButton}>
-          Close
+          <X className={styles.closeIcon}/>
         </button>
         <div className={styles.children}>{children}</div>
       </div>

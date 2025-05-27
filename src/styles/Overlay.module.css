@@ -11,20 +11,18 @@
     w-full sm:w-1/2
     max-w-[600px] min-w-[300px]
     max-h-[100vh] overflow-y-auto
-    rounded-xl
-    bg-darkBlue;
+    bg-darkBlue rounded-xl;
 }
 
 .closeButton {
   @apply
-    absolute top-4 right-4
+    absolute top-3 right-3
     bg-transparent border-none
-    text-xl font-bold
     cursor-pointer;
 }
 
-.closeButton:hover {
-  @apply opacity-80;
+.closeIcon {
+  @apply w-8 h-8;
 }
 
 .content {

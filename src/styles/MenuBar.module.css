@@ -1,0 +1,24 @@
+.menuBar {
+  @apply
+    h-12
+    pl-4
+    border-b border-white
+    flex justify-end items-center;
+}
+
+.menuButton {
+  @apply
+    p-3;
+}
+
+.menuButton:hover {
+  @apply
+    bg-blue
+    cursor-pointer;
+}
+
+.menuIcon {
+  @apply
+    h-6
+    w-auto;
+}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inconsolata } from "next/font/google";
 import "@styles/globals.css";
+import React from "react";
 
 const inconsolata = Inconsolata({
   subsets: ["latin"],
@@ -11,11 +12,11 @@ export const metadata: Metadata = {
   description: "A web-based Freecell card game built with React and Next.js",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
+type LayoutProps = {
   children: React.ReactNode;
-}>) {
+};
+
+const RootLayout = ({ children }: LayoutProps) => {
   return (
     <html lang="en">
       <head>
@@ -24,4 +25,6 @@ export default function RootLayout({
       <body className={inconsolata.className}>{children}</body>
     </html>
   );
-}
+};
+
+export default RootLayout;

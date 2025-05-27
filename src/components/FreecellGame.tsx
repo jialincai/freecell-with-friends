@@ -1,9 +1,9 @@
 "use client";
 
-import { IRefPhaserGame, PhaserGame } from "@components/PhasorGame";
 import { useRef } from "react";
+import { IRefPhaserGame, PhaserGame } from "@components/PhasorGame";
 
-const FreecellGame: React.FC = () => {
+const FreecellGame = () => {
   const phaserRef = useRef<IRefPhaserGame | null>(null);
 
   return (

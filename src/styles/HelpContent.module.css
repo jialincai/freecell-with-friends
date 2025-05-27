@@ -1,0 +1,40 @@
+.container {
+  @apply
+    p-6
+    space-y-6
+    text-base leading-relaxed
+    text-white;
+}
+
+.sectionRow {
+  @apply
+    flex items-start gap-4;
+}
+
+.sectionColumn {
+  @apply
+    flex flex-col items-center gap-4;
+}
+
+.heading {
+  @apply
+    text-4xl font-bold
+    text-blue text-center;
+}
+
+.image {
+  @apply
+    mx-auto rounded-lg
+    max-w-full h-auto;
+}
+
+.footer {
+  @apply
+    text-sm text-left
+    border-t border-white pt-8;
+}
+
+.link {
+  @apply
+    text-blue
+}

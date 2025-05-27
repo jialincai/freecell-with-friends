@@ -1,8 +1,10 @@
 import FreecellGame from "@components/FreecellGame";
+import MenuBar from "@components/MenuBar";
 
-const HomePage: React.FC = () => {
+const HomePage = () => {
   return (
     <div>
+      <MenuBar />
       <FreecellGame />
     </div>
   );

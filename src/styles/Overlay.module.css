@@ -27,6 +27,5 @@
 
 .content {
   @apply
-    p-6
-    text-[0.95rem] leading-relaxed;
+    px-6 py-12
 }

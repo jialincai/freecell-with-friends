@@ -24,7 +24,7 @@ const Overlay = ({ hidden, onClose, children }: OverlayProps) => {
         <button onClick={onClose} className={styles.closeButton}>
           <X className={styles.closeIcon} />
         </button>
-        <div className={styles.children}>{children}</div>
+        <div className={styles.content}>{children}</div>
       </div>
     </div>
   );

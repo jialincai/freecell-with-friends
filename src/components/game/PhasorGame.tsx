@@ -1,7 +1,7 @@
 "use client";
 
 import { forwardRef, useLayoutEffect, useRef } from "react";
-import "@styles/PhasorGame.module.css";
+import "@styles/game/PhasorGame.module.css";
 
 export interface IRefPhaserGame {
   game: Phaser.Game | null;

@@ -6,7 +6,7 @@ import Overlay from "@components/ui/Overlay";
 import HelpContent from "@components/ui/HelpContent";
 import LoginContent from "@components/ui/LoginContent";
 import StatsContent from "@components/ui/StatsContent";
-import styles from "@styles/MenuBar.module.css";
+import styles from "@styles/ui/MenuBar.module.css";
 
 export type OverlayPanel = "stats" | "login" | "help" | null;
 

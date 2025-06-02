@@ -1,7 +1,10 @@
 "use client";
 
+import { Share2 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
-import type { OverlayMode } from "@components/ui/MenuBar";
+import { OverlayMode } from "@components/ui/MenuBar";
+
+import styles from "@styles/ui/StatsContent.module.css";
 
 type StatsContentProps = {
   setMode: (mode: OverlayMode) => void;
@@ -23,12 +26,33 @@ const StatsContent = ({ setMode }: StatsContentProps) => {
 
   return (
     <>
-      <p>Want to start tracking your stats and streaks?</p>
-      <button onClick={() => setMode("login")}>Create a free account</button>
-      <button onClick={() => setMode("login")}>
-        Already registered? Log in
-      </button>
-      <button onClick={() => alert("TODO: implement share")}>Share</button>
+      <div className={styles.container}>
+        <p className={styles.heading}>
+          Want to start tracking your stats and streaks?
+        </p>
+        <div className={styles.buttonGroup}>
+          <button
+            className={styles.registerButton}
+            onClick={() => setMode("login")}
+          >
+            Create a free account
+          </button>
+          <button
+            className={styles.loginButton}
+            onClick={() => setMode("login")}
+          >
+            Already registered? Log in
+          </button>
+        </div>
+
+        <button
+          className={styles.shareButton}
+          onClick={() => alert("TODO: implement share")}
+        >
+          Share
+          <Share2 className={styles.shareIcon} />
+        </button>
+      </div>
     </>
   );
 };

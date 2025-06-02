@@ -7,18 +7,20 @@
 
 .sectionRow {
   @apply
-    flex items-start gap-4;
+    flex
+    items-start gap-4;
 }
 
 .sectionColumn {
   @apply
-    flex flex-col items-center gap-4;
+    flex flex-col
+    items-center gap-4;
 }
 
 .heading {
   @apply
     text-4xl font-bold
-    text-blue text-center;
+    text-center;
 }
 
 .image {

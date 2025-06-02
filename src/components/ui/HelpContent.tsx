@@ -1,9 +1,9 @@
-import styles from "@styles/HelpContent.module.css";
+import styles from "@styles/ui/HelpContent.module.css";
 
 const HelpContent = () => {
   return (
     <div className={styles.container}>
-      <h2 className={styles.heading}>How To Play</h2>
+      <p className={styles.heading}>How To Play</p>
 
       <div className={styles.sectionColumn}>
         <p>

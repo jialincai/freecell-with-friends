@@ -1,20 +1,29 @@
 "use client";
 
 import { signIn } from "next-auth/react";
+import styles from "@styles/ui/LoginContent.module.css";
 
 const LoginContent = () => {
   return (
-    <div>
-      <h1>Create a free account to track your stats</h1>
+    <div className={styles.container}>
+      <p className={styles.heading}>Log in or create an account</p>
 
-      <div>
-        <button onClick={() => signIn("google")}>
-          <img src="img/social/google.png" alt="Google" />
+      <div className={styles.buttonGroup}>
+        <button className={styles.authButton} onClick={() => signIn("google")}>
+          <img
+            src="img/social/google.png"
+            alt="Google icon"
+            className={styles.authImage}
+          />
           Continue with Google
         </button>
 
-        <button onClick={() => signIn("discord")}>
-          <img src="img/social/discord.png" alt="Discord" />
+        <button className={styles.authButton} onClick={() => signIn("discord")}>
+          <img
+            src="img/social/discord.png"
+            alt="Discord icon"
+            className={styles.authImage}
+          />
           Continue with Discord
         </button>
       </div>

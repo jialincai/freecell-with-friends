@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { X } from "lucide-react";
-import styles from "@styles/Overlay.module.css";
+import styles from "@styles/ui/Overlay.module.css";
 
 type OverlayProps = {
   hidden: boolean;
@@ -19,7 +19,7 @@ const Overlay = ({ hidden, onClose, children }: OverlayProps) => {
   if (hidden) return null;
 
   return (
-    <div className={styles.overlay}>
+    <div className={styles.backdrop}>
       <div className={styles.modal}>
         <button onClick={onClose} className={styles.closeButton}>
           <X className={styles.closeIcon} />

@@ -1,12 +1,14 @@
 "use client";
 
 import { useSession, signOut } from "next-auth/react";
-import LoginContent from "@components/ui/LoginContent";
+import type { OverlayMode } from "@components/ui/MenuBar";
 
-const StatsContent = () => {
+type StatsContentProps = {
+  setMode: (mode: OverlayMode) => void;
+};
+
+const StatsContent = ({ setMode }: StatsContentProps) => {
   const { data: session } = useSession();
-
-  if (mode === "login") return <LoginContent />;
 
   if (session) {
     return (

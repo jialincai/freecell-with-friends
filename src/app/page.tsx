@@ -1,5 +1,5 @@
-import FreecellGame from "@components/FreecellGame";
-import MenuBar from "@components/MenuBar";
+import FreecellGame from "@components/game/FreecellGame";
+import MenuBar from "@components/ui/MenuBar";
 
 const HomePage = () => {
   return (

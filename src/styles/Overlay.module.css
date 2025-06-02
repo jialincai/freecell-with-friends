@@ -9,9 +9,10 @@
   @apply
     relative
     w-full sm:w-1/2
+    h-screen
     max-w-[600px] min-w-[300px]
-    max-h-[100vh] overflow-y-auto
-    bg-darkBlue rounded-xl;
+    overflow-y-auto
+    bg-darkBlue;
 }
 
 .closeButton {

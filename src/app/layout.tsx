@@ -1,7 +1,10 @@
+import React from "react";
 import type { Metadata } from "next";
+
+import SessionWrapper from "@components/SessionWrapper";
+
 import { Inconsolata } from "next/font/google";
 import "@styles/globals.css";
-import React from "react";
 
 const inconsolata = Inconsolata({
   subsets: ["latin"],
@@ -18,12 +21,14 @@ type LayoutProps = {
 
 const RootLayout = ({ children }: LayoutProps) => {
   return (
-    <html lang="en">
-      <head>
-        <link rel="icon" href="/favicon.ico" />
-      </head>
-      <body className={inconsolata.className}>{children}</body>
-    </html>
+    <SessionWrapper>
+      <html lang="en">
+        <head>
+          <link rel="icon" href="/favicon.ico" />
+        </head>
+        <body className={inconsolata.className}>{children}</body>
+      </html>
+    </SessionWrapper>
   );
 };
 

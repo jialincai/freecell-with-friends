@@ -1,9 +1,9 @@
-import styles from "@styles/HelpContent.module.css";
+import styles from "@styles/ui/HelpPage.module.css";
 
-const HelpContent = () => {
+const HelpPage = () => {
   return (
     <div className={styles.container}>
-      <h2 className={styles.heading}>How To Play</h2>
+      <p className={styles.heading}>How To Play</p>
 
       <div className={styles.sectionColumn}>
         <p>
@@ -73,4 +73,4 @@ const HelpContent = () => {
   );
 };
 
-export default HelpContent;
+export default HelpPage;

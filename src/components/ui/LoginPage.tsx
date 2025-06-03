@@ -1,12 +1,14 @@
 "use client";
 
+import { OverlayMode } from "@components/ui/MenuBar";
 import { signIn } from "next-auth/react";
-import styles from "@styles/ui/LoginContent.module.css";
+import statStyles from "@styles/ui/StatsPage.module.css";
+import styles from "@styles/ui/LoginPage.module.css";
 
-const LoginContent = () => {
+const LoginPage = () => {
   return (
-    <div className={styles.container}>
-      <p className={styles.heading}>Log in or create an account</p>
+    <div className={statStyles.container}>
+      <p className={statStyles.heading}>Log in or create an account</p>
 
       <div className={styles.buttonGroup}>
         <button className={styles.authButton} onClick={() => signIn("google")}>
@@ -31,4 +33,4 @@ const LoginContent = () => {
   );
 };
 
-export default LoginContent;
+export default LoginPage;

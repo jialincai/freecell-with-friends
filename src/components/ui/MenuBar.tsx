@@ -2,31 +2,33 @@
 
 import { useState } from "react";
 import { HelpCircle, Settings, Trophy } from "lucide-react";
+
 import Overlay from "@components/ui/Overlay";
-import HelpContent from "@components/ui/HelpContent";
-import LoginContent from "@components/ui/LoginContent";
-import StatsContent from "@components/ui/StatsContent";
+import HelpPage from "@components/ui/HelpPage";
+import LoginPage from "@components/ui/LoginPage";
+import StatsPage from "@components/ui/StatsPage";
+
 import styles from "@styles/ui/MenuBar.module.css";
 
-export type OverlayPanel = "stats" | "login" | "help" | null;
+export type OverlayMode = "stats" | "login" | "help" | null;
 
 const overlayComponents: Record<
-  Exclude<OverlayPanel, null>,
-  React.FC<{ setMode: (mode: OverlayPanel) => void }>
+  Exclude<OverlayMode, null>,
+  React.FC<{ setMode: (mode: OverlayMode) => void }>
 > = {
-  stats: ({ setMode }) => <StatsContent setMode={setMode} />,
-  login: ({ setMode }) => <LoginContent setMode={setMode} />,
-  help: () => <HelpContent />,
+  stats: ({ setMode }) => <StatsPage setMode={setMode} />,
+  login: () => <LoginPage />,
+  help: () => <HelpPage />,
 };
 
-const overlayCloseMap: Record<Exclude<OverlayPanel, null>, OverlayPanel> = {
+const overlayCloseMap: Record<Exclude<OverlayMode, null>, OverlayMode> = {
   stats: null,
   login: "stats",
   help: null,
 };
 
 const MenuBar = () => {
-  const [activePanel, setActivePanel] = useState<OverlayPanel>(null);
+  const [activePanel, setActivePanel] = useState<OverlayMode>(null);
 
   const ActiveContent = activePanel ? overlayComponents[activePanel] : null;
 

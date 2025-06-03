@@ -28,6 +28,5 @@
 
 .content {
   @apply
-    flex-grow min-h-full
-    px-6 py-12;
+    flex-grow min-h-full;
 }

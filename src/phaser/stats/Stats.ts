@@ -1,5 +1,12 @@
-import { StatsData } from "@phaser/stats/StatsData";
-import { StatsState } from "@phaser/stats/state/StatsState";
+export type StatsData = {
+  seed: number;
+};
+
+export type StatsState = {
+  startTime: number;
+  pauseTime: number;
+};
+
 
 export type Stats = {
   data: StatsData;

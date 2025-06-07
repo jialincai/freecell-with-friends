@@ -1,4 +1,4 @@
-import { Stats } from "@phaser/stats/state/Stats";
+import { Stats } from "@phaser/stats/Stats";
 import { StatsView } from "@phaser/stats/StatsView";
 import {
   deserializeStats,
@@ -28,18 +28,19 @@ export class StatsController {
     this.view.setTimerText(this.formatElapsedTime(elapsedMs));
   }
 
-  public saveStats(): void {
-    localStorage.setItem(STORAGE_KEY, serializeStats(this.model));
-  }
+  // TODO: delete
+  // public saveStats(): void {
+  //   localStorage.setItem(STORAGE_KEY, serializeStats(this.model));
+  // }
 
-  public loadStats(): void {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    const loadedStats = raw ? deserializeStats(raw) : null;
+  // public loadStats(): void {
+  //   const raw = localStorage.getItem(STORAGE_KEY);
+  //   const loadedStats = raw ? deserializeStats(raw) : null;
 
-    if (!loadedStats || loadedStats.data.seed !== this.model.data.seed) return;
+  //   if (!loadedStats || loadedStats.data.seed !== this.model.data.seed) return;
 
-    this.model.state = loadedStats.state;
-  }
+  //   this.model.state = loadedStats.state;
+  // }
 
   private handleVisibilityChange = (): void => {
     const now = Date.now();

@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 import { BORDER_PAD_DIMENSIONS } from "@phaser/constants/dimensions";
-import { Stats } from "./state/Stats";
+import { Stats } from "@phaser/stats/Stats";
 import { TEXT_COLOR } from "@phaser/constants/colors";
 import { getHexColorString } from "@utils/Function";
 import { FONT_FAMILY, FONT_SIZE } from "@phaser/constants/fonts";

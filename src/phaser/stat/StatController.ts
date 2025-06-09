@@ -1,23 +1,19 @@
-import { Stats } from "@phaser/stats/Stats";
-import { StatsView } from "@phaser/stats/StatsView";
+import { Stat } from "@phaser/stat/Stat";
+import { StatView } from "@phaser/stat/StatView";
 import {
-  deserializeStats,
-  serializeStats,
   withPauseTime,
   withStartTime,
-} from "@phaser/stats/domain/StatsLogic";
+} from "@phaser/stat/domain/StatLogic";
 import { STORAGE_KEY } from "@phaser/constants/storage";
 
-export class StatsController {
-  public model: Stats;
-  public readonly view: StatsView;
+export class StatController {
+  public model: Stat;
+  public readonly view: StatView;
 
-  constructor(scene: Phaser.Scene, model: Stats) {
+  constructor(scene: Phaser.Scene, model: Stat) {
     this.model = model;
-    this.loadStats();
-    this.saveStats();
 
-    this.view = new StatsView(scene, this.model);
+    this.view = new StatView(scene, this.model);
     this.updateTimeDisplay();
 
     document.addEventListener("visibilitychange", this.handleVisibilityChange);
@@ -28,20 +24,6 @@ export class StatsController {
     this.view.setTimerText(this.formatElapsedTime(elapsedMs));
   }
 
-  // TODO: delete
-  // public saveStats(): void {
-  //   localStorage.setItem(STORAGE_KEY, serializeStats(this.model));
-  // }
-
-  // public loadStats(): void {
-  //   const raw = localStorage.getItem(STORAGE_KEY);
-  //   const loadedStats = raw ? deserializeStats(raw) : null;
-
-  //   if (!loadedStats || loadedStats.data.seed !== this.model.data.seed) return;
-
-  //   this.model.state = loadedStats.state;
-  // }
-
   private handleVisibilityChange = (): void => {
     const now = Date.now();
 
@@ -51,8 +33,6 @@ export class StatsController {
           this.model.state,
           this.model.state.startTime + (now - this.model.state.pauseTime),
         );
-
-    this.saveStats();
   };
 
   private formatElapsedTime(ms: number): string {

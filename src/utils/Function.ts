@@ -23,33 +23,16 @@ export class PubSubStack<T> {
     this.items = [];
     this.events.emit("clear");
   }
-
-  subscribe(event: string, listener: (item: T) => void): void {
+  
+  subscribe(event: string, listener: (item: T ) => void): void {
     this.events.on(event, listener);
+  }
+
+  toArray(): T[] {
+    return [...this.items];
   }
 }
 
 export function getHexColorString(hex: number): string {
   return `#${hex.toString(16).padStart(6, "0")}`;
-}
-
-export interface Command {
-  do(): void;
-  undo(): void;
-}
-
-export class CompositeCommand implements Command {
-  private readonly commands: Command[];
-
-  constructor(...commands: Command[]) {
-    this.commands = commands;
-  }
-
-  do(): void {
-    this.commands.forEach((command) => command.do());
-  }
-
-  undo(): void {
-    [...this.commands].reverse().forEach((command) => command.undo());
-  }
 }

@@ -39,8 +39,13 @@ import {
 } from "@phaser/constants/colors";
 import { FONT_FAMILY, FONT_SIZE } from "@phaser/constants/fonts";
 import { getSingleCardMoves } from "@phaser/move/domain/CardMoveLogic";
-import { StatsController } from "@phaser/stats/StatsController";
-import { createStats } from "@phaser/stats/state/Stats";
+import { StatsController } from "@phaser/stat/StatController";
+import { createStats } from "@phaser/stat/Stat";
+import SaveController from "@utils/save/SaveController";
+import { createSave } from "@utils/save/Save";
+import MoveSavable from "@phaser/move/MoveSaveable";
+import StatsSavable from "@phaser/stat/StatSaveable";
+import { Card } from "@phaser/card/state/Card";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -49,13 +54,13 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 };
 
 export default class GameState extends Phaser.Scene {
-  private moveHistory = new PubSubStack<CardMoveSequence>();
+  private save!: SaveController;
 
   private deck!: DeckController;
   private piles!: PileController[];
 
+  private moveHistory!: PubSubStack<CardMoveSequence>;
   private stat!: StatsController;
-
   private winText!: Phaser.GameObjects.Text;
 
   public constructor() {
@@ -63,11 +68,8 @@ export default class GameState extends Phaser.Scene {
   }
 
   public create(): void {
-    // Setup stat
-    this.stat = new StatsController(
-      this,
-      createStats(this.dateToSeed(new Date()), Date.now(), 0),
-    );
+    // Create save and register saveable objects
+    this.save = new SaveController({}, createSave());
 
     // Create deck
     const deckModel = createDeck();
@@ -85,6 +87,17 @@ export default class GameState extends Phaser.Scene {
       return pile;
     });
 
+    // Initialize move history and rehydrate from save
+    this.moveHistory = new PubSubStack<CardMoveSequence>();
+    this.save.registerSaveable(new MoveSavable(this.moveHistory));
+
+    // Setup stat and rehydrate from save
+    this.stat = new StatsController(
+      this,
+      createStats(this.dateToSeed(new Date()), Date.now(), 0),
+    );
+    this.save.registerSaveable(new StatsSaveable(this.stat));
+
     // Create UI
     this.createButtons();
     this.createText();
@@ -98,7 +111,7 @@ export default class GameState extends Phaser.Scene {
   }
 
   private createCommandListeners(): void {
-    this.moveHistory.subscribe("push", (move) => {
+    this.moveHistory.subscribe("push", (move: CardMoveSequence) => {
       const isSimpleDirectMove =
         move.steps.length === 1 &&
         !FOUNDATION_PILES.includes(move.steps[0].toPile);
@@ -119,6 +132,11 @@ export default class GameState extends Phaser.Scene {
       const undo = invertCardMoveSequence(move);
       this.deck.executeCardMoveSequence(undo);
     });
+
+    this.moveHistory.subscribe("clear", () => {
+      this.deck.dealCards();
+      this.winText.setVisible(false);
+    });
   }
 
   // TODO: Refactor to generalize and DRY up.
@@ -127,9 +145,7 @@ export default class GameState extends Phaser.Scene {
       {
         label: "Redeal",
         onClick: () => {
-          this.deck.dealCards();
           this.moveHistory.clear();
-          this.winText.setVisible(false);
         },
       },
       {

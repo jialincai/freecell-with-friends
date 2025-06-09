@@ -1,21 +1,20 @@
 export const SAVE_VERSION = 1;
 export const SAVE_KEY = "freecellwithfriends_save";
 
-export interface ISaveChunk<T> {
-  id: string;
-  save(): T;
-  load(data: T): void;
-}
-
 export type SaveData = {
   version: number;
 };
 
 export type SaveState = {
-  chunks: Record<string, unknown>;
+  chunks: Record<string, any>;
 };
 
 export type Save = {
   data: SaveData;
   state: SaveState;
 };
+
+export const createSave = (): Save => ({
+  data: { version: SAVE_VERSION },
+  state: { chunks: {} },
+});

@@ -1,9 +1,22 @@
-import { ISaveChunk, Save, SaveState, SAVE_VERSION } from "@utils/save/Save";
+import { Save, SaveState, SAVE_VERSION } from "@utils/save/Save";
+import { SaveableRegistry, ISaveable } from "@utils/save/ISaveable";
 
-export function serializeChunks(chunks: Record<string, ISaveChunk<unknown>>): Save {
+export function withSaveable(
+  registry: SaveableRegistry,
+  saveable: ISaveable<any>
+): SaveableRegistry {
+  return {
+    ...registry,
+    [saveable.id]: saveable,
+  };
+}
+
+export function serializeChunks(
+  chunks: SaveableRegistry,
+): Save {
   const state: SaveState = { chunks: {} };
   for (const [id, chunk] of Object.entries(chunks)) {
-    state.chunks[id] = chunk.save();
+    state.chunks[id] = chunk.getSnapshot();
   }
 
   return {
@@ -16,7 +29,7 @@ export function serializeChunks(chunks: Record<string, ISaveChunk<unknown>>): Sa
 
 export function deserializeChunks(
   save: Save,
-  keys: readonly string[]
+  keys: readonly string[],
 ): Record<string, unknown> {
   const result = {} as Record<string, unknown>;
 

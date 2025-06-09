@@ -1,14 +1,14 @@
 import * as Phaser from "phaser";
 import { BORDER_PAD_DIMENSIONS } from "@phaser/constants/dimensions";
-import { Stats } from "@phaser/stats/Stats";
+import { Stat } from "@phaser/stat/Stat";
 import { TEXT_COLOR } from "@phaser/constants/colors";
 import { getHexColorString } from "@utils/Function";
 import { FONT_FAMILY, FONT_SIZE } from "@phaser/constants/fonts";
 
-export class StatsView {
+export class StatView {
   private timer: Phaser.GameObjects.Text;
 
-  constructor(scene: Phaser.Scene, _model: Stats) {
+  constructor(scene: Phaser.Scene, _model: Stat) {
     this.timer = scene.add
       .text(
         scene.cameras.main.width - BORDER_PAD_DIMENSIONS.width,

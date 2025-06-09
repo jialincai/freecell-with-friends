@@ -1,23 +1,22 @@
-export type StatsData = {
+export type StatData = {
   seed: number;
 };
 
-export type StatsState = {
+export type StatState = {
   startTime: number;
   pauseTime: number;
 };
 
-
-export type Stats = {
-  data: StatsData;
-  state: StatsState;
+export type Stat = {
+  data: StatData;
+  state: StatState;
 };
 
-export function createStats(
+export function createStat(
   seed: number,
   startTime: number,
   pauseTime: number,
-): Stats {
+): Stat {
   return {
     data: { seed },
     state: { startTime, pauseTime },

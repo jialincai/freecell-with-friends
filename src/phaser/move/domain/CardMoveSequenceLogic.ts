@@ -15,7 +15,7 @@ import {
   CardMoveSequence,
   createCardMoveSequence,
 } from "@phaser/move/CardMoveSequence";
-import { createCardMove } from "@phaser/move/CardMove";
+import { CardMove, createCardMove } from "@phaser/move/CardMove";
 import {
   areFoundationsFull,
   calculateMaxMoveSize,
@@ -251,4 +251,28 @@ export function invertCardMoveSequence(
         ),
       ),
   );
+}
+
+export function flattenCardMoveSequences(
+  sequences: CardMoveSequence[],
+): CardMoveSequence {
+  const moveByCard: Record<string, CardMove> = sequences.reduce(
+    (acc, sequence) => {
+      for (const move of sequence.steps) {
+        const existing = acc[move.card];
+
+        acc[move.card] = existing
+          ? {
+              ...existing,
+              toPile: move.toPile,
+              toPosition: move.toPosition,
+            }
+          : { ...move };
+      }
+      return acc;
+    },
+    {} as Record<string, CardMove>,
+  );
+
+  return createCardMoveSequence(Object.values(moveByCard));
 }

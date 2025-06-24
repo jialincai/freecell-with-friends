@@ -45,7 +45,6 @@ import SaveController from "@utils/save/SaveController";
 import { createSave } from "@utils/save/Save";
 import MoveSavable from "@phaser/move/MoveSaveable";
 import { StatSaveable } from "@phaser/stat/StatSaveable";
-import { Card } from "@phaser/card/state/Card";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -68,46 +67,46 @@ export default class GameState extends Phaser.Scene {
   }
 
   public create(): void {
-    // Create save and register saveable objects
+    // Create UI elements
+    this.createButtons();
+    this.createText();
+
+    // Setup save system
     this.save = new SaveController({}, createSave());
 
-    // Setup stat and rehydrate from save
+    // Setup stats and register with save system
     this.stat = new StatController(
       this,
       createStat(this.dateToSeed(new Date()), Date.now(), 0),
     );
     this.save.registerSaveable(new StatSaveable(this.stat.model));
 
-    // Create deck
+    // Create deck and piles
     const deckModel = createDeck();
     this.deck = new DeckController(this, deckModel);
-    this.deck.shuffleCards(this.stat.model.data.seed); // TODO: seed with random value
+    this.deck.shuffleCards(this.stat.model.data.seed);
     this.deck.dealCards();
 
-    // Create piles
     this.piles = Object.values(PileId).map((pileId) => {
       const pileModel = createPile(pileId);
       const pile = new PileController(this, pileModel);
-
       if (pile.model.data.id === PileId.None) pile.view.setAlpha(0);
-
       return pile;
     });
 
-    // Initialize move history and rehydrate from save
+    // Setup move history and register with save system
     this.moveHistory = new PubSubStack<CardMoveSequence>();
     this.save.registerSaveable(new MoveSavable(this.moveHistory));
+    
+    // Setup animations
+    this.createCommandListeners();
 
-    // Create UI
-    this.createButtons();
-    this.createText();
+    // Rehydrate state from save system
+    this.save.loadFromStorage();
 
-    // Setup interactions
+    // Setup interactions and animations
     setupCardInteraction(this.deck, this.moveHistory);
     setupHoverHighlight(this.deck, this.piles);
-
-    // Setup player move history tracking
-    this.createCommandListeners();
   }
 
   private createCommandListeners(): void {
@@ -126,6 +125,8 @@ export default class GameState extends Phaser.Scene {
         this,
         TWEEN_DURATION,
       );
+
+      console.log("Move history size:", this.moveHistory.toArray().length);
     });
 
     this.moveHistory.subscribe("pop", (move) => {
@@ -271,5 +272,6 @@ export default class GameState extends Phaser.Scene {
     }
 
     this.stat.updateTimeDisplay();
+    // this.save.saveToStorage();
   }
 }

@@ -37,7 +37,7 @@ class SaveController {
         this.registry[key]?.loadFromSnapshot(value);
       }
     } catch (e) {
-      console.warn("Failed to load save file.");
+      console.warn("Failed to load save file with following error:", e);
     }
   }
 }

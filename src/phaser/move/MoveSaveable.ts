@@ -17,7 +17,7 @@ class MoveSaveable implements ISaveable<CardMoveSequence[]> {
 
   loadFromSnapshot(data: CardMoveSequence[]): void {
     this.ref.clear();
-    for(const move of data) {
+    for (const move of data) {
       this.ref.push(move);
     }
   }

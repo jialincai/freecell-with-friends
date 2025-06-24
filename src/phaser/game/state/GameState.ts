@@ -39,12 +39,12 @@ import {
 } from "@phaser/constants/colors";
 import { FONT_FAMILY, FONT_SIZE } from "@phaser/constants/fonts";
 import { getSingleCardMoves } from "@phaser/move/domain/CardMoveLogic";
-import { StatsController } from "@phaser/stat/StatController";
-import { createStats } from "@phaser/stat/Stat";
+import { StatController } from "@phaser/stat/StatController";
+import { createStat } from "@phaser/stat/Stat";
 import SaveController from "@utils/save/SaveController";
 import { createSave } from "@utils/save/Save";
 import MoveSavable from "@phaser/move/MoveSaveable";
-import StatsSavable from "@phaser/stat/StatSaveable";
+import { StatSaveable } from "@phaser/stat/StatSaveable";
 import { Card } from "@phaser/card/state/Card";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
@@ -60,7 +60,7 @@ export default class GameState extends Phaser.Scene {
   private piles!: PileController[];
 
   private moveHistory!: PubSubStack<CardMoveSequence>;
-  private stat!: StatsController;
+  private stat!: StatController;
   private winText!: Phaser.GameObjects.Text;
 
   public constructor() {
@@ -71,10 +71,17 @@ export default class GameState extends Phaser.Scene {
     // Create save and register saveable objects
     this.save = new SaveController({}, createSave());
 
+    // Setup stat and rehydrate from save
+    this.stat = new StatController(
+      this,
+      createStat(this.dateToSeed(new Date()), Date.now(), 0),
+    );
+    this.save.registerSaveable(new StatSaveable(this.stat.model));
+
     // Create deck
     const deckModel = createDeck();
     this.deck = new DeckController(this, deckModel);
-    this.deck.shuffleCards(this.stat.model.data.seed);
+    this.deck.shuffleCards(this.stat.model.data.seed); // TODO: seed with random value
     this.deck.dealCards();
 
     // Create piles
@@ -90,13 +97,6 @@ export default class GameState extends Phaser.Scene {
     // Initialize move history and rehydrate from save
     this.moveHistory = new PubSubStack<CardMoveSequence>();
     this.save.registerSaveable(new MoveSavable(this.moveHistory));
-
-    // Setup stat and rehydrate from save
-    this.stat = new StatsController(
-      this,
-      createStats(this.dateToSeed(new Date()), Date.now(), 0),
-    );
-    this.save.registerSaveable(new StatsSaveable(this.stat));
 
     // Create UI
     this.createButtons();

@@ -3,7 +3,7 @@ import { SaveableRegistry, ISaveable } from "@utils/save/ISaveable";
 
 export function withSaveable(
   registry: SaveableRegistry,
-  saveable: ISaveable<any>
+  saveable: ISaveable<any>,
 ): SaveableRegistry {
   return {
     ...registry,
@@ -11,9 +11,7 @@ export function withSaveable(
   };
 }
 
-export function serializeChunks(
-  chunks: SaveableRegistry,
-): Save {
+export function serializeChunks(chunks: SaveableRegistry): Save {
   const state: SaveState = { chunks: {} };
   for (const [id, chunk] of Object.entries(chunks)) {
     state.chunks[id] = chunk.getSnapshot();

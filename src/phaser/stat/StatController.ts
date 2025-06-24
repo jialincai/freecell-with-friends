@@ -1,10 +1,6 @@
 import { Stat } from "@phaser/stat/Stat";
 import { StatView } from "@phaser/stat/StatView";
-import {
-  withPauseTime,
-  withStartTime,
-} from "@phaser/stat/domain/StatLogic";
-import { STORAGE_KEY } from "@phaser/constants/storage";
+import { withPauseTime, withStartTime } from "@phaser/stat/domain/StatLogic";
 
 export class StatController {
   public model: Stat;

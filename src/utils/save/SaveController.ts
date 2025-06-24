@@ -1,5 +1,9 @@
 import { SAVE_KEY } from "@utils/save/Save";
-import { withSaveable, deserializeChunks, serializeChunks } from "@utils/save/domain/SaveLogic";
+import {
+  withSaveable,
+  deserializeChunks,
+  serializeChunks,
+} from "@utils/save/domain/SaveLogic";
 import type { Save } from "@utils/save/Save";
 import type { SaveableRegistry, ISaveable } from "@utils/save/ISaveable";
 

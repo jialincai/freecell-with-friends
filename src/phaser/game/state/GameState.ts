@@ -125,8 +125,6 @@ export default class GameState extends Phaser.Scene {
         this,
         TWEEN_DURATION,
       );
-
-      console.log("Move history size:", this.moveHistory.toArray().length);
     });
 
     this.moveHistory.subscribe("pop", (move) => {
@@ -272,6 +270,6 @@ export default class GameState extends Phaser.Scene {
     }
 
     this.stat.updateTimeDisplay();
-    // this.save.saveToStorage();
+    this.save.saveToStorage();
   }
 }

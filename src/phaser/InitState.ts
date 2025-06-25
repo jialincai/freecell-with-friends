@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 
 // Card images
-import { images, spritesheets } from "@phaser/constants/assets";
+import { spritesheets } from "@phaser/constants/assets";
 import { baseURL } from "@phaser/constants/loading";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
@@ -50,9 +50,6 @@ export default class InitState extends Phaser.Scene {
       progressBar.destroy();
       progressBox.destroy();
     });
-
-    // Images
-    images.forEach(({ key, file }) => this.load.image(key, file));
 
     // Spritesheets
     spritesheets.forEach(({ file, frameHeight, frameWidth, key }) => {

@@ -61,6 +61,7 @@ export default class GameState extends Phaser.Scene {
   private moveStack!: PubSubStack<CardMoveSequence>;
   private animationQueue!: AsyncQueue;
 
+  private timerEvents!: Phaser.Time.TimerEvent[];
   private stat!: StatController;
   private winText!: Phaser.GameObjects.Text;
 
@@ -70,6 +71,7 @@ export default class GameState extends Phaser.Scene {
 
   public create(): void {
     this.animationQueue = new AsyncQueue();
+    this.startTimerEvents();
 
     // Create UI elements
     this.createButtons();
@@ -255,6 +257,25 @@ export default class GameState extends Phaser.Scene {
       .setVisible(false);
   }
 
+  private startTimerEvents(): void {
+    this.timerEvents = [];
+    this.timerEvents.push(
+      this.time.addEvent({
+        delay: 1000,
+        loop: true,
+        callback: () => {
+          this.stat.updateTimeDisplay();
+          this.save.saveToStorage();
+        },
+      }),
+    );
+  }
+
+  private stopTimerEvents(): void {
+    this.timerEvents.forEach(event => event.remove(false));
+    this.timerEvents = [];
+  }
+
   // TODO: Pure funcitons we may want to rehome someday.
   // Game state should only contain stateful logic.
   private dateToSeed(date: Date): number {
@@ -274,22 +295,11 @@ export default class GameState extends Phaser.Scene {
         this,
         TWEEN_DURATION,
       );
-      // this.moveStack.push(sequence); // TODO: We want to push this to the stack but we don't want to expand this sequence.
-      return;
-    }
 
-    if (areFoundationsFull(this.deck.model)) {
       this.winText.setVisible(true);
+      this.stopTimerEvents();
       return;
+      // this.moveStack.push(sequence); // TODO: We want to push this to the stack but we don't want to expand this sequence.
     }
-
-    this.time.addEvent({
-      delay: 1000,
-      loop: true,
-      callback: () => {
-        this.stat.updateTimeDisplay();
-        this.save.saveToStorage();
-      },
-    });
   }
 }

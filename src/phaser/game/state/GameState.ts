@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 
-import { getHexColorString, PubSubStack } from "@utils/Function";
+import { getHexColorString, PubSubStack, AsyncQueue } from "@utils/Function";
 import {
   CELL_PILES,
   FOUNDATION_PILES,
@@ -58,7 +58,9 @@ export default class GameState extends Phaser.Scene {
   private deck!: DeckController;
   private piles!: PileController[];
 
-  private moveHistory!: PubSubStack<CardMoveSequence>;
+  private moveStack!: PubSubStack<CardMoveSequence>;
+  private animationQueue!: AsyncQueue;
+
   private stat!: StatController;
   private winText!: Phaser.GameObjects.Text;
 
@@ -67,6 +69,8 @@ export default class GameState extends Phaser.Scene {
   }
 
   public create(): void {
+    this.animationQueue = new AsyncQueue();
+
     // Create UI elements
     this.createButtons();
     this.createText();
@@ -95,8 +99,8 @@ export default class GameState extends Phaser.Scene {
     });
 
     // Setup move history and register with save system
-    this.moveHistory = new PubSubStack<CardMoveSequence>();
-    this.save.registerSaveable(new MoveSavable(this.moveHistory));
+    this.moveStack = new PubSubStack<CardMoveSequence>();
+    this.save.registerSaveable(new MoveSavable(this.moveStack));
     
     // Setup animations
     this.createCommandListeners();
@@ -105,35 +109,44 @@ export default class GameState extends Phaser.Scene {
     this.save.loadFromStorage();
 
     // Setup interactions and animations
-    setupCardInteraction(this.deck, this.moveHistory);
+    setupCardInteraction(this.deck, this.moveStack);
     setupHoverHighlight(this.deck, this.piles);
   }
 
   private createCommandListeners(): void {
-    this.moveHistory.subscribe("push", (move: CardMoveSequence) => {
-      const isSimpleDirectMove =
+    this.moveStack.subscribe("push", (move: CardMoveSequence) => {
+      const isSingleCardMove =
         move.steps.length === 1 &&
         !FOUNDATION_PILES.includes(move.steps[0].toPile);
 
-      if (isSimpleDirectMove) {
-        this.deck.executeCardMoveSequence(move);
+      if (isSingleCardMove) {
+        this.animationQueue.enqueue(async () => {
+          this.deck.executeCardMoveSequence(move);
+        });
         return;
       }
+
       const expandedSequence = expand(this.deck.model, move);
-      this.deck.executeCardMoveSequenceWithTweens(
-        expandedSequence,
-        this,
-        TWEEN_DURATION,
-      );
+      this.animationQueue.enqueue(async () => {
+        await this.deck.executeCardMoveSequenceWithTweens(
+          expandedSequence,
+          this,
+          TWEEN_DURATION,
+        );
+      });
     });
 
-    this.moveHistory.subscribe("pop", (move) => {
+    this.moveStack.subscribe("pop", (move) => {
       const undo = invertCardMoveSequence(move);
-      this.deck.executeCardMoveSequence(undo);
+      this.animationQueue.enqueue(async () => {
+        this.deck.executeCardMoveSequence(undo);
+      });
     });
 
-    this.moveHistory.subscribe("clear", () => {
-      this.deck.dealCards();
+    this.moveStack.subscribe("clear", () => {
+      this.animationQueue.enqueue(async () => {
+        this.deck.dealCards();
+      });
       this.winText.setVisible(false);
     });
   }
@@ -144,13 +157,13 @@ export default class GameState extends Phaser.Scene {
       {
         label: "Redeal",
         onClick: () => {
-          this.moveHistory.clear();
+          this.moveStack.clear();
         },
       },
       {
         label: "Undo",
         onClick: () => {
-          this.moveHistory.pop();
+          this.moveStack.pop();
         },
       },
       {
@@ -234,7 +247,7 @@ export default class GameState extends Phaser.Scene {
         this.cameras.main.height - FONT_SIZE + BORDER_PAD_DIMENSIONS.height,
         "You Win!",
         {
-          color: getHexColorString(TEXT_COLOR), // TODO: Keep font DRY.
+          color: getHexColorString(TEXT_COLOR),
           fontSize: FONT_SIZE,
           fontFamily: FONT_FAMILY,
         },
@@ -261,6 +274,7 @@ export default class GameState extends Phaser.Scene {
         this,
         TWEEN_DURATION,
       );
+      // this.moveStack.push(sequence); // TODO: We want to push this to the stack but we don't want to expand this sequence.
       return;
     }
 
@@ -269,7 +283,13 @@ export default class GameState extends Phaser.Scene {
       return;
     }
 
-    this.stat.updateTimeDisplay();
-    this.save.saveToStorage();
+    this.time.addEvent({
+      delay: 1000,
+      loop: true,
+      callback: () => {
+        this.stat.updateTimeDisplay();
+        this.save.saveToStorage();
+      },
+    });
   }
 }

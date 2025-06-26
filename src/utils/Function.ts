@@ -1,5 +1,7 @@
 import { EventEmitter } from "events";
 
+// TODO: Seperate various utility functions into their own files 
+
 export class PubSubStack<T> {
   private items: T[];
   private events: EventEmitter;
@@ -30,6 +32,20 @@ export class PubSubStack<T> {
 
   toArray(): T[] {
     return [...this.items];
+  }
+}
+
+type AsyncAction = () => Promise<void>;
+
+export class AsyncQueue {
+  private current: Promise<void> = Promise.resolve();
+
+  enqueue(action: AsyncAction): void {
+    this.current = this.current.then(() => action());
+  }
+
+  async flush(): Promise<void> {
+    await this.current;
   }
 }
 

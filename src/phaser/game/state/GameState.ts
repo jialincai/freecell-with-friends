@@ -1,6 +1,11 @@
 import * as Phaser from "phaser";
 
-import { getHexColorString, PubSubStack, AsyncQueue } from "@utils/Function";
+import {
+  getHexColorString,
+  PubSubStack,
+  AsyncQueue,
+  dateToSeed,
+} from "@utils/Function";
 import {
   CELL_PILES,
   FOUNDATION_PILES,
@@ -39,12 +44,14 @@ import {
 } from "@phaser/constants/colors";
 import { FONT_FAMILY, FONT_SIZE } from "@phaser/constants/fonts";
 import { getSingleCardMoves } from "@phaser/move/domain/CardMoveLogic";
-import { StatController } from "@phaser/stat/StatController";
-import { createStat } from "@phaser/stat/Stat";
+import { SessionController } from "@phaser/session/SessionController";
+import { createSession } from "@phaser/session/Session";
 import SaveController from "@utils/save/SaveController";
-import { createSave } from "@utils/save/Save";
+import { createSave, SAVE_VERSION } from "@utils/save/Save";
 import MoveSavable from "@phaser/move/MoveSaveable";
-import { StatSaveable } from "@phaser/stat/StatSaveable";
+import { SessionSaveable } from "@phaser/session/SessionSaveable";
+import { createMeta, Meta } from "@phaser/meta/Meta";
+import { MetaSaveable } from "@phaser/meta/MetaSaveable";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -61,8 +68,10 @@ export default class GameState extends Phaser.Scene {
   private moveStack!: PubSubStack<CardMoveSequence>;
   private animationQueue!: AsyncQueue;
 
+  private meta!: Meta;
+  private session!: SessionController;
+
   private timerEvents!: Phaser.Time.TimerEvent[];
-  private stat!: StatController;
   private winText!: Phaser.GameObjects.Text;
 
   public constructor() {
@@ -70,29 +79,41 @@ export default class GameState extends Phaser.Scene {
   }
 
   public create(): void {
+    // Setup async queue and UI
     this.animationQueue = new AsyncQueue();
     this.startTimerEvents();
-
-    // Create UI elements
     this.createButtons();
     this.createText();
 
     // Setup save system
     this.save = new SaveController({}, createSave());
 
-    // Setup stats and register with save system
-    this.stat = new StatController(
-      this,
-      createStat(this.dateToSeed(new Date()), Date.now(), 0),
-    );
-    this.save.registerSaveable(new StatSaveable(this.stat.model));
+    // Create & register initial metadata
+    const currentSeed = dateToSeed(new Date());
+    this.meta = createMeta(SAVE_VERSION, currentSeed, false);
+    this.save.registerSaveable(new MetaSaveable(this.meta));
 
-    // Create deck and piles
+    // Load saved metadata only
+    this.save.loadFromStorage();
+
+    // Reset storage and metadata if seed changed
+    if (this.meta.data.seed !== currentSeed) {
+      this.save.resetStorage();
+      this.meta = createMeta(SAVE_VERSION, currentSeed, false);
+      this.save.registerSaveable(new MetaSaveable(this.meta));
+    }
+
+    // Register session
+    this.session = new SessionController(this, createSession(Date.now(), 0));
+    this.save.registerSaveable(new SessionSaveable(this.session.model));
+
+    // Setup deck
     const deckModel = createDeck();
     this.deck = new DeckController(this, deckModel);
-    this.deck.shuffleCards(this.stat.model.data.seed);
+    this.deck.shuffleCards(this.meta.data.seed);
     this.deck.dealCards();
 
+    // Setup piles
     this.piles = Object.values(PileId).map((pileId) => {
       const pileModel = createPile(pileId);
       const pile = new PileController(this, pileModel);
@@ -100,19 +121,17 @@ export default class GameState extends Phaser.Scene {
       return pile;
     });
 
-    // Setup move history and register with save system
+    // Register move history
     this.moveStack = new PubSubStack<CardMoveSequence>();
     this.save.registerSaveable(new MoveSavable(this.moveStack));
-    
-    // Setup animations
+
+    // Setup interactions
     this.createCommandListeners();
-
-    // Rehydrate state from save system
-    this.save.loadFromStorage();
-
-    // Setup interactions and animations
     setupCardInteraction(this.deck, this.moveStack);
     setupHoverHighlight(this.deck, this.piles);
+
+    // Final load — after all saveables are registered
+    this.save.loadFromStorage();
   }
 
   private createCommandListeners(): void {
@@ -264,7 +283,7 @@ export default class GameState extends Phaser.Scene {
         delay: 1000,
         loop: true,
         callback: () => {
-          this.stat.updateTimeDisplay();
+          this.session.updateTimeDisplay();
           this.save.saveToStorage();
         },
       }),
@@ -272,19 +291,8 @@ export default class GameState extends Phaser.Scene {
   }
 
   private stopTimerEvents(): void {
-    this.timerEvents.forEach(event => event.remove(false));
+    this.timerEvents.forEach((event) => event.remove(false));
     this.timerEvents = [];
-  }
-
-  // TODO: Pure funcitons we may want to rehome someday.
-  // Game state should only contain stateful logic.
-  private dateToSeed(date: Date): number {
-    const [year, month, day] = date
-      .toISOString()
-      .split("T")[0]
-      .split("-")
-      .map(Number);
-    return year * 10000 + month * 100 + day;
   }
 
   public update(): void {

@@ -1,8 +1,8 @@
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = "1.0.0";
 export const SAVE_KEY = "freecellwithfriends_save";
 
 export type SaveData = {
-  version: number;
+  version: string;
 };
 
 export type SaveState = {

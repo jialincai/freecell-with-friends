@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
 
-// TODO: Seperate various utility functions into their own files 
+// TODO: Seperate various utility functions into their own files
 
 export class PubSubStack<T> {
   private items: T[];
@@ -51,4 +51,13 @@ export class AsyncQueue {
 
 export function getHexColorString(hex: number): string {
   return `#${hex.toString(16).padStart(6, "0")}`;
+}
+
+export function dateToSeed(date: Date): number {
+  const [year, month, day] = date
+    .toISOString()
+    .split("T")[0]
+    .split("-")
+    .map(Number);
+  return year * 10000 + month * 100 + day;
 }

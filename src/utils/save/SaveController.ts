@@ -40,6 +40,10 @@ class SaveController {
       console.warn("Failed to load save file with following error:", e);
     }
   }
+
+  resetStorage() {
+    localStorage.removeItem(SAVE_KEY);
+  }
 }
 
 export default SaveController;

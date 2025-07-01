@@ -1,15 +1,18 @@
-import { Stat } from "@phaser/stat/Stat";
-import { StatView } from "@phaser/stat/StatView";
-import { withPauseTime, withStartTime } from "@phaser/stat/domain/StatLogic";
+import { Session } from "@phaser/session/Session";
+import { SessionView } from "@phaser/session/SessionView";
+import {
+  withPauseTime,
+  withStartTime,
+} from "@phaser/session/domain/SessionLogic";
 
-export class StatController {
-  public model: Stat;
-  public readonly view: StatView;
+export class SessionController {
+  public model: Session;
+  public readonly view: SessionView;
 
-  constructor(scene: Phaser.Scene, model: Stat) {
+  constructor(scene: Phaser.Scene, model: Session) {
     this.model = model;
 
-    this.view = new StatView(scene, this.model);
+    this.view = new SessionView(scene, this.model);
     this.updateTimeDisplay();
 
     document.addEventListener("visibilitychange", this.handleVisibilityChange);

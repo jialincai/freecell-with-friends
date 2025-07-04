@@ -12,23 +12,22 @@ import {
   PileId,
   TABLEAU_PILES,
 } from "@phaser/constants/table";
-import { TWEEN_DURATION } from "@phaser/constants/tweens";
 import { setupCardInteraction } from "@phaser/game/input/CardInteraction";
 import { setupHoverHighlight } from "@phaser/game/input/HoverHighlight";
 import { DeckController } from "@phaser/deck/DeckController";
 import { createDeck } from "@phaser/deck/state/Deck";
 import { PileController } from "@phaser/pile/PileController";
 import { createPile } from "@phaser/pile/state/Pile";
-import { CardMoveSequence } from "@phaser/move/CardMoveSequence";
+import {
+  CardMoveSequence,
+  createCardMoveSequence,
+} from "@phaser/move/CardMoveSequence";
 import {
   invertCardMoveSequence,
-  expand,
   createAutocompleteCardMoveSequence,
+  withTween,
 } from "@phaser/move/domain/CardMoveSequenceLogic";
-import {
-  areFoundationsFull,
-  areAllTableausOrdered,
-} from "@phaser/game/domain/FreecellRules";
+import { areAllTableausOrdered } from "@phaser/game/domain/FreecellRules";
 import {
   BORDER_PAD_DIMENSIONS,
   BUTTON_DIMENSIONS,
@@ -45,13 +44,15 @@ import {
 import { FONT_FAMILY, FONT_SIZE } from "@phaser/constants/fonts";
 import { getSingleCardMoves } from "@phaser/move/domain/CardMoveLogic";
 import { SessionController } from "@phaser/session/SessionController";
-import { createSession } from "@phaser/session/Session";
+import { createSession, Session } from "@phaser/session/Session";
 import SaveController from "@utils/save/SaveController";
 import { createSave, SAVE_VERSION } from "@utils/save/Save";
 import MoveSavable from "@phaser/move/MoveSaveable";
-import { SessionSaveable } from "@phaser/session/SessionSaveable";
+import SessionSaveable from "@phaser/session/SessionSaveable";
 import { createMeta, Meta } from "@phaser/meta/Meta";
-import { MetaSaveable } from "@phaser/meta/MetaSaveable";
+import MetaSaveable from "@phaser/meta/MetaSaveable";
+import { withComplete } from "@phaser/meta/domain/MetaLogic";
+import { setupTableauDrag } from "@phaser/deck/domain/DeckLogic";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -65,7 +66,7 @@ export default class GameState extends Phaser.Scene {
   private deck!: DeckController;
   private piles!: PileController[];
 
-  private moveStack!: PubSubStack<CardMoveSequence>;
+  private moveHistory!: PubSubStack<CardMoveSequence>;
   private animationQueue!: AsyncQueue;
 
   private meta!: Meta;
@@ -79,9 +80,7 @@ export default class GameState extends Phaser.Scene {
   }
 
   public create(): void {
-    // Setup async queue and UI
-    this.animationQueue = new AsyncQueue();
-    this.startTimerEvents();
+    // Setup UI
     this.createButtons();
     this.createText();
 
@@ -89,9 +88,16 @@ export default class GameState extends Phaser.Scene {
     this.save = new SaveController({}, createSave());
 
     // Create & register initial metadata
-    const currentSeed = dateToSeed(new Date());
+    const currentSeed = dateToSeed(new Date()); // TODO: remove
     this.meta = createMeta(SAVE_VERSION, currentSeed, false);
-    this.save.registerSaveable(new MetaSaveable(this.meta));
+    this.save.registerSaveable(
+      new MetaSaveable(
+        () => this.meta,
+        (data: Meta) => {
+          this.meta = data;
+        },
+      ),
+    );
 
     // Load saved metadata only
     this.save.loadFromStorage();
@@ -100,18 +106,24 @@ export default class GameState extends Phaser.Scene {
     if (this.meta.data.seed !== currentSeed) {
       this.save.resetStorage();
       this.meta = createMeta(SAVE_VERSION, currentSeed, false);
-      this.save.registerSaveable(new MetaSaveable(this.meta));
     }
 
     // Register session
     this.session = new SessionController(this, createSession(Date.now(), 0));
-    this.save.registerSaveable(new SessionSaveable(this.session.model));
+    this.save.registerSaveable(
+      new SessionSaveable(
+        () => this.session.model,
+        (data: Session) => {
+          this.session.model = data;
+        },
+      ),
+    );
 
     // Setup deck
     const deckModel = createDeck();
-    this.deck = new DeckController(this, deckModel);
-    this.deck.shuffleCards(this.meta.data.seed);
-    this.deck.dealCards();
+    this.deck = new DeckController(this, setupTableauDrag(deckModel));
+    // this.deck.shuffleCards(this.meta.data.seed); // TODO: change back
+    // this.deck.dealCards();
 
     // Setup piles
     this.piles = Object.values(PileId).map((pileId) => {
@@ -121,50 +133,50 @@ export default class GameState extends Phaser.Scene {
       return pile;
     });
 
+    // Setup animation queue
+    this.animationQueue = new AsyncQueue();
+
     // Register move history
-    this.moveStack = new PubSubStack<CardMoveSequence>();
-    this.save.registerSaveable(new MoveSavable(this.moveStack));
+    this.moveHistory = new PubSubStack<CardMoveSequence>();
+    this.save.registerSaveable(
+      new MoveSavable(
+        () => this.moveHistory.toArray(),
+        (data: CardMoveSequence[]) => {
+          this.moveHistory.clear();
+          data.forEach((moveSequence) => {
+            this.moveHistory.push(createCardMoveSequence(moveSequence.steps));
+          });
+        },
+      ),
+    );
 
     // Setup interactions
     this.createCommandListeners();
-    setupCardInteraction(this.deck, this.moveStack);
+    setupCardInteraction(this.deck, this.moveHistory);
     setupHoverHighlight(this.deck, this.piles);
 
     // Final load — after all saveables are registered
     this.save.loadFromStorage();
+
+    // Start the game timer
+    this.startTimerEvents();
   }
 
   private createCommandListeners(): void {
-    this.moveStack.subscribe("push", (move: CardMoveSequence) => {
-      const isSingleCardMove =
-        move.steps.length === 1 &&
-        !FOUNDATION_PILES.includes(move.steps[0].toPile);
-
-      if (isSingleCardMove) {
-        this.animationQueue.enqueue(async () => {
-          this.deck.executeCardMoveSequence(move);
-        });
-        return;
-      }
-
-      const expandedSequence = expand(this.deck.model, move);
+    this.moveHistory.subscribe("push", (move: CardMoveSequence) => {
       this.animationQueue.enqueue(async () => {
-        await this.deck.executeCardMoveSequenceWithTweens(
-          expandedSequence,
-          this,
-          TWEEN_DURATION,
-        );
+        await this.deck.executeCardMoveSequence(move, this);
       });
     });
 
-    this.moveStack.subscribe("pop", (move) => {
+    this.moveHistory.subscribe("pop", (move) => {
       const undo = invertCardMoveSequence(move);
       this.animationQueue.enqueue(async () => {
         this.deck.executeCardMoveSequence(undo);
       });
     });
 
-    this.moveStack.subscribe("clear", () => {
+    this.moveHistory.subscribe("clear", () => {
       this.animationQueue.enqueue(async () => {
         this.deck.dealCards();
       });
@@ -178,13 +190,13 @@ export default class GameState extends Phaser.Scene {
       {
         label: "Redeal",
         onClick: () => {
-          this.moveStack.clear();
+          this.moveHistory.clear();
         },
       },
       {
         label: "Undo",
         onClick: () => {
-          this.moveStack.pop();
+          this.moveHistory.pop();
         },
       },
       {
@@ -265,7 +277,7 @@ export default class GameState extends Phaser.Scene {
     this.winText = this.add
       .text(
         BORDER_PAD_DIMENSIONS.width,
-        this.cameras.main.height - FONT_SIZE + BORDER_PAD_DIMENSIONS.height,
+        this.cameras.main.height - FONT_SIZE * 2 + BORDER_PAD_DIMENSIONS.height,
         "You Win!",
         {
           color: getHexColorString(TEXT_COLOR),
@@ -291,23 +303,28 @@ export default class GameState extends Phaser.Scene {
   }
 
   private stopTimerEvents(): void {
+    this.session.updateTimeDisplay(); // TODO: Keep DRY this is repeated in startTimerEvents
+    this.save.saveToStorage();
+
     this.timerEvents.forEach((event) => event.remove(false));
     this.timerEvents = [];
   }
 
   public update(): void {
-    if (areAllTableausOrdered(this.deck.model)) {
-      const sequence = createAutocompleteCardMoveSequence(this.deck.model);
-      this.deck.executeCardMoveSequenceWithTweens(
-        sequence,
-        this,
-        TWEEN_DURATION,
-      );
-
-      this.winText.setVisible(true);
+    if (this.meta.state.complete) {
       this.stopTimerEvents();
+      this.input.enabled = false;
+      this.winText.setVisible(true);
       return;
-      // this.moveStack.push(sequence); // TODO: We want to push this to the stack but we don't want to expand this sequence.
+    }
+
+    if (!this.meta.state.complete && areAllTableausOrdered(this.deck.model)) {
+      const sequence = withTween(
+        createAutocompleteCardMoveSequence(this.deck.model),
+      );
+      this.moveHistory.push(sequence);
+
+      this.meta = withComplete(this.meta);
     }
   }
 }

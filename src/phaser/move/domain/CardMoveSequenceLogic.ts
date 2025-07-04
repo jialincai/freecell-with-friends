@@ -276,3 +276,7 @@ export function flattenCardMoveSequences(
 
   return createCardMoveSequence(Object.values(moveByCard));
 }
+
+export function withTween(sequence: CardMoveSequence): CardMoveSequence {
+  return createCardMoveSequence(sequence.steps, true);
+}

@@ -1,25 +1,24 @@
 import { ISaveable } from "@utils/save/ISaveable";
-import { CardMoveSequence } from "@phaser/move/CardMoveSequence";
-import { PubSubStack } from "@utils/Function";
+import {
+  CardMoveSequence,
+  createCardMoveSequence,
+} from "@phaser/move/CardMoveSequence";
 
 class MoveSaveable implements ISaveable<CardMoveSequence[]> {
-  public id: string;
-  public ref: PubSubStack<CardMoveSequence>;
+  public id = "move";
 
-  constructor(moveHistory: PubSubStack<CardMoveSequence>) {
-    this.id = "move";
-    this.ref = moveHistory;
-  }
+  constructor(
+    public get: () => CardMoveSequence[],
+    public set: (data: CardMoveSequence[]) => void,
+  ) {}
 
   getSnapshot(): CardMoveSequence[] {
-    return this.ref.toArray();
+    return structuredClone(this.get());
   }
 
   loadFromSnapshot(data: CardMoveSequence[]): void {
-    this.ref.clear();
-    for (const move of data) {
-      this.ref.push(move);
-    }
+    const cleaned = data.map((seq) => createCardMoveSequence(seq.steps));
+    this.set(cleaned);
   }
 }
 

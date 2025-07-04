@@ -4,7 +4,7 @@ export type MetaData = {
 };
 
 export type MetaState = {
-  isComplete: boolean;
+  complete: boolean;
 };
 
 export type Meta = {
@@ -15,10 +15,10 @@ export type Meta = {
 export function createMeta(
   version: string,
   seed: number,
-  isComplete: boolean,
+  complete: boolean,
 ): Meta {
   return {
     data: { version, seed },
-    state: { isComplete },
+    state: { complete },
   };
 }

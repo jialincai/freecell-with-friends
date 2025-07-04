@@ -12,6 +12,7 @@ import {
 } from "@phaser/move/CardMoveSequence";
 import { CardId } from "@phaser/card/domain/CardId";
 import { getCardWorldPosition } from "@phaser/card/domain/CardViewLogic";
+import { TWEEN_DURATION } from "@phaser/constants/tweens";
 
 export class DeckController {
   public model: Deck;
@@ -37,12 +38,28 @@ export class DeckController {
       .sort((a, b) => a.model.state.position - b.model.state.position);
   }
 
-  executeCardMoveSequence(cardMoves: CardMoveSequence) {
+  async executeCardMoveSequence(
+    sequence: CardMoveSequence,
+    scene: Phaser.Scene,
+    tweenDuration: number = TWEEN_DURATION,
+  ): Promise<void> {
+    if (sequence.useTween) {
+      await this.executeCardMoveSequenceWithTweens(
+        sequence,
+        scene,
+        tweenDuration,
+      );
+    } else {
+      this.executeCardMoveSequenceInstant(sequence);
+    }
+  }
+
+  private executeCardMoveSequenceInstant(cardMoves: CardMoveSequence) {
     this.model = applyCardMoves(this.model, cardMoves);
     this.cardControllers.forEach((c, i) => c.setModel(this.model.cards[i]));
   }
 
-  async executeCardMoveSequenceWithTweens(
+  private async executeCardMoveSequenceWithTweens(
     cardMoves: CardMoveSequence,
     scene: Phaser.Scene,
     tweenDuration: number,
@@ -67,7 +84,7 @@ export class DeckController {
           duration: tweenDuration,
           ease: "Cubic",
           onComplete: () => {
-            this.executeCardMoveSequence(createCardMoveSequence([step]));
+            this.executeCardMoveSequenceInstant(createCardMoveSequence([step]));
             resolve();
           },
         });

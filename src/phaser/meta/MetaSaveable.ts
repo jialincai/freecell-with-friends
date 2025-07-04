@@ -3,18 +3,19 @@ import { Meta } from "@phaser/meta/Meta";
 
 export class MetaSaveable implements ISaveable<Meta> {
   public id = "meta";
-  public ref: Meta;
 
-  constructor(state: Meta) {
-    this.ref = state;
-  }
+  constructor(
+    public get: () => Meta,
+    public set: (data: Meta) => void,
+  ) {}
 
   getSnapshot(): Meta {
-    return structuredClone(this.ref);
+    return structuredClone(this.get());
   }
 
   loadFromSnapshot(data: Meta): void {
-    this.ref.data = { ...data.data };
-    this.ref.state = { ...data.state };
+    this.set(data);
   }
 }
+
+export default MetaSaveable;

@@ -39,7 +39,6 @@ import {
   BUTTON_TEXT_COLOR,
   HIGHLIGHT_COLOR,
   RED,
-  TEXT_COLOR,
 } from "@phaser/constants/colors";
 import { FONT_FAMILY, FONT_SIZE } from "@phaser/constants/fonts";
 import { getSingleCardMoves } from "@phaser/move/domain/CardMoveLogic";

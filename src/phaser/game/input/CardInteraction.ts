@@ -14,6 +14,7 @@ import {
 } from "@phaser/move/CardMoveSequence";
 import { getNextCardPositionsInPile } from "@phaser/deck/domain/DeckLogic";
 import { STACK_DRAG_OFFSET } from "@phaser/constants/dimensions";
+import { expand, withTween } from "@phaser/move/domain/CardMoveSequenceLogic";
 
 export function setupCardInteraction(
   deckController: DeckController,
@@ -54,7 +55,7 @@ export function setupCardInteraction(
       ) => {
         if (!isMovable()) return;
         if (!(target instanceof PileView)) return;
-        dropCardInNewPile(deckController, cardController, target, moveHistory);
+        dropCardsInNewPile(deckController, cardController, target, moveHistory);
       },
     );
 
@@ -98,7 +99,7 @@ function resetDragCardWorldPosition(
   });
 }
 
-function dropCardInNewPile(
+function dropCardsInNewPile(
   deck: DeckController,
   card: CardController,
   target: PileView,
@@ -128,7 +129,12 @@ function dropCardInNewPile(
       );
     }),
   );
-  moveHistory.push(moveSequence);
+
+  moveHistory.push(
+    dragChildren.length > 1
+      ? withTween(expand(deck.model, moveSequence))
+      : moveSequence,
+  );
 }
 
 function snapCardToFoundationPile(
@@ -161,5 +167,5 @@ function snapCardToFoundationPile(
       newPilePosition.position,
     ),
   ]);
-  moveHistory.push(moveSequence);
+  moveHistory.push(withTween(moveSequence));
 }

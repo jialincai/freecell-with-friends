@@ -1,6 +1,6 @@
 "use client";
 
-import { OverlayMode } from "@components/ui/MenuBar";
+import Image from "next/image";
 import { signIn } from "next-auth/react";
 import statStyles from "@styles/ui/StatsPage.module.css";
 import styles from "@styles/ui/LoginPage.module.css";
@@ -12,18 +12,22 @@ const LoginPage = () => {
 
       <div className={styles.buttonGroup}>
         <button className={styles.authButton} onClick={() => signIn("google")}>
-          <img
-            src="img/social/google.png"
+          <Image
+            src="/img/social/google.png"
             alt="Google icon"
+            width={256}
+            height={256}
             className={styles.authImage}
           />
           Continue with Google
         </button>
 
         <button className={styles.authButton} onClick={() => signIn("discord")}>
-          <img
-            src="img/social/discord.png"
+          <Image
+            src="/img/social/discord.png"
             alt="Discord icon"
+            width={256}
+            height={256}
             className={styles.authImage}
           />
           Continue with Discord

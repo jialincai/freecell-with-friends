@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 
-import { baseURL } from "./constants/loading";
+import { baseURL } from "@phaser/constants/loading";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -16,6 +16,7 @@ export default class PreInitState extends Phaser.Scene {
   public preload(): void {
     // Set base url
     this.load.baseURL = baseURL;
+    this.load.image("img_load", "img/loading.png");
   }
 
   public create(): void {

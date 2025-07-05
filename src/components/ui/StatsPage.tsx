@@ -13,7 +13,7 @@ type StatsPageProps = {
 const StatsPage = ({ setMode }: StatsPageProps) => {
   const { data: session } = useSession();
 
-  if (session) return <StatsPageUser/>;
+  if (session) return <StatsPageUser />;
   return <StatsPageAnon setMode={setMode} />;
 };
 

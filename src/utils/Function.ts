@@ -1,5 +1,7 @@
 import { EventEmitter } from "events";
 
+// TODO: Seperate various utility functions into their own files
+
 export class PubSubStack<T> {
   private items: T[];
   private events: EventEmitter;
@@ -27,29 +29,35 @@ export class PubSubStack<T> {
   subscribe(event: string, listener: (item: T) => void): void {
     this.events.on(event, listener);
   }
+
+  toArray(): T[] {
+    return [...this.items];
+  }
+}
+
+type AsyncAction = () => Promise<void>;
+
+export class AsyncQueue {
+  private current: Promise<void> = Promise.resolve();
+
+  enqueue(action: AsyncAction): void {
+    this.current = this.current.then(() => action());
+  }
+
+  async flush(): Promise<void> {
+    await this.current;
+  }
 }
 
 export function getHexColorString(hex: number): string {
   return `#${hex.toString(16).padStart(6, "0")}`;
 }
 
-export interface Command {
-  do(): void;
-  undo(): void;
-}
-
-export class CompositeCommand implements Command {
-  private readonly commands: Command[];
-
-  constructor(...commands: Command[]) {
-    this.commands = commands;
-  }
-
-  do(): void {
-    this.commands.forEach((command) => command.do());
-  }
-
-  undo(): void {
-    [...this.commands].reverse().forEach((command) => command.undo());
-  }
+export function dateToSeed(date: Date): number {
+  const [year, month, day] = date
+    .toISOString()
+    .split("T")[0]
+    .split("-")
+    .map(Number);
+  return year * 10000 + month * 100 + day;
 }

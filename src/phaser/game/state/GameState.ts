@@ -1,29 +1,33 @@
 import * as Phaser from "phaser";
 
-import { getHexColorString, PubSubStack } from "@utils/Function";
+import {
+  getHexColorString,
+  PubSubStack,
+  AsyncQueue,
+  dateToSeed,
+} from "@utils/Function";
 import {
   CELL_PILES,
   FOUNDATION_PILES,
   PileId,
   TABLEAU_PILES,
 } from "@phaser/constants/table";
-import { TWEEN_DURATION } from "@phaser/constants/tweens";
 import { setupCardInteraction } from "@phaser/game/input/CardInteraction";
 import { setupHoverHighlight } from "@phaser/game/input/HoverHighlight";
 import { DeckController } from "@phaser/deck/DeckController";
 import { createDeck } from "@phaser/deck/state/Deck";
 import { PileController } from "@phaser/pile/PileController";
 import { createPile } from "@phaser/pile/state/Pile";
-import { CardMoveSequence } from "@phaser/move/CardMoveSequence";
+import {
+  CardMoveSequence,
+  createCardMoveSequence,
+} from "@phaser/move/CardMoveSequence";
 import {
   invertCardMoveSequence,
-  expand,
   createAutocompleteCardMoveSequence,
+  withTween,
 } from "@phaser/move/domain/CardMoveSequenceLogic";
-import {
-  areFoundationsFull,
-  areAllTableausOrdered,
-} from "@phaser/game/domain/FreecellRules";
+import { areAllTableausOrdered } from "@phaser/game/domain/FreecellRules";
 import {
   BORDER_PAD_DIMENSIONS,
   BUTTON_DIMENSIONS,
@@ -35,12 +39,18 @@ import {
   BUTTON_TEXT_COLOR,
   HIGHLIGHT_COLOR,
   RED,
-  TEXT_COLOR,
 } from "@phaser/constants/colors";
 import { FONT_FAMILY, FONT_SIZE } from "@phaser/constants/fonts";
 import { getSingleCardMoves } from "@phaser/move/domain/CardMoveLogic";
-import { StatsController } from "@phaser/stats/StatsController";
-import { createStats } from "@phaser/stats/state/Stats";
+import { SessionController } from "@phaser/session/SessionController";
+import { createSession, Session } from "@phaser/session/Session";
+import SaveController from "@utils/save/SaveController";
+import { createSave, SAVE_VERSION } from "@utils/save/Save";
+import MoveSavable from "@phaser/move/MoveSaveable";
+import SessionSaveable from "@phaser/session/SessionSaveable";
+import { createMeta, Meta } from "@phaser/meta/Meta";
+import MetaSaveable from "@phaser/meta/MetaSaveable";
+import { withComplete } from "@phaser/meta/domain/MetaLogic";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -49,75 +59,128 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
 };
 
 export default class GameState extends Phaser.Scene {
-  private moveHistory = new PubSubStack<CardMoveSequence>();
+  private save!: SaveController;
 
   private deck!: DeckController;
   private piles!: PileController[];
 
-  private stat!: StatsController;
+  private moveHistory!: PubSubStack<CardMoveSequence>;
+  private animationQueue!: AsyncQueue;
 
-  private winText!: Phaser.GameObjects.Text;
+  private meta!: Meta;
+  private session!: SessionController;
+
+  private timerEvents!: Phaser.Time.TimerEvent[];
 
   public constructor() {
     super(sceneConfig);
   }
 
+  // TODO: This function is getting to long.
+  // Consider breaking into smaller function that implement State pattern for different solitaire games.
   public create(): void {
-    // Setup stat
-    this.stat = new StatsController(
-      this,
-      createStats(this.dateToSeed(new Date()), Date.now(), 0),
+    // Setup UI
+    this.createButtons();
+
+    // Setup save system
+    this.save = new SaveController({}, createSave());
+
+    // Create and load metadata
+    const currentSeed = dateToSeed(new Date()); // TODO: remove
+    this.meta = createMeta(SAVE_VERSION, currentSeed, false);
+    this.save.registerSaveable(
+      new MetaSaveable(
+        () => this.meta,
+        (data: Meta) => {
+          this.meta = data;
+        },
+      ),
+    );
+    this.save.loadFromStorage();
+
+    // Reset storage and metadata if daily seed changed
+    if (this.meta.data.seed !== currentSeed) {
+      this.save.resetStorage();
+      this.meta = createMeta(SAVE_VERSION, currentSeed, false);
+    }
+
+    // Register session
+    this.session = new SessionController(this, createSession());
+    this.save.registerSaveable(
+      new SessionSaveable(
+        () => this.session.model,
+        (data: Session) => {
+          this.session.model = data;
+        },
+      ),
     );
 
-    // Create deck
+    // Shuffle and deal deck
     const deckModel = createDeck();
     this.deck = new DeckController(this, deckModel);
-    this.deck.shuffleCards(this.stat.model.data.seed);
+    this.deck.shuffleCards(this.meta.data.seed);
     this.deck.dealCards();
 
-    // Create piles
+    // Setup piles
     this.piles = Object.values(PileId).map((pileId) => {
       const pileModel = createPile(pileId);
       const pile = new PileController(this, pileModel);
-
       if (pile.model.data.id === PileId.None) pile.view.setAlpha(0);
-
       return pile;
     });
 
-    // Create UI
-    this.createButtons();
-    this.createText();
+    // Setup animation queue
+    this.animationQueue = new AsyncQueue();
 
-    // Setup interactions
+    // Setup move history
+    this.moveHistory = new PubSubStack<CardMoveSequence>();
+    this.save.registerSaveable(
+      new MoveSavable(
+        () => this.moveHistory.toArray(),
+        (data: CardMoveSequence[]) => {
+          this.moveHistory.clear();
+          data.forEach((moveSequence) => {
+            this.moveHistory.push(createCardMoveSequence(moveSequence.steps));
+          });
+        },
+      ),
+    );
+
+    // Setup event listeners
+    this.createCommandListeners();
     setupCardInteraction(this.deck, this.moveHistory);
     setupHoverHighlight(this.deck, this.piles);
 
-    // Setup player move history tracking
-    this.createCommandListeners();
+    // Final persistant data to registered saveables
+    this.save.loadFromStorage();
+
+    // Start timed events or load complete state
+    if (this.meta.state.complete) {
+      this.input.enabled = false;
+      this.session.incrementTimer(0);
+    } else {
+      this.startTimerEvents();
+    }
   }
 
   private createCommandListeners(): void {
-    this.moveHistory.subscribe("push", (move) => {
-      const isSimpleDirectMove =
-        move.steps.length === 1 &&
-        !FOUNDATION_PILES.includes(move.steps[0].toPile);
-
-      if (isSimpleDirectMove) {
-        this.deck.executeCardMoveSequence(move);
-        return;
-      }
-      const expandedSequence = expand(this.deck.model, move);
-      this.deck.executeCardMoveSequenceWithTweens(
-        expandedSequence,
-        this,
-        TWEEN_DURATION,
-      );
+    this.moveHistory.subscribe("push", (move: CardMoveSequence) => {
+      this.animationQueue.enqueue(async () => {
+        await this.deck.executeCardMoveSequence(move, this);
+      });
     });
 
     this.moveHistory.subscribe("pop", (move) => {
       const undo = invertCardMoveSequence(move);
-      this.deck.executeCardMoveSequence(undo);
+      this.animationQueue.enqueue(async () => {
+        this.deck.executeCardMoveSequence(undo, this);
+      });
+    });
+
+    this.moveHistory.subscribe("clear", () => {
+      this.animationQueue.enqueue(async () => {
+        this.deck.dealCards();
+      });
     });
   }
 
@@ -127,9 +190,7 @@ export default class GameState extends Phaser.Scene {
       {
         label: "Redeal",
         onClick: () => {
-          this.deck.dealCards();
           this.moveHistory.clear();
-          this.winText.setVisible(false);
         },
       },
       {
@@ -212,48 +273,38 @@ export default class GameState extends Phaser.Scene {
     });
   }
 
-  private createText(): void {
-    this.winText = this.add
-      .text(
-        BORDER_PAD_DIMENSIONS.width,
-        this.cameras.main.height - FONT_SIZE + BORDER_PAD_DIMENSIONS.height,
-        "You Win!",
-        {
-          color: getHexColorString(TEXT_COLOR), // TODO: Keep font DRY.
-          fontSize: FONT_SIZE,
-          fontFamily: FONT_FAMILY,
+  private startTimerEvents(): void {
+    this.timerEvents = [];
+    this.timerEvents.push(
+      this.time.addEvent({
+        delay: 1000,
+        loop: true,
+        callback: () => {
+          this.session.incrementTimer(1000);
+          this.save.saveToStorage();
         },
-      )
-      .setVisible(false);
+      }),
+    );
   }
 
-  // TODO: Pure funcitons we may want to rehome someday.
-  // Game state should only contain stateful logic.
-  private dateToSeed(date: Date): number {
-    const [year, month, day] = date
-      .toISOString()
-      .split("T")[0]
-      .split("-")
-      .map(Number);
-    return year * 10000 + month * 100 + day;
+  private stopTimerEvents(): void {
+    this.timerEvents.forEach((event) => event.remove(false));
+    this.timerEvents = [];
   }
 
   public update(): void {
+    if (this.meta.state.complete) return;
+
     if (areAllTableausOrdered(this.deck.model)) {
-      const sequence = createAutocompleteCardMoveSequence(this.deck.model);
-      this.deck.executeCardMoveSequenceWithTweens(
-        sequence,
-        this,
-        TWEEN_DURATION,
+      const sequence = withTween(
+        createAutocompleteCardMoveSequence(this.deck.model),
       );
-      return;
-    }
+      this.moveHistory.push(sequence);
 
-    if (areFoundationsFull(this.deck.model)) {
-      this.winText.setVisible(true);
-      return;
+      this.meta = withComplete(this.meta);
+      this.input.enabled = false;
+      this.save.saveToStorage();
+      this.stopTimerEvents();
     }
-
-    this.stat.updateTimeDisplay();
   }
 }

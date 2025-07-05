@@ -1,5 +1,5 @@
 import { Deck } from "@phaser/deck/state/Deck";
-import { CardMove, createCardMove } from "../CardMove";
+import { CardMove, createCardMove } from "@phaser/move/CardMove";
 import { PileId } from "@phaser/constants/table";
 import { getCardsInPile } from "@phaser/deck/domain/DeckLogic";
 import { filterValidDropPiles } from "@phaser/game/domain/FreecellRules";

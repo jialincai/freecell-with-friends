@@ -1,3 +1,5 @@
+export const images = []; // Back ground  can go here in the future
+
 export const spritesheets = [
   {
     file: "img/cards.png",

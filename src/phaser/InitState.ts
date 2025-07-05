@@ -3,6 +3,7 @@ import * as Phaser from "phaser";
 // Card images
 import { spritesheets } from "@phaser/constants/assets";
 import { baseURL } from "@phaser/constants/loading";
+import { SCREEN_DIMENSIONS } from "@phaser/constants/dimensions";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -19,6 +20,15 @@ export default class InitState extends Phaser.Scene {
   public preload(): void {
     // Set base url
     this.load.baseURL = baseURL;
+
+    // Background
+    this.add
+      .image(
+        SCREEN_DIMENSIONS.width / 2,
+        SCREEN_DIMENSIONS.height / 4,
+        "img_load",
+      )
+      .setScale(2);
 
     const { width, height } = this.cameras.main;
 
@@ -37,7 +47,7 @@ export default class InitState extends Phaser.Scene {
     // Progress update
     this.load.on("progress", (value: number) => {
       progressBar.clear();
-      progressBar.fillStyle(0x000000, 1);
+      progressBar.fillStyle(0xffffff, 1);
       progressBar.fillRect(
         barX + 2,
         barY + 2,

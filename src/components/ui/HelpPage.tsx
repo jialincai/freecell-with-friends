@@ -75,10 +75,11 @@ const HelpPage = () => {
       </div>
 
       <p className={styles.footer}>
-        Created by{" "}
+        Copyright © 2025{" "}
         <a href="https://jialincai.com" className={styles.link}>
-          Jialin
+          Jialin Cai
         </a>
+        . All rights reserved.
       </p>
     </div>
   );

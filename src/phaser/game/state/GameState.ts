@@ -52,7 +52,6 @@ import SessionSaveable from "@phaser/session/SessionSaveable";
 import { createMeta, Meta } from "@phaser/meta/Meta";
 import MetaSaveable from "@phaser/meta/MetaSaveable";
 import { withComplete } from "@phaser/meta/domain/MetaLogic";
-import { setupTableauDrag } from "@phaser/deck/domain/DeckLogic";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -73,7 +72,6 @@ export default class GameState extends Phaser.Scene {
   private session!: SessionController;
 
   private timerEvents!: Phaser.Time.TimerEvent[];
-  private winText!: Phaser.GameObjects.Text;
 
   public constructor() {
     super(sceneConfig);
@@ -84,7 +82,6 @@ export default class GameState extends Phaser.Scene {
   public create(): void {
     // Setup UI
     this.createButtons();
-    this.createText();
 
     // Setup save system
     this.save = new SaveController({}, createSave());
@@ -161,7 +158,6 @@ export default class GameState extends Phaser.Scene {
     // Start timed events or load complete state
     if (this.meta.state.complete) {
       this.input.enabled = false;
-      this.winText.setVisible(true);
       this.session.incrementTimer(0);
     } else {
       this.startTimerEvents();
@@ -186,7 +182,6 @@ export default class GameState extends Phaser.Scene {
       this.animationQueue.enqueue(async () => {
         this.deck.dealCards();
       });
-      this.winText.setVisible(false);
     });
   }
 
@@ -279,21 +274,6 @@ export default class GameState extends Phaser.Scene {
     });
   }
 
-  private createText(): void {
-    this.winText = this.add
-      .text(
-        BORDER_PAD_DIMENSIONS.width,
-        this.cameras.main.height - FONT_SIZE * 2 + BORDER_PAD_DIMENSIONS.height,
-        "You Win!",
-        {
-          color: getHexColorString(TEXT_COLOR),
-          fontSize: FONT_SIZE,
-          fontFamily: FONT_FAMILY,
-        },
-      )
-      .setVisible(false);
-  }
-
   private startTimerEvents(): void {
     this.timerEvents = [];
     this.timerEvents.push(
@@ -324,7 +304,7 @@ export default class GameState extends Phaser.Scene {
 
       this.meta = withComplete(this.meta);
       this.input.enabled = false;
-      this.winText.setVisible(true);
+      this.save.saveToStorage();
       this.stopTimerEvents();
     }
   }

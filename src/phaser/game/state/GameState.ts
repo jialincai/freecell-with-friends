@@ -79,6 +79,8 @@ export default class GameState extends Phaser.Scene {
     super(sceneConfig);
   }
 
+  // TODO: This function is getting to long.
+  // Consider breaking into smaller function that implement State pattern for different solitaire games.
   public create(): void {
     // Setup UI
     this.createButtons();
@@ -87,7 +89,7 @@ export default class GameState extends Phaser.Scene {
     // Setup save system
     this.save = new SaveController({}, createSave());
 
-    // Create & register initial metadata
+    // Create and load metadata
     const currentSeed = dateToSeed(new Date()); // TODO: remove
     this.meta = createMeta(SAVE_VERSION, currentSeed, false);
     this.save.registerSaveable(
@@ -98,18 +100,16 @@ export default class GameState extends Phaser.Scene {
         },
       ),
     );
-
-    // Load saved metadata only
     this.save.loadFromStorage();
 
-    // Reset storage and metadata if seed changed
+    // Reset storage and metadata if daily seed changed
     if (this.meta.data.seed !== currentSeed) {
       this.save.resetStorage();
       this.meta = createMeta(SAVE_VERSION, currentSeed, false);
     }
 
     // Register session
-    this.session = new SessionController(this, createSession(Date.now(), 0));
+    this.session = new SessionController(this, createSession());
     this.save.registerSaveable(
       new SessionSaveable(
         () => this.session.model,
@@ -119,11 +119,11 @@ export default class GameState extends Phaser.Scene {
       ),
     );
 
-    // Setup deck
+    // Shuffle and deal deck
     const deckModel = createDeck();
-    this.deck = new DeckController(this, setupTableauDrag(deckModel));
-    // this.deck.shuffleCards(this.meta.data.seed); // TODO: change back
-    // this.deck.dealCards();
+    this.deck = new DeckController(this, deckModel);
+    this.deck.shuffleCards(this.meta.data.seed);
+    this.deck.dealCards();
 
     // Setup piles
     this.piles = Object.values(PileId).map((pileId) => {
@@ -136,7 +136,7 @@ export default class GameState extends Phaser.Scene {
     // Setup animation queue
     this.animationQueue = new AsyncQueue();
 
-    // Register move history
+    // Setup move history
     this.moveHistory = new PubSubStack<CardMoveSequence>();
     this.save.registerSaveable(
       new MoveSavable(
@@ -150,16 +150,22 @@ export default class GameState extends Phaser.Scene {
       ),
     );
 
-    // Setup interactions
+    // Setup event listeners
     this.createCommandListeners();
     setupCardInteraction(this.deck, this.moveHistory);
     setupHoverHighlight(this.deck, this.piles);
 
-    // Final load — after all saveables are registered
+    // Final persistant data to registered saveables
     this.save.loadFromStorage();
 
-    // Start the game timer
-    this.startTimerEvents();
+    // Start timed events or load complete state
+    if (this.meta.state.complete) {
+      this.input.enabled = false;
+      this.winText.setVisible(true);
+      this.session.incrementTimer(0);
+    } else {
+      this.startTimerEvents();
+    }
   }
 
   private createCommandListeners(): void {
@@ -172,7 +178,7 @@ export default class GameState extends Phaser.Scene {
     this.moveHistory.subscribe("pop", (move) => {
       const undo = invertCardMoveSequence(move);
       this.animationQueue.enqueue(async () => {
-        this.deck.executeCardMoveSequence(undo);
+        this.deck.executeCardMoveSequence(undo, this);
       });
     });
 
@@ -295,7 +301,7 @@ export default class GameState extends Phaser.Scene {
         delay: 1000,
         loop: true,
         callback: () => {
-          this.session.updateTimeDisplay();
+          this.session.incrementTimer(1000);
           this.save.saveToStorage();
         },
       }),
@@ -303,28 +309,23 @@ export default class GameState extends Phaser.Scene {
   }
 
   private stopTimerEvents(): void {
-    this.session.updateTimeDisplay(); // TODO: Keep DRY this is repeated in startTimerEvents
-    this.save.saveToStorage();
-
     this.timerEvents.forEach((event) => event.remove(false));
     this.timerEvents = [];
   }
 
   public update(): void {
-    if (this.meta.state.complete) {
-      this.stopTimerEvents();
-      this.input.enabled = false;
-      this.winText.setVisible(true);
-      return;
-    }
+    if (this.meta.state.complete) return;
 
-    if (!this.meta.state.complete && areAllTableausOrdered(this.deck.model)) {
+    if (areAllTableausOrdered(this.deck.model)) {
       const sequence = withTween(
         createAutocompleteCardMoveSequence(this.deck.model),
       );
       this.moveHistory.push(sequence);
 
       this.meta = withComplete(this.meta);
+      this.input.enabled = false;
+      this.winText.setVisible(true);
+      this.stopTimerEvents();
     }
   }
 }

@@ -1,8 +1,7 @@
 export type SessionData = {};
 
 export type SessionState = {
-  startTime: number;
-  pauseTime: number;
+  timeElapsedMs: number;
 };
 
 export type Session = {
@@ -10,9 +9,9 @@ export type Session = {
   state: SessionState;
 };
 
-export function createSession(startTime: number, pauseTime: number): Session {
+export function createSession(): Session {
   return {
     data: {},
-    state: { startTime, pauseTime },
+    state: { timeElapsedMs: 0 },
   };
 }

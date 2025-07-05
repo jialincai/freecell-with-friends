@@ -3,7 +3,7 @@ import { SaveableRegistry, ISaveable } from "@utils/save/ISaveable";
 
 export function withSaveable(
   registry: SaveableRegistry,
-  saveable: ISaveable<any>,
+  saveable: ISaveable<unknown>,
 ): SaveableRegistry {
   return {
     ...registry,

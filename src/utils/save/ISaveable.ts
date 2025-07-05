@@ -1,5 +1,5 @@
 /**
- * Specifies save interface for any runtime object.
+ * Specifies save interface for a runtime object.
  *
  * Implementations must enforce state is retrieved and updated exclusively through externally
  * provided `get` and `set` functions. Implementations must avoid holding references to the object
@@ -22,4 +22,4 @@ export interface ISaveable<T> {
   loadFromSnapshot(data: T): void;
 }
 
-export type SaveableRegistry = Record<string, ISaveable<any>>;
+export type SaveableRegistry = Record<string, ISaveable<unknown>>;

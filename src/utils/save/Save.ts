@@ -6,7 +6,7 @@ export type SaveData = {
 };
 
 export type SaveState = {
-  chunks: Record<string, any>;
+  chunks: Record<string, unknown>;
 };
 
 export type Save = {

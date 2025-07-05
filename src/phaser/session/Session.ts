@@ -1,4 +1,4 @@
-export type SessionData = {};
+export type SessionData = Record<string, never>;
 
 export type SessionState = {
   timeElapsedMs: number;

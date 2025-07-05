@@ -16,7 +16,7 @@ class SaveController {
     this.save = save;
   }
 
-  registerSaveable(saveable: ISaveable<any>) {
+  registerSaveable(saveable: ISaveable<unknown>) {
     this.registry = withSaveable(this.registry, saveable);
   }
 

@@ -1,7 +1,7 @@
 import { ISaveable } from "@utils/save/ISaveable";
 import { Meta } from "@phaser/meta/Meta";
 
-export class MetaSaveable implements ISaveable<Meta> {
+class MetaSaveable implements ISaveable<Meta> {
   public id = "meta";
 
   constructor(

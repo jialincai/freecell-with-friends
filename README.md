@@ -1,27 +1,35 @@
 # Freecell-React Setup Guide
 
-A web Freecell game built with Phasor.
+A web Freecell game built with Phasor, Next.js, and postgreSQL.
 
 ## Prerequisites
 
 - Node.js
+- Docker
+- Docker Compose
 
-## Installation Steps
+## Development Guide
 
-1. **Install Project Dependencies**
+### Local Testing
 
-   Navigate to your project directory and install the necessary dependencies:
+1. Ensure `target:dev` in the file `docker-compose.yml`.
+
+1. Build Docker image
 
    ```bash
-   npm install
+   docker compose build
    ```
 
-1. **Run the Development Server**
-
-   Start the development server to see your project in action:
+1. Run Docker image
 
    ```bash
-   npm run dev
+   docker compose up
+   ```
+
+1. Stop and remove containers. Optional flags `--rmi all --volumes` to cleanup images and volumes.
+
+   ```bash
+   docker compose down
    ```
 
 1. **View Your Project**
@@ -29,8 +37,6 @@ A web Freecell game built with Phasor.
    Open your browser and open:
 
    [http://localhost:3000](http://localhost:3000)
-
-## Development Guide
 
 ### Running the Linter
 
@@ -50,15 +56,4 @@ Make sure to fix any remaining issues manually if they cannot be auto-fixed.
 
 ### Deployment
 
-To deploy the game as a static website:
-
-1. Build the project:
-
-   ```bash
-   npm run build
-   ```
-
-   This will generate an `/out` folder containing your static site.
-
-1. Upload the contents of the `/out` folder to your hosting platform.
-Ensure that `index.html` is located at the root of your hosted directory.
+The project is currently deployed with Vercel. Simply update branch `main` and the rest is handled.

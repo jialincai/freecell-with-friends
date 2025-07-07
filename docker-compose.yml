@@ -1,0 +1,11 @@
+services:
+  freecell-phaser:
+    image: freecell-phaser
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - .:/freecell-phaser
+    ports:
+      - "3000:3000"

@@ -10,7 +10,25 @@ A web Freecell game built with Phasor, Next.js, and postgreSQL.
 
 ## Development Guide
 
-### Local Testing
+### Local Development
+
+1. Navigate to your project directory and install the necessary dependencies:
+
+   ```bash
+   npm install
+   ```
+
+1. Start the development server to see your project in action:
+
+   ```bash
+   npm run dev
+   ```
+
+1. Open your browser at the following address to view:
+
+   [http://localhost:3000](http://localhost:3000)
+
+### Local Testing with Database
 
 1. Ensure `target:dev` in the file `docker-compose.yml`.
 
@@ -32,21 +50,13 @@ A web Freecell game built with Phasor, Next.js, and postgreSQL.
    docker compose down
    ```
 
-1. **View Your Project**
-
-   Open your browser and open:
+1. Open your browser and open:
 
    [http://localhost:3000](http://localhost:3000)
 
 ### Running the Linter
 
-To ensure code consistency and catch potential issues, run the linter:
-
-```bash
-npm run lint
-```
-
-To automatically fix linting issues:
+Run the auto fix linter after following [Local Development](#local-development) steps:
 
 ```bash
 npm run lint:fix

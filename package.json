@@ -12,8 +12,9 @@
   "dependencies": {
     "lucide-react": "^0.510",
     "next": "^15",
-    "next-auth": "^4.24",
+    "next-auth": "^4",
     "phaser": "^3",
+    "postgres": "^3",
     "react": "^19",
     "react-dom": "^19"
   },

@@ -21,34 +21,37 @@
         "name": "next"
       }
     ],
-    "baseUrl": "src",
+    "baseUrl": ".",
     "paths": {
       "@app/*": [
-        "app/*"
+        "src/app/*"
       ],
       "@components/*": [
-        "components/*"
+        "src/components/*"
       ],
       "@phaser/*": [
-        "phaser/*"
+        "src/phaser/*"
       ],
       "@pixi/*": [
-        "pixi/*"
+        "src/pixi/*"
       ],
       "@styles/*": [
-        "styles/*"
+        "src/styles/*"
       ],
       "@utils/*": [
-        "utils/*"
+        "src/utils/*"
       ],
       "@hooks/*": [
-        "hooks/*"
+        "src/hooks/*"
       ],
       "@contexts/*": [
-        "contexts/*"
+        "src/contexts/*"
       ],
-      "@textures/*": [
-        "../public/img/*"
+      "@auth/*": [
+        "auth/*"
+      ],
+      "@lib/*": [
+        "lib/*"
       ]
     },
     "target": "ES2017"

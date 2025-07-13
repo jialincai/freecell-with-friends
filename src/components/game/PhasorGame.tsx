@@ -17,7 +17,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
     useLayoutEffect(() => {
       if (gameRef.current === null) {
         const loadGame = async () => {
-          const { default: StartGame } = await import("phaser/main");
+          const { default: StartGame } = await import("src/phaser/main");
           gameRef.current = StartGame(containerId);
         };
         loadGame();

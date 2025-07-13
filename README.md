@@ -12,13 +12,13 @@ A web Freecell game built with Phasor, Next.js, and postgreSQL.
 
 ### Local Development
 
-1. Navigate to your project directory and install the necessary dependencies:
+1. Navigate to your project directory and install dependencies:
 
    ```bash
    npm install
    ```
 
-1. Start the development server to see your project in action:
+1. Start the development server:
 
    ```bash
    npm run dev
@@ -29,8 +29,6 @@ A web Freecell game built with Phasor, Next.js, and postgreSQL.
    [http://localhost:3000](http://localhost:3000)
 
 ### Local Testing with Database
-
-1. Ensure `target:dev` in the file `docker-compose.yml`.
 
 1. Build Docker image
 
@@ -44,15 +42,14 @@ A web Freecell game built with Phasor, Next.js, and postgreSQL.
    docker compose up
    ```
 
+   **NOTE:** Database initialization only runs the first time the Postgres data volume is initialized.
+   If the volume already exists, the script won’t re-run. Run the SQL manually using `adminer`.
+
 1. Stop and remove containers. Optional flags `--rmi all --volumes` to cleanup images and volumes.
 
    ```bash
    docker compose down
    ```
-
-1. Open your browser and open:
-
-   [http://localhost:3000](http://localhost:3000)
 
 ### Running the Linter
 

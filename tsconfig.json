@@ -21,31 +21,28 @@
         "name": "next"
       }
     ],
-    "baseUrl": ".",
+    "baseUrl": "./src",
     "paths": {
       "@app/*": [
-        "src/app/*"
+        "app/*"
       ],
       "@components/*": [
-        "src/components/*"
+        "components/*"
       ],
       "@phaser/*": [
-        "src/phaser/*"
-      ],
-      "@pixi/*": [
-        "src/pixi/*"
+        "phaser/*"
       ],
       "@styles/*": [
-        "src/styles/*"
+        "styles/*"
       ],
       "@utils/*": [
-        "src/utils/*"
+        "utils/*"
       ],
       "@hooks/*": [
-        "src/hooks/*"
+        "hooks/*"
       ],
       "@contexts/*": [
-        "src/contexts/*"
+        "contexts/*"
       ],
       "@auth/*": [
         "auth/*"

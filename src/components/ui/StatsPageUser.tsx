@@ -1,26 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import useSWR from "swr";
 import { signOut } from "next-auth/react";
 import ShareButton from "@components/ui/ShareButton";
 import statStyles from "@styles/ui/StatsPage.module.css";
 
-const UserStatsPage = () => {
-  const [stats, setStats] = useState<{ time: number } | null>(null);
+const fetcher = (url: string) =>
+  fetch(url).then((res) => {
+    if (!res.ok) throw new Error("Failed to fetch user stats");
+    return res.json();
+  });
 
-  useEffect(() => {
-    fetch("/api/user-stats")
-      .then((res) => res.ok ? res.json() : Promise.reject())
-      .then((stats) => setStats(stats))
-      .catch(() => setStats(null));
-  }, []);
+const UserStatsPage = () => {
+  const { data: stats, error } = useSWR("/api/user/add", fetcher);
 
   return (
     <div className={statStyles.container}>
       <p className={statStyles.heading}>Statistics</p>
-      <p>
-        { stats ? `Time: ${stats.time} ms` : `Loading...` }
-      </p>
+      <p>{stats ? `Time: ${stats.time} ms` : `Loading...`}</p>
 
       <ShareButton />
       <button className="underline" onClick={() => signOut()}>

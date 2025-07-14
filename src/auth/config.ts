@@ -1,7 +1,6 @@
 import GoogleProvider from "next-auth/providers/google";
 import DiscordProvider from "next-auth/providers/discord";
-import { v5 as uuidv5 } from 'uuid';
-import { findUserById, insertUser } from "@lib/db/users";
+import { computeUserId } from "@auth/ids";
 
 const authOptions = {
   providers: [
@@ -16,26 +15,21 @@ const authOptions = {
   ],
   callbacks: {
     async jwt({ token, account, profile }) {
-      if (account && profile) {
-        const id = uuidv5(`${account.provider}:${account.providerAccountId}`,
-                           uuidv5("https://freecellwithfriends.com", uuidv5.URL));
-        const email = token.email
-
-        const existing = await findUserById(id)
-        if (!existing) {
-          await insertUser({ id, email: email ?? "" });
-        }
-
-        token.frecell_id = id
-      }
-
-      return token
+      if (account && profile)
+        token.frecell_id = computeUserId(
+          account.provider,
+          account.providerAccountId,
+        );
+      return token;
     },
 
-    async session({ session, token}) {
-      session.user.id = token.frecell_id
-      return session
-    }, 
+    async session({ session, token }) {
+      session.user.id = token.frecell_id;
+      return session;
+    },
+  },
+  pages: {
+    signIn: "/?overlay=login",
   },
 };
 

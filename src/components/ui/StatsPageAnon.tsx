@@ -1,11 +1,11 @@
 "use client";
 
-import { useOverlayNavigation } from "@lib/hooks/useOverlayNavigation";
+import { useOverlayRouter } from "@lib/hooks/overlay";
 import ShareButton from "@components/ui/ShareButton";
 import styles from "@styles/ui/StatsPage.module.css";
 
 const AnonStatsPage = () => {
-  const { openOverlay } = useOverlayNavigation();
+  const overlayRouter = useOverlayRouter();
 
   return (
     <div className={styles.container}>
@@ -16,12 +16,15 @@ const AnonStatsPage = () => {
       <div className={styles.buttonGroup}>
         <button
           className={`${styles.ovalButton} bg-white text-black`}
-          onClick={() => openOverlay("login")}
+          onClick={() => overlayRouter.open("login")}
         >
           Create a free account
         </button>
 
-        <button className="underline" onClick={() => openOverlay("login")}>
+        <button
+          className="underline"
+          onClick={() => overlayRouter.open("login")}
+        >
           Already registered? Log in
         </button>
       </div>

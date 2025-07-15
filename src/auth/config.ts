@@ -16,7 +16,7 @@ const authOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, account }: { token: JWT; account: Account }) {
+    async jwt({ token, account }: { token: JWT; account?: Account | null }) {
       if (account)
         token.fwf_uuid = computeUserId(
           account.provider,

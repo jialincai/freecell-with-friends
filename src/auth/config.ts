@@ -1,6 +1,8 @@
 import GoogleProvider from "next-auth/providers/google";
 import DiscordProvider from "next-auth/providers/discord";
 import { computeUserId } from "@auth/ids";
+import { Account, Session } from "next-auth";
+import { JWT } from "next-auth/jwt";
 
 const authOptions = {
   providers: [
@@ -14,17 +16,19 @@ const authOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, account, profile }) {
-      if (account && profile)
-        token.frecell_id = computeUserId(
+    async jwt({ token, account }: { token: JWT; account: Account }) {
+      if (account)
+        token.fwf_uuid = computeUserId(
           account.provider,
           account.providerAccountId,
         );
       return token;
     },
 
-    async session({ session, token }) {
-      session.user.id = token.frecell_id;
+    async session({ session, token }: { session: Session; token: JWT }) {
+      if (session.user) {
+        session.user.id = token.fwf_uuid;
+      }
       return session;
     },
   },

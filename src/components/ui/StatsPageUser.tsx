@@ -12,7 +12,7 @@ const fetcher = (url: string) =>
   });
 
 const UserStatsPage = () => {
-  const { data: stats, error } = useSWR("/api/user/add", fetcher);
+  const { data: stats } = useSWR("/api/user/add", fetcher);
 
   return (
     <div className={statStyles.container}>

@@ -1,46 +1,59 @@
 # Freecell-React Setup Guide
 
-A web Freecell game built with Phasor.
+A web Freecell game built with Phasor, Next.js, and postgreSQL.
 
 ## Prerequisites
 
 - Node.js
+- Docker
+- Docker Compose
 
-## Installation Steps
+## Development Guide
 
-1. **Install Project Dependencies**
+### Local Development
 
-   Navigate to your project directory and install the necessary dependencies:
+1. Navigate to your project directory and install dependencies:
 
    ```bash
    npm install
    ```
 
-1. **Run the Development Server**
-
-   Start the development server to see your project in action:
+1. Start the development server:
 
    ```bash
    npm run dev
    ```
 
-1. **View Your Project**
-
-   Open your browser and open:
+1. Open your browser at the following address to view:
 
    [http://localhost:3000](http://localhost:3000)
 
-## Development Guide
+### Local Testing with Database
+
+1. Build Docker image
+
+   ```bash
+   docker compose build
+   ```
+
+1. Run Docker image
+
+   ```bash
+   docker compose up
+   ```
+
+   **NOTE:** Database initialization only runs the first time the Postgres data volume is initialized.
+   If the volume already exists, the script won’t re-run. Run the SQL manually using `adminer`.
+
+1. Stop and remove containers. Optional flags `--rmi all --volumes` to cleanup images and volumes.
+
+   ```bash
+   docker compose down
+   ```
 
 ### Running the Linter
 
-To ensure code consistency and catch potential issues, run the linter:
-
-```bash
-npm run lint
-```
-
-To automatically fix linting issues:
+Run the auto fix linter after following [Local Development](#local-development) steps:
 
 ```bash
 npm run lint:fix
@@ -50,15 +63,4 @@ Make sure to fix any remaining issues manually if they cannot be auto-fixed.
 
 ### Deployment
 
-To deploy the game as a static website:
-
-1. Build the project:
-
-   ```bash
-   npm run build
-   ```
-
-   This will generate an `/out` folder containing your static site.
-
-1. Upload the contents of the `/out` folder to your hosting platform.
-Ensure that `index.html` is located at the root of your hosted directory.
+The project is currently deployed with Vercel. Simply update branch `main` and the rest is handled.

@@ -21,7 +21,7 @@
         "name": "next"
       }
     ],
-    "baseUrl": "src",
+    "baseUrl": "./src",
     "paths": {
       "@app/*": [
         "app/*"
@@ -32,11 +32,11 @@
       "@phaser/*": [
         "phaser/*"
       ],
-      "@pixi/*": [
-        "pixi/*"
-      ],
       "@styles/*": [
         "styles/*"
+      ],
+      "@types/*": [
+        "types/*"
       ],
       "@utils/*": [
         "utils/*"
@@ -47,8 +47,11 @@
       "@contexts/*": [
         "contexts/*"
       ],
-      "@textures/*": [
-        "../public/img/*"
+      "@auth/*": [
+        "auth/*"
+      ],
+      "@lib/*": [
+        "lib/*"
       ]
     },
     "target": "ES2017"

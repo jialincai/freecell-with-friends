@@ -1,13 +1,12 @@
-import { OverlayMode } from "@components/ui/MenuBar";
-import ShareButton from "@components/ui/ShareButton";
+"use client";
 
+import { useOverlayRouter } from "@hooks/overlay";
+import ShareButton from "@components/ui/ShareButton";
 import styles from "@styles/ui/StatsPage.module.css";
 
-type AnonStatsPageProps = {
-  setMode: (mode: OverlayMode) => void;
-};
+const AnonStatsPage = () => {
+  const overlayRouter = useOverlayRouter();
 
-const AnonStatsPage = ({ setMode }: AnonStatsPageProps) => {
   return (
     <div className={styles.container}>
       <p className={styles.heading}>
@@ -17,12 +16,15 @@ const AnonStatsPage = ({ setMode }: AnonStatsPageProps) => {
       <div className={styles.buttonGroup}>
         <button
           className={`${styles.ovalButton} bg-white text-black`}
-          onClick={() => setMode("login")}
+          onClick={() => overlayRouter.open("login")}
         >
           Create a free account
         </button>
 
-        <button className="underline" onClick={() => setMode("login")}>
+        <button
+          className="underline"
+          onClick={() => overlayRouter.open("login")}
+        >
           Already registered? Log in
         </button>
       </div>

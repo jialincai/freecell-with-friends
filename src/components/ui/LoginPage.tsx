@@ -5,13 +5,20 @@ import { signIn } from "next-auth/react";
 import statStyles from "@styles/ui/StatsPage.module.css";
 import styles from "@styles/ui/LoginPage.module.css";
 
-const LoginPage = () => {
+type LoginPageProps = {
+  loginFailed: boolean;
+};
+
+const LoginPage = ({ loginFailed }: LoginPageProps) => {
   return (
     <div className={statStyles.container}>
       <p className={statStyles.heading}>Log in or create an account</p>
 
       <div className={styles.buttonGroup}>
-        <button className={styles.authButton} onClick={() => signIn("google")}>
+        <button
+          className={styles.authButton}
+          onClick={() => signIn("google", { callbackUrl: "/?overlay=stats" })}
+        >
           <Image
             src="/img/social/google.png"
             alt="Google icon"
@@ -22,7 +29,10 @@ const LoginPage = () => {
           Continue with Google
         </button>
 
-        <button className={styles.authButton} onClick={() => signIn("discord")}>
+        <button
+          className={styles.authButton}
+          onClick={() => signIn("discord", { callbackUrl: "/?overlay=stats" })}
+        >
           <Image
             src="/img/social/discord.png"
             alt="Discord icon"
@@ -32,6 +42,12 @@ const LoginPage = () => {
           />
           Continue with Discord
         </button>
+
+        <p
+          className={`${styles.errorBox} ${loginFailed ? "opacity-100" : "opacity-0"}`}
+        >
+          Login failed. Please try again.
+        </p>
       </div>
     </div>
   );

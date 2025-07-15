@@ -6,7 +6,7 @@ import styles from "@styles/ui/Overlay.module.css";
 import StatsPage from "./StatsPage";
 import LoginPage from "./LoginPage";
 import HelpPage from "./HelpPage";
-import { useOverlayQuery, useOverlayRouter } from "@lib/hooks/overlay";
+import { useOverlayQuery, useOverlayRouter } from "@hooks/overlay";
 
 const Overlay = () => {
   const [overlay, loginError] = useOverlayQuery();

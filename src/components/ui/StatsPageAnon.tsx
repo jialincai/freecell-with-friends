@@ -1,6 +1,6 @@
 "use client";
 
-import { useOverlayRouter } from "@lib/hooks/overlay";
+import { useOverlayRouter } from "@hooks/overlay";
 import ShareButton from "@components/ui/ShareButton";
 import styles from "@styles/ui/StatsPage.module.css";
 

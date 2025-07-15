@@ -1,7 +1,7 @@
 "use client";
 
 import { HelpCircle, Trophy } from "lucide-react";
-import { useOverlayRouter } from "@lib/hooks/overlay";
+import { useOverlayRouter } from "@hooks/overlay";
 import styles from "@styles/ui/MenuBar.module.css";
 
 const MenuBar = () => {

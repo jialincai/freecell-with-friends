@@ -52,13 +52,7 @@ import { createMeta, Meta } from "@phaser/meta/Meta";
 import MetaSaveable from "@phaser/meta/MetaSaveable";
 import { withComplete } from "@phaser/meta/domain/MetaLogic";
 
-const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
-  active: false,
-  key: "GameState",
-  visible: false,
-};
-
-export default class GameState extends Phaser.Scene {
+export default class Game extends Phaser.Scene {
   private save!: SaveController;
 
   private deck!: DeckController;
@@ -73,7 +67,7 @@ export default class GameState extends Phaser.Scene {
   private timerEvents!: Phaser.Time.TimerEvent[];
 
   public constructor() {
-    super(sceneConfig);
+    super('Game');
   }
 
   // TODO: This function is getting to long.

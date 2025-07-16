@@ -3,6 +3,7 @@ import DiscordProvider from "next-auth/providers/discord";
 import { computeUserId } from "@auth/ids";
 import { Account, Session } from "next-auth";
 import { JWT } from "next-auth/jwt";
+import { upsertUser } from "@lib/db/users";
 
 const authOptions = {
   providers: [
@@ -16,6 +17,7 @@ const authOptions = {
     }),
   ],
   callbacks: {
+
     async jwt({ token, account }: { token: JWT; account?: Account | null }) {
       if (account)
         token.fwf_uuid = computeUserId(
@@ -30,6 +32,17 @@ const authOptions = {
         session.user.id = token.fwf_uuid;
       }
       return session;
+    },
+
+    async signIn({ account, email }: { account: Account; email: string }) {
+      const userId = computeUserId(account.provider, account.providerAccountId);
+
+      try {
+        await upsertUser({ id: userId, email: email });
+        return true;
+      } catch (err) {
+        return "/?overlay=login&error=db";
+      }
     },
   },
   pages: {

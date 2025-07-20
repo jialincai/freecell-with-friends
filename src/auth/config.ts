@@ -40,7 +40,6 @@ const authOptions = {
       const email = user.email;
 
       try {
-        console.log("Upserting user", { id, email });
         await upsertUser({ id, email });
         return true;
       } catch {

@@ -294,12 +294,6 @@ export default class Game extends Phaser.Scene {
       this.save.saveToStorage();
       this.timerEvent.remove(false);
 
-      console.log(
-        this.meta.data.seed,
-        "completed in",
-        this.session.model.state.timeElapsedMs,
-      );
-
       EventBus.emit(
         "game-completed",
         this.session.model.state.timeElapsedMs,

@@ -1,8 +1,9 @@
 "use client";
 
 import { forwardRef, useEffect, useLayoutEffect, useRef } from "react";
-import "@styles/game/PhasorGame.module.css";
 import { Deal } from "@lib/db/deals";
+import { CardMoveSequence } from "@phaser/move/CardMoveSequence";
+import "@styles/game/PhasorGame.module.css";
 
 export interface IRefPhaserGame {
   game: Phaser.Game | null;
@@ -46,23 +47,26 @@ export const PhaserGame = forwardRef<IRefPhaserGame, PhaserGameProps>(
       const loadEventBus = async () => {
         const { EventBus } = await import("@phaser/EventBus");
 
-        EventBus.on("game-completed", async (completionTimeMs, moveArray) => {
-          try {
-            const res = await fetch("/api/completion", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                dealId: deal.id,
-                completionTimeMs,
-                moveArray,
-              }),
-            });
+        EventBus.on(
+          "game-completed",
+          async (completionTimeMs: number, moveArray: CardMoveSequence[]) => {
+            try {
+              const res = await fetch("/api/completion", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  dealId: deal.id,
+                  completionTimeMs,
+                  moveArray,
+                }),
+              });
 
-            if (!res.ok) throw new Error(await res.text());
-          } catch (err) {
-            console.error("Failed to submit completion:", err);
-          }
-        });
+              if (!res.ok) throw new Error(await res.text());
+            } catch (err) {
+              console.error("Failed to submit completion:", err);
+            }
+          },
+        );
       };
 
       loadEventBus();

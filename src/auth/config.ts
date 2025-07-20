@@ -1,7 +1,7 @@
 import GoogleProvider from "next-auth/providers/google";
 import DiscordProvider from "next-auth/providers/discord";
 import { computeUserId } from "@auth/ids";
-import { Account, Session } from "next-auth";
+import { Account, Session, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import { upsertUser } from "@lib/db/users";
 
@@ -33,7 +33,9 @@ const authOptions = {
       return session;
     },
 
-    async signIn({ account, user }: { account: Account; user }) {
+    async signIn({ user, account }: { user: User; account: Account | null }) {
+      if (!account || !user.email) return "/overlay=login&error=auth";
+
       const id = computeUserId(account.provider, account.providerAccountId);
       const email = user.email;
 

@@ -28,23 +28,24 @@ const FreecellGame = () => {
     fetchSeed();
   }, []);
 
-  const pause = () => {
-    if (!phaserRef.current) return;
+  // TODO: implement pause/resume calls to Phaser game when an overlay is active
+  // const pause = () => {
+  //   if (!phaserRef.current) return;
 
-    const scene = phaserRef.current.scene;
-    if (scene && scene.scene.key === "Game") {
-      (scene as Phaser.Game).pause();
-    }
-  };
+  //   const scene = phaserRef.current.scene;
+  //   if (scene && scene.scene.key === "Game") {
+  //     (scene as Phaser.Game).pause();
+  //   }
+  // };
 
-  const resume = () => {
-    if (!phaserRef.current) return;
+  // const resume = () => {
+  //   if (!phaserRef.current) return;
 
-    const scene = phaserRef.current.scene;
-    if (scene && scene.scene.key === "Game") {
-      (scene as Phaser.Game).resume();
-    }
-  };
+  //   const scene = phaserRef.current.scene;
+  //   if (scene && scene.scene.key === "Game") {
+  //     (scene as Phaser.Game).resume();
+  //   }
+  // };
 
   if (!deal) return;
 

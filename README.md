@@ -39,11 +39,11 @@ POSTGRES_PASSWORD=insert_same_password_matching above
 
    1. A CSV file containing the shuffled seeds is available on Google Drive.
 
-   1. Download the file and place it in the db-init/ directory of the project.
+   1. Download the file and place it in the `db-init/` directory of the project.
 
-   1. Make sure the filename matches the one referenced in db-init/init.sql (used to populate the deals table).
+   1. Make sure the filename matches the one referenced in `db-init/init.sql` (used to populate the deals table).
 
-   1. If the filename differs, Update the COPY FROM line in init.sql to reflect the new filename.
+   1. If the filename differs, update the `COPY FROM` line in `db-init/init.sql` to reflect the new filename.
 
 #### Create Postgres Container
 
@@ -64,11 +64,13 @@ POSTGRES_PASSWORD=insert_same_password_matching above
    **NOTE:** Database initialization only runs the first time the Postgres data volume is initialized.
    If the volume already exists, the script won’t re-run. Run the SQL manually using `adminer`.
 
-1. Stop and remove containers. Optional flags `--rmi all --volumes` to cleanup images and volumes.
+1. Stop and remove containers.
 
    ```bash
    docker compose down
    ```
+
+   **NOTE:** Optional flags `--rmi all --volumes` to cleanup images and volumes.
 
 ### Local Development
 
@@ -84,19 +86,23 @@ POSTGRES_PASSWORD=insert_same_password_matching above
    npm run dev
    ```
 
-1. Open your browser at the following address to view:
-
-   [http://localhost:3000](http://localhost:3000)
+1. View the project at [http://localhost:3000](http://localhost:3000).
 
 ## Running the Linter
 
-Run the auto fix linter after following [Local Development](#local-development) steps:
+1. Before pushing any code to remote, run the linter.
 
-```bash
-npm run lint:fix
-```
+   ```bash
+   npm run lint:fix
+   ```
 
-Make sure to fix any remaining issues manually if they cannot be auto-fixed.
+   **NOTE:** Formatting issues are fixed automatically, but extra attention may be needed to resolve any remaining issues and warnings.
+
+1. Upon issue completion, resolve all build errors.
+
+   ```bash
+   npm run build
+   ```
 
 ## Deployment
 

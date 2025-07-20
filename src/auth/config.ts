@@ -17,7 +17,6 @@ const authOptions = {
     }),
   ],
   callbacks: {
-
     async jwt({ token, account }: { token: JWT; account?: Account | null }) {
       if (account)
         token.fwf_uuid = computeUserId(
@@ -34,13 +33,16 @@ const authOptions = {
       return session;
     },
 
-    async signIn({ account, email }: { account: Account; email: string }) {
-      const userId = computeUserId(account.provider, account.providerAccountId);
+    async signIn({ account, user }: { account: Account; user }) {
+      const id = computeUserId(account.provider, account.providerAccountId);
+      const email = user.email;
 
       try {
-        await upsertUser({ id: userId, email: email });
+        console.log("Upserting user", { id, email });
+        await upsertUser({ id, email });
         return true;
-      } catch (err) {
+      } catch {
+        console.log("Failed to upsert user");
         return "/?overlay=login&error=db";
       }
     },

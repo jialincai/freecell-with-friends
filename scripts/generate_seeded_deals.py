@@ -15,9 +15,9 @@ OUTPUT_DIR = Path(__file__).resolve().parent.parent / "db-init"
 OUTPUT_DIR.mkdir(exist_ok=True)
 
 def main():
-    ms_seeds = [i for i in range(TOTAL) if i not in EXCLUDE]
+    seeds = [i for i in range(TOTAL) if i not in EXCLUDE]
     random.seed(SEED)
-    random.shuffle(ms_seeds)
+    random.shuffle(seeds)
 
     date_tag = date.today().strftime("%Y%m%d")
     csv_path = OUTPUT_DIR / f"freecell_deals_seeded_{date_tag}.csv"
@@ -26,14 +26,14 @@ def main():
     # Write CSV
     with open(csv_path, "w", newline="") as f:
         writer = csv.writer(f)
-        for i, ms_seed in enumerate(ms_seeds):
+        for i, seed in enumerate(seeds):
             date_str = (START_DATE + timedelta(days=i)).isoformat()
-            writer.writerow([ms_seed, date_str])
+            writer.writerow([seed, date_str])
 
     # Write metadata
     metadata = {
         "shuffle_seed": SEED,
-        "excluded_ms_seeds": sorted(EXCLUDE),
+        "excluded_seeds": sorted(EXCLUDE),
         "total_deals": TOTAL,
         "start_date": START_DATE.isoformat(),
         "generator": "random.shuffle",

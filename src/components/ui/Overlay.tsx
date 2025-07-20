@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { X } from "lucide-react";
 import styles from "@styles/ui/Overlay.module.css";
 import StatsPage from "./StatsPage";

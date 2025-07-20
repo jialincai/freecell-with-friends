@@ -1,11 +1,6 @@
 import * as Phaser from "phaser";
 
-import {
-  getHexColorString,
-  PubSubStack,
-  AsyncQueue,
-  dateToSeed,
-} from "@utils/Function";
+import { getHexColorString, PubSubStack, AsyncQueue } from "@utils/Function";
 import {
   CELL_PILES,
   FOUNDATION_PILES,
@@ -51,14 +46,9 @@ import SessionSaveable from "@phaser/session/SessionSaveable";
 import { createMeta, Meta } from "@phaser/meta/Meta";
 import MetaSaveable from "@phaser/meta/MetaSaveable";
 import { withComplete } from "@phaser/meta/domain/MetaLogic";
+import { EventBus } from "@phaser/EventBus";
 
-const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
-  active: false,
-  key: "GameState",
-  visible: false,
-};
-
-export default class GameState extends Phaser.Scene {
+export default class Game extends Phaser.Scene {
   private save!: SaveController;
 
   private deck!: DeckController;
@@ -70,10 +60,10 @@ export default class GameState extends Phaser.Scene {
   private meta!: Meta;
   private session!: SessionController;
 
-  private timerEvents!: Phaser.Time.TimerEvent[];
+  private timerEvent!: Phaser.Time.TimerEvent;
 
   public constructor() {
-    super(sceneConfig);
+    super("Game");
   }
 
   // TODO: This function is getting to long.
@@ -86,8 +76,8 @@ export default class GameState extends Phaser.Scene {
     this.save = new SaveController({}, createSave());
 
     // Create and load metadata
-    const currentSeed = dateToSeed(new Date()); // TODO: remove
-    this.meta = createMeta(SAVE_VERSION, currentSeed, false);
+    const dailySeed = this.registry.get("seed");
+    this.meta = createMeta(SAVE_VERSION, dailySeed, false);
     this.save.registerSaveable(
       new MetaSaveable(
         () => this.meta,
@@ -99,9 +89,9 @@ export default class GameState extends Phaser.Scene {
     this.save.loadFromStorage();
 
     // Reset storage and metadata if daily seed changed
-    if (this.meta.data.seed !== currentSeed) {
+    if (this.meta.data.seed !== dailySeed) {
       this.save.resetStorage();
-      this.meta = createMeta(SAVE_VERSION, currentSeed, false);
+      this.meta = createMeta(SAVE_VERSION, dailySeed, false);
     }
 
     // Register session
@@ -159,7 +149,14 @@ export default class GameState extends Phaser.Scene {
       this.input.enabled = false;
       this.session.incrementTimer(0);
     } else {
-      this.startTimerEvents();
+      this.timerEvent = this.time.addEvent({
+        delay: 1000,
+        loop: true,
+        callback: () => {
+          this.session.incrementTimer(1000);
+          this.save.saveToStorage();
+        },
+      });
     }
   }
 
@@ -273,38 +270,41 @@ export default class GameState extends Phaser.Scene {
     });
   }
 
-  private startTimerEvents(): void {
-    this.timerEvents = [];
-    this.timerEvents.push(
-      this.time.addEvent({
-        delay: 1000,
-        loop: true,
-        callback: () => {
-          this.session.incrementTimer(1000);
-          this.save.saveToStorage();
-        },
-      }),
-    );
+  public pause(): void {
+    this.timerEvent.paused = true;
+    this.input.enabled = false;
   }
 
-  private stopTimerEvents(): void {
-    this.timerEvents.forEach((event) => event.remove(false));
-    this.timerEvents = [];
+  public resume(): void {
+    this.timerEvent.paused = false;
+    this.input.enabled = true;
   }
 
   public update(): void {
     if (this.meta.state.complete) return;
 
     if (areAllTableausOrdered(this.deck.model)) {
+      this.input.enabled = false;
       const sequence = withTween(
         createAutocompleteCardMoveSequence(this.deck.model),
       );
       this.moveHistory.push(sequence);
 
       this.meta = withComplete(this.meta);
-      this.input.enabled = false;
       this.save.saveToStorage();
-      this.stopTimerEvents();
+      this.timerEvent.remove(false);
+
+      console.log(
+        this.meta.data.seed,
+        "completed in",
+        this.session.model.state.timeElapsedMs,
+      );
+
+      EventBus.emit(
+        "game-completed",
+        this.session.model.state.timeElapsedMs,
+        this.moveHistory.toArray(),
+      );
     }
   }
 }

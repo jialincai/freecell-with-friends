@@ -1,6 +1,8 @@
 "use client";
 
-import { forwardRef, useLayoutEffect, useRef } from "react";
+import { forwardRef, useEffect, useLayoutEffect, useRef } from "react";
+import { Deal } from "@lib/db/deals";
+import { CardMoveSequence } from "@phaser/move/CardMoveSequence";
 import "@styles/game/PhasorGame.module.css";
 
 export interface IRefPhaserGame {
@@ -8,8 +10,12 @@ export interface IRefPhaserGame {
   scene: Phaser.Scene | null;
 }
 
-export const PhaserGame = forwardRef<IRefPhaserGame>(
-  function PhaserGame(_, ref) {
+interface PhaserGameProps {
+  deal: Deal;
+}
+
+export const PhaserGame = forwardRef<IRefPhaserGame, PhaserGameProps>(
+  function PhaserGame({ deal }, ref) {
     const containerId = "game-container";
     const containerRef = useRef<HTMLDivElement | null>(null);
     const gameRef = useRef<Phaser.Game | null>(null);
@@ -17,8 +23,8 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
     useLayoutEffect(() => {
       if (gameRef.current === null) {
         const loadGame = async () => {
-          const { default: StartGame } = await import("phaser/main");
-          gameRef.current = StartGame(containerId);
+          const { default: StartGame } = await import("@phaser/main");
+          gameRef.current = StartGame(containerId, deal.seed);
         };
         loadGame();
 
@@ -35,7 +41,36 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
           gameRef.current = null;
         }
       };
-    }, [ref]);
+    }, [ref, deal.seed]);
+
+    useEffect(() => {
+      const loadEventBus = async () => {
+        const { EventBus } = await import("@phaser/EventBus");
+
+        EventBus.on(
+          "game-completed",
+          async (completionTimeMs: number, moveArray: CardMoveSequence[]) => {
+            try {
+              const res = await fetch("/api/completion", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  dealId: deal.id,
+                  completionTimeMs,
+                  moveArray,
+                }),
+              });
+
+              if (!res.ok) throw new Error(await res.text());
+            } catch (err) {
+              console.error("Failed to submit completion:", err);
+            }
+          },
+        );
+      };
+
+      loadEventBus();
+    }, [deal.id]);
 
     return <div id={containerId} ref={containerRef}></div>;
   },

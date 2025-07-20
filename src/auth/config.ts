@@ -1,8 +1,9 @@
 import GoogleProvider from "next-auth/providers/google";
 import DiscordProvider from "next-auth/providers/discord";
 import { computeUserId } from "@auth/ids";
-import { Account, Session } from "next-auth";
+import { Account, Session, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
+import { upsertUser } from "@lib/db/users";
 
 const authOptions = {
   providers: [
@@ -30,6 +31,22 @@ const authOptions = {
         session.user.id = token.fwf_uuid;
       }
       return session;
+    },
+
+    async signIn({ user, account }: { user: User; account: Account | null }) {
+      if (!account || !user.email) return "/overlay=login&error=auth";
+
+      const id = computeUserId(account.provider, account.providerAccountId);
+      const email = user.email;
+
+      try {
+        console.log("Upserting user", { id, email });
+        await upsertUser({ id, email });
+        return true;
+      } catch {
+        console.log("Failed to upsert user");
+        return "/?overlay=login&error=db";
+      }
     },
   },
   pages: {

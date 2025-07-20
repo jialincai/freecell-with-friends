@@ -2,25 +2,14 @@ import * as Phaser from "phaser";
 
 // Card images
 import { spritesheets } from "@phaser/constants/assets";
-import { baseURL } from "@phaser/constants/loading";
 import { SCREEN_DIMENSIONS } from "@phaser/constants/dimensions";
 
-const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
-  active: false,
-  key: "InitState",
-  visible: false,
-};
-
-export default class InitState extends Phaser.Scene {
+export default class Preloader extends Phaser.Scene {
   public constructor() {
-    super(sceneConfig);
+    super("Preloader");
   }
 
-  // eslint-disable-next-line max-lines-per-function
   public preload(): void {
-    // Set base url
-    this.load.baseURL = baseURL;
-
     // Background
     this.add
       .image(
@@ -68,6 +57,6 @@ export default class InitState extends Phaser.Scene {
   }
 
   public create(): void {
-    this.scene.start("GameState");
+    this.scene.start("Game");
   }
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { X } from "lucide-react";
 import styles from "@styles/ui/Overlay.module.css";
 import StatsPage from "./StatsPage";
@@ -11,15 +10,6 @@ import { useOverlayQuery, useOverlayRouter } from "@hooks/overlay";
 const Overlay = () => {
   const [overlay, loginError] = useOverlayQuery();
   const overlayRouter = useOverlayRouter();
-
-  useEffect(() => {
-    if (loginError) {
-      const url = new URL(window.location.href);
-      url.searchParams.delete("callbackUrl");
-      url.searchParams.delete("error");
-      window.history.replaceState({}, document.title, url.toString());
-    }
-  }, [loginError]);
 
   if (!overlay) return null;
 

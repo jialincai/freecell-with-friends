@@ -107,3 +107,5 @@ POSTGRES_PASSWORD=insert_same_password_matching above
 ## Deployment
 
 The project is currently deployed with Vercel. Simply update branch `main` and the rest is handled.
+
+If Vercel deployment fails in a branch, DO NOT MERGE THE FAILED BRANCH INTO MAIN.

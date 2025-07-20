@@ -12,7 +12,7 @@ CREATE TABLE deals (
 );
 
 COPY deals (seed, date)
-FROM '/docker-entrypoint-initdb.d/freecell_deals_seeded_20250718.csv'
+FROM '/docker-entrypoint-initdb.d/freecell_deals_shuffled_20250720.csv'
 WITH (FORMAT csv);
 
 CREATE TABLE completions (

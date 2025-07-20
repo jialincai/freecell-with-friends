@@ -20,8 +20,8 @@ def main():
     random.shuffle(seeds)
 
     date_tag = date.today().strftime("%Y%m%d")
-    csv_path = OUTPUT_DIR / f"freecell_deals_seeded_{date_tag}.csv"
-    meta_path = OUTPUT_DIR / f"freecell_deals_seeded_{date_tag}.json"
+    csv_path = OUTPUT_DIR / f"freecell_deals_shuffled_{date_tag}.csv"
+    meta_path = OUTPUT_DIR / f"freecell_deals_shuffled_{date_tag}.json"
 
     # Write CSV
     with open(csv_path, "w", newline="") as f:

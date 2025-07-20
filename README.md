@@ -96,9 +96,9 @@ POSTGRES_PASSWORD=insert_same_password_matching above
    npm run lint:fix
    ```
 
-   **NOTE:** Formatting issues are fixed automatically, but extra attention may be needed to resolve any remaining issues and warnings.
+   **NOTE:** Formatting issues are fixed automatically, but extra attention may be needed to resolve remaining issues.
 
-1. Upon issue completion, resolve all build errors.
+1. Upon issue completion, scan and resolve all build errors.
 
    ```bash
    npm run build

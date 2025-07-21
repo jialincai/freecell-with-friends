@@ -4,6 +4,7 @@ import { forwardRef, useEffect, useLayoutEffect, useRef } from "react";
 import { CardMoveSequence } from "@phaser/move/CardMoveSequence";
 import { useDailyDeal } from "@components/context/DealContext";
 import "@styles/game/PhasorGame.module.css";
+import { useSession } from "next-auth/react";
 
 export interface IRefPhaserGame {
   game: Phaser.Game | null;
@@ -16,6 +17,8 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
     const containerId = "game-container";
     const containerRef = useRef<HTMLDivElement | null>(null);
     const gameRef = useRef<Phaser.Game | null>(null);
+
+    const { status: sessionStatus } = useSession();
 
     useLayoutEffect(() => {
       if (gameRef.current === null) {
@@ -47,6 +50,8 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
         EventBus.on(
           "game-completed",
           async (completionTimeMs: number, moveArray: CardMoveSequence[]) => {
+            if (sessionStatus !== "authenticated") return;
+
             try {
               const res = await fetch("/api/completion", {
                 method: "POST",
@@ -67,7 +72,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
       };
 
       loadEventBus();
-    }, [deal.id]);
+    }, [deal.id, sessionStatus]);
 
     return <div id={containerId} ref={containerRef}></div>;
   },

@@ -1,8 +1,8 @@
 "use client";
 
 import { forwardRef, useEffect, useLayoutEffect, useRef } from "react";
-import { Deal } from "@lib/db/deals";
 import { CardMoveSequence } from "@phaser/move/CardMoveSequence";
+import { useDailyDeal } from "@components/context/DealContext";
 import "@styles/game/PhasorGame.module.css";
 
 export interface IRefPhaserGame {
@@ -10,12 +10,9 @@ export interface IRefPhaserGame {
   scene: Phaser.Scene | null;
 }
 
-interface PhaserGameProps {
-  deal: Deal;
-}
-
-export const PhaserGame = forwardRef<IRefPhaserGame, PhaserGameProps>(
-  function PhaserGame({ deal }, ref) {
+export const PhaserGame = forwardRef<IRefPhaserGame>(
+  function PhaserGame(_, ref) {
+    const deal = useDailyDeal();
     const containerId = "game-container";
     const containerRef = useRef<HTMLDivElement | null>(null);
     const gameRef = useRef<Phaser.Game | null>(null);

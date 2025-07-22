@@ -36,3 +36,11 @@
   @apply
     w-4 h-4;
 }
+
+.toast {
+  @apply
+    p-2 rounded-lg
+    bg-white text-black
+    text-center
+    text-sm font-semibold;
+}

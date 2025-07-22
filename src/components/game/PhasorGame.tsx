@@ -13,12 +13,12 @@ export interface IRefPhaserGame {
 
 export const PhaserGame = forwardRef<IRefPhaserGame>(
   function PhaserGame(_, ref) {
-    const deal = useDailyDeal();
     const containerId = "game-container";
     const containerRef = useRef<HTMLDivElement | null>(null);
     const gameRef = useRef<Phaser.Game | null>(null);
 
     const { status: sessionStatus } = useSession();
+    const deal = useDailyDeal();
 
     useLayoutEffect(() => {
       if (gameRef.current === null) {
@@ -41,7 +41,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
           gameRef.current = null;
         }
       };
-    }, [ref, deal.seed]);
+    }, [ref, deal]);
 
     useEffect(() => {
       const loadEventBus = async () => {
@@ -72,7 +72,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
       };
 
       loadEventBus();
-    }, [deal.id, sessionStatus]);
+    }, [sessionStatus, deal]);
 
     return <div id={containerId} ref={containerRef}></div>;
   },

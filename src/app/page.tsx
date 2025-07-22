@@ -8,6 +8,7 @@ import Overlay from "@components/ui/Overlay";
 import MenuBar from "@components/ui/MenuBar";
 import { Suspense } from "react";
 import { Deal } from "@lib/db/deals";
+import { Toaster } from "sonner";
 
 const HomePage = () => {
   const [deal, setDeal] = useState<Deal | null>(null);
@@ -27,6 +28,8 @@ const HomePage = () => {
     <SessionProvider>
       <DealProvider deal={deal}>
         <div>
+          {/* TODO: Figure out why position="bottom-center" is not centered */}
+          <Toaster/> 
           <Suspense fallback={null}>
             <Overlay />
           </Suspense>

@@ -1,6 +1,7 @@
 import { Share2 } from "lucide-react";
-import styles from "@styles/ui/StatsPage.module.css";
 import { useDailyDeal } from "@components/context/DealContext";
+import { toast } from "sonner";
+import styles from "@styles/ui/StatsPage.module.css";
 
 const formatTime = (ms: number | null): string => {
   if (ms == null) return "XX:XX";
@@ -16,14 +17,14 @@ const formatTime = (ms: number | null): string => {
 const emojiForPercentile = (p: number | null): string => {
   if (p == null) return "🔮"; // unknown
   if (p < 5) return "🪦";
-  if (p < 15) return "🐌";
+  if (p < 20) return "🐌";
   if (p < 30) return "🦥";
-  if (p < 45) return "🐢";
-  if (p < 60) return "👍";
-  if (p < 75) return "🐇";
-  if (p < 85) return "🐎";
-  if (p < 95) return "🏎️";
-  if (p < 99) return "🚀";
+  if (p < 40) return "🐢";
+  if (p < 50) return "👍";
+  if (p < 60) return "🐇";
+  if (p < 70) return "🐎";
+  if (p < 80) return "🏎️";
+  if (p < 95) return "🚀";
   return "🦄";
 };
 
@@ -46,9 +47,13 @@ const ShareButton = () => {
       const time = formatTime(data.completionTimeMs);
       const emoji = emojiForPercentile(data.percentile);
       const message = `Freecell ${deal.id}\n${time} = ${emoji}`;
+      // const message = `Freecell ${deal.id}\n${streak}🔥💀\n${time} = ${emoji}`;
 
       await navigator.clipboard.writeText(message);
-      alert("Copied results to clipboard!");
+      toast.dismiss();
+      toast.custom(() => (
+          <p className={styles.toast}>Copied to clipboard</p>
+      ));
     } catch (err) {
       console.error("Share failed", err);
     }

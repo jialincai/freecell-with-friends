@@ -6,8 +6,7 @@ import { Meta } from "@phaser/meta/Meta";
 import { Session } from "@phaser/session/Session";
 import styles from "@styles/ui/StatsPage.module.css";
 
-const formatTime = (ms: number | null): string => {
-  if (ms == null) return "XX:XX";
+const formatTime = (ms: number): string => {
   const min = Math.floor(ms / 60000)
     .toString()
     .padStart(2, "0");
@@ -17,8 +16,7 @@ const formatTime = (ms: number | null): string => {
   return `${min}:${sec}`;
 };
 
-const emojiForPercentile = (p: number | null): string => {
-  if (p == null) return "🔮"; // unknown
+const emojiForPercentile = (p: number): string => {
   if (p < 5) return "🪦";
   if (p < 20) return "🐌";
   if (p < 30) return "🦥";
@@ -56,13 +54,13 @@ const ShareButton = () => {
           body: JSON.stringify({ deal, completionTime }),
         });
 
-        const data = await res.json();
+        const percentile = await res.json();
         if (!res.ok) {
           throw new Error("Database error");
         }
 
         time = formatTime(completionTime);
-        timeEmoji = emojiForPercentile(data.percentile);
+        timeEmoji = percentile != null ? emojiForPercentile(percentile) : "👍";
       } catch (err) {
         console.error("Share failed", err);
       }

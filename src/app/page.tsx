@@ -24,6 +24,9 @@ const HomePage = () => {
 
   if (!deal) return null; // TODO: Handle database error with error page
 
+  // TODO: Upon intial page load we should sync up local to remote save data.
+  // For example, if the database know of completion but local browser doesn't -- hydrate local save.
+  // Alternatively, if user is authenticated and local completion is not in database -- POST it.
   return (
     <SessionProvider>
       <DealProvider deal={deal}>

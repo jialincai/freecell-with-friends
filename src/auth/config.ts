@@ -40,11 +40,9 @@ const authOptions = {
       const email = user.email;
 
       try {
-        console.log("Upserting user", { id, email });
         await upsertUser({ id, email });
         return true;
       } catch {
-        console.log("Failed to upsert user");
         return "/?overlay=login&error=db";
       }
     },

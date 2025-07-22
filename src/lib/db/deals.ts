@@ -6,7 +6,7 @@ export type Deal = {
   date: string;
 };
 
-export async function getDealFromDate(date: string): Promise<Deal | null> {
+export async function getDeal(date: string) {
   const result = await sql<Deal[]>`
     SELECT id, seed, date FROM deals WHERE date = ${date}
   `;

@@ -1,17 +1,19 @@
-import { getDealFromDate } from "@lib/db/deals";
+import { getDeal } from "@lib/db/deals";
 
 export async function GET() {
   try {
     const currentUTC = new Date().toISOString().slice(0, 10);
-    const deal = await getDealFromDate(currentUTC);
+    const deal = await getDeal(currentUTC);
 
     if (!deal) {
       throw new Error(`No daily deal found for ${currentUTC}`);
     }
 
-    return Response.json({ deal });
+    return Response.json(deal);
   } catch (err) {
-    console.error(err);
-    return Response.json({ error: "Internal server error" }, { status: 500 });
+    return Response.json(
+      { error: `Internal server error: ${String(err)}` },
+      { status: 500 },
+    );
   }
 }

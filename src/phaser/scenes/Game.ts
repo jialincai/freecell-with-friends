@@ -95,6 +95,7 @@ export default class Game extends Phaser.Scene {
     }
 
     // Register session
+    // TODO: seed and complete should probably be moved from Meta into Session
     this.session = new SessionController(this, createSession());
     this.save.registerSaveable(
       new SessionSaveable(
@@ -293,12 +294,6 @@ export default class Game extends Phaser.Scene {
       this.meta = withComplete(this.meta);
       this.save.saveToStorage();
       this.timerEvent.remove(false);
-
-      console.log(
-        this.meta.data.seed,
-        "completed in",
-        this.session.model.state.timeElapsedMs,
-      );
 
       EventBus.emit(
         "game-completed",

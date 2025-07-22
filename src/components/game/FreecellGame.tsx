@@ -1,32 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { IRefPhaserGame, PhaserGame } from "@components/game/PhasorGame";
-import { Deal } from "@lib/db/deals";
 
 const FreecellGame = () => {
   const phaserRef = useRef<IRefPhaserGame | null>(null);
-  const [deal, setDeal] = useState<Deal | null>(null);
-
-  useEffect(() => {
-    const fetchSeed = async () => {
-      try {
-        const res = await fetch("/api/deal/current");
-        if (!res.ok) throw new Error("Failed to fetch seed");
-        const data = await res.json();
-        setDeal(data.deal);
-      } catch (err) {
-        console.error(err, "Fallback to default:");
-        setDeal({
-          id: -1,
-          seed: 123456,
-          date: new Date().toISOString().slice(0, 10),
-        });
-      }
-    };
-
-    fetchSeed();
-  }, []);
 
   // TODO: implement pause/resume calls to Phaser game when an overlay is active
   // const pause = () => {
@@ -47,11 +25,9 @@ const FreecellGame = () => {
   //   }
   // };
 
-  if (!deal) return;
-
   return (
     <div>
-      <PhaserGame ref={phaserRef} deal={deal} />
+      <PhaserGame ref={phaserRef} />
     </div>
   );
 };

@@ -1,6 +1,11 @@
 import sql from "@lib/db";
 
-export async function findUserById(id: string) {
+export type User = {
+  id: string;
+  email: string;
+};
+
+export async function getUser(id: string) {
   const result = await sql`
     SELECT * FROM users WHERE id = ${id}
   `;

@@ -1,11 +1,11 @@
 "use client";
 
 import { X } from "lucide-react";
-import styles from "@styles/ui/Overlay.module.css";
-import StatsPage from "./StatsPage";
-import LoginPage from "./LoginPage";
-import HelpPage from "./HelpPage";
 import { useOverlayQuery, useOverlayRouter } from "@hooks/overlay";
+import StatsPage from "@components/ui/StatsPage";
+import LoginPage from "@components/ui/LoginPage";
+import HelpPage from "@components/ui/HelpPage";
+import styles from "@styles/ui/Overlay.module.css";
 
 const Overlay = () => {
   const [overlay, loginError] = useOverlayQuery();

@@ -1,8 +1,8 @@
 "use client";
 
 import { forwardRef, useEffect, useLayoutEffect, useRef } from "react";
-import { Deal } from "@lib/db/deals";
 import { CardMoveSequence } from "@phaser/move/CardMoveSequence";
+import { useDailyDeal } from "@components/context/DealContext";
 import "@styles/game/PhasorGame.module.css";
 import { useSession } from "next-auth/react";
 
@@ -11,17 +11,14 @@ export interface IRefPhaserGame {
   scene: Phaser.Scene | null;
 }
 
-interface PhaserGameProps {
-  deal: Deal;
-}
-
-export const PhaserGame = forwardRef<IRefPhaserGame, PhaserGameProps>(
-  function PhaserGame({ deal }, ref) {
+export const PhaserGame = forwardRef<IRefPhaserGame>(
+  function PhaserGame(_, ref) {
     const containerId = "game-container";
     const containerRef = useRef<HTMLDivElement | null>(null);
     const gameRef = useRef<Phaser.Game | null>(null);
 
     const { status: sessionStatus } = useSession();
+    const deal = useDailyDeal();
 
     useLayoutEffect(() => {
       if (gameRef.current === null) {
@@ -44,7 +41,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame, PhaserGameProps>(
           gameRef.current = null;
         }
       };
-    }, [ref, deal.seed]);
+    }, [ref, deal]);
 
     useEffect(() => {
       const loadEventBus = async () => {
@@ -75,7 +72,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame, PhaserGameProps>(
       };
 
       loadEventBus();
-    }, [deal.id, sessionStatus]);
+    }, [sessionStatus, deal]);
 
     return <div id={containerId} ref={containerRef}></div>;
   },

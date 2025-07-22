@@ -1,7 +1,6 @@
 "use client";
 
 import { X } from "lucide-react";
-import { Toaster } from "sonner";
 import { useOverlayQuery, useOverlayRouter } from "@hooks/overlay";
 import StatsPage from "@components/ui/StatsPage";
 import LoginPage from "@components/ui/LoginPage";

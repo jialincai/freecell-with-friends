@@ -51,9 +51,7 @@ const ShareButton = () => {
 
       await navigator.clipboard.writeText(message);
       toast.dismiss();
-      toast.custom(() => (
-          <p className={styles.toast}>Copied to clipboard</p>
-      ));
+      toast.custom(() => <p className={styles.toast}>Copied to clipboard</p>);
     } catch (err) {
       console.error("Share failed", err);
     }

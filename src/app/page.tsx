@@ -29,7 +29,7 @@ const HomePage = () => {
       <DealProvider deal={deal}>
         <div>
           {/* TODO: Figure out why position="bottom-center" is not centered */}
-          <Toaster/> 
+          <Toaster />
           <Suspense fallback={null}>
             <Overlay />
           </Suspense>

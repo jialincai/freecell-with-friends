@@ -95,6 +95,7 @@ export default class Game extends Phaser.Scene {
     }
 
     // Register session
+    // TODO: seed and complete should probably be moved from Meta into Session
     this.session = new SessionController(this, createSession());
     this.save.registerSaveable(
       new SessionSaveable(

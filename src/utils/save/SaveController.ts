@@ -20,12 +20,12 @@ class SaveController {
     this.registry = withSaveable(this.registry, saveable as ISaveable<unknown>);
   }
 
-  saveToStorage() {
+  saveToStorage(): void {
     const save = serializeChunks(this.registry);
     localStorage.setItem(SAVE_KEY, JSON.stringify(save));
   }
 
-  loadFromStorage() {
+  loadFromStorage(): void {
     const json = localStorage.getItem(SAVE_KEY);
     if (!json) return;
 
@@ -43,6 +43,18 @@ class SaveController {
 
   resetStorage() {
     localStorage.removeItem(SAVE_KEY);
+  }
+
+  static getSave(): Save | null {
+    const json = localStorage.getItem(SAVE_KEY);
+    if (!json) return null;
+
+    try {
+      return JSON.parse(json) as Save;
+    } catch (e) {
+      console.warn("Failed to parse raw save file:", e);
+      return null;
+    }
   }
 }
 

@@ -1,6 +1,9 @@
 import { Share2 } from "lucide-react";
-import { useDailyDeal } from "@components/context/DealContext";
 import { toast } from "sonner";
+import { useDailyDeal } from "@components/context/DealContext";
+import SaveController from "@utils/save/SaveController";
+import { Meta } from "@phaser/meta/Meta";
+import { Session } from "@phaser/session/Session";
 import styles from "@styles/ui/StatsPage.module.css";
 
 const formatTime = (ms: number | null): string => {
@@ -32,29 +35,43 @@ const ShareButton = () => {
   const deal = useDailyDeal();
 
   const handleShare = async () => {
-    try {
-      const res = await fetch("/api/user/share", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ deal }),
-      });
+    const localSave = SaveController.getSave();
+    const localMeta = (localSave?.state.chunks.meta as Meta) ?? null;
+    const localSession = (localSave?.state.chunks.session as Session) ?? null;
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error("Database error");
+    let time = "XX:XX";
+    let timeEmoji = "🔮";
+
+    if (
+      localMeta &&
+      localMeta.state.complete &&
+      localSession &&
+      localSession.state.timeElapsedMs
+    ) {
+      try {
+        const completionTime = localSession.state.timeElapsedMs;
+        const res = await fetch("/api/user/share", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ deal, completionTime }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error("Database error");
+        }
+
+        time = formatTime(completionTime);
+        timeEmoji = emojiForPercentile(data.percentile);
+      } catch (err) {
+        console.error("Share failed", err);
       }
-
-      const time = formatTime(data.completionTimeMs);
-      const emoji = emojiForPercentile(data.percentile);
-      const message = `Freecell ${deal.id}\n${time} = ${emoji}`;
-      // const message = `Freecell ${deal.id}\n${streak}🔥💀\n${time} = ${emoji}`;
-
-      await navigator.clipboard.writeText(message);
-      toast.dismiss();
-      toast.custom(() => <p className={styles.toast}>Copied to clipboard</p>);
-    } catch (err) {
-      console.error("Share failed", err);
     }
+
+    const message = `Freecell ${deal.id}\n${time} ~ ${timeEmoji}`;
+    await navigator.clipboard.writeText(message);
+    toast.dismiss();
+    toast.custom(() => <p className={styles.toast}>Copied to clipboard</p>);
   };
 
   return (

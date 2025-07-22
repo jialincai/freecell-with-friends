@@ -66,7 +66,7 @@ const ShareButton = () => {
       }
     }
 
-    const message = `Freecell ${deal.id}\n${time} ~ ${timeEmoji}`;
+    const message = `Freecell ${deal.id}\n${time} = ${timeEmoji}`;
     await navigator.clipboard.writeText(message);
     toast.dismiss();
     toast.custom(() => <p className={styles.toast}>Copied to clipboard</p>);

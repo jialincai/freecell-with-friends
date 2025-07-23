@@ -8,7 +8,6 @@ import { Meta } from "@phaser/meta/Meta";
 import { Session } from "@phaser/session/Session";
 import { useDailyDeal } from "@components/context/DealContext";
 import styles from "@styles/ui/StatsPage.module.css";
-import { statSync } from "fs";
 
 const emojiForPercentile = (p: number): string => {
   if (p < 5) return "🪦";

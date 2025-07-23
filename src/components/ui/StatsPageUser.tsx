@@ -5,12 +5,7 @@ import { signOut } from "next-auth/react";
 import ShareButton from "@components/ui/ShareButton";
 import styles from "@styles/ui/StatsPage.module.css";
 import { formatTime } from "@utils/Function";
-
-const fetcher = (url: string) =>
-  fetch(url).then((res) => {
-    if (!res.ok) throw new Error("Failed to fetch user stats");
-    return res.json();
-  });
+import { fetcher } from "@utils/fetcher";
 
 const StatBlock = ({
   value,
@@ -26,7 +21,9 @@ const StatBlock = ({
 );
 
 const UserStatsPage = () => {
-  const { data: stats } = useSWR("/api/user/stats", fetcher);
+  const { data: stats } = useSWR("/api/user/stats", (url) =>
+    fetcher(url, { silentCodes: [401] }),
+  );
 
   return (
     <div className={styles.container}>

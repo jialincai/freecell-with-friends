@@ -6,16 +6,10 @@
     gap-12;
 }
 
-/* .heading {
+.heading {
   @apply
     text-xl font-semibold
     text-center;
-} */
-
-.heading {
-  @apply
-    text-4xl font-bold
-    text-left;
 }
 
 .buttonGroup {

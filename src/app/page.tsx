@@ -1,26 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense } from "react";
 import { SessionProvider } from "next-auth/react";
-import { DealProvider } from "@components/context/DealContext";
+import useSWR from "swr";
+import { Toaster } from "sonner";
+import { fetcher } from "@utils/fetcher";
 import FreecellGame from "@components/game/FreecellGame";
 import Overlay from "@components/ui/Overlay";
 import MenuBar from "@components/ui/MenuBar";
-import { Suspense } from "react";
-import { Deal } from "@lib/db/deals";
-import { Toaster } from "sonner";
+import { DealProvider } from "@components/context/DealContext";
 
 const HomePage = () => {
-  const [deal, setDeal] = useState<Deal | null>(null);
-
-  useEffect(() => {
-    const loadDeal = async () => {
-      const res = await fetch("/api/deal/current");
-      const data = await res.json();
-      setDeal(data);
-    };
-    loadDeal();
-  }, []);
+  const { data: deal } = useSWR("/api/deal/current", fetcher);
 
   if (!deal) return null; // TODO: Handle database error with error page
 

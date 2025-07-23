@@ -7,24 +7,6 @@ export type Completion = {
   moves: unknown;
 };
 
-export async function upsertCompletion({
-  userId,
-  dealId,
-  completionTimeMs,
-  moves,
-}: {
-  userId: string;
-  dealId: number;
-  completionTimeMs: number;
-  moves: string;
-}) {
-  await sql`
-    INSERT INTO completions (user_id, deal_id, completion_time_ms, moves)
-    VALUES (${userId}, ${dealId}, ${completionTimeMs}, ${moves}::jsonb)
-    ON CONFLICT (user_id, deal_id) DO NOTHING
-  `;
-}
-
 export async function getCompletion({
   userId,
   dealId,
@@ -39,19 +21,34 @@ export async function getCompletion({
   return result[0] ?? null;
 }
 
-export async function filterCompletionsByDeal(dealId: number) {
-  return await sql`
-    SELECT * FROM completions
+export async function countCompletionsByDeal(dealId: number) {
+  const [row] = await sql`
+    SELECT COUNT(*)::int AS count
+    FROM completions
     WHERE deal_id = ${dealId}
   `;
+  return row.count;
 }
 
-export async function filterCompletionsByTime(
+export async function countCompletionsByTime(
   minTimeMs: number,
   maxTimeMs: number,
 ) {
-  return await sql`
-    SELECT * FROM completions
+  const [row] = await sql`
+    SELECT COUNT(*)::int AS count
+    FROM completions
     WHERE completion_time_ms BETWEEN ${minTimeMs} AND ${maxTimeMs}
   `;
+  return row.count;
+}
+
+export async function getUserCompletionStats(userId: string) {
+  const [row] = await sql`
+    SELECT
+      COUNT(*)::int AS count,
+      AVG(completion_time_ms)::int as average
+    FROM completions
+    WHERE user_id = ${userId}
+  `;
+  return { count: row.count, average: row.average };
 }

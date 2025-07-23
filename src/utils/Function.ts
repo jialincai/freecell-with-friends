@@ -61,3 +61,18 @@ export function dateToSeed(date: Date): number {
     .map(Number);
   return year * 10000 + month * 100 + day;
 }
+
+export function formatTime(ms: number): string {
+  const min = Math.floor(ms / 60000)
+    .toString()
+    .padStart(2, "0");
+  const sec = Math.floor((ms % 60000) / 1000)
+    .toString()
+    .padStart(2, "0");
+  return `${min}:${sec}`;
+}
+
+export function getCurrentUTCDateString() {
+  const isoString = new Date().toISOString(); // always UTC
+  return isoString.slice(0, 10); // 'YYYY-MM-DD'
+}

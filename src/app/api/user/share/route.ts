@@ -1,18 +1,18 @@
 import {
-  filterCompletionsByDeal,
-  filterCompletionsByTime,
+  countCompletionsByDeal,
+  countCompletionsByTime,
 } from "@lib/db/completions";
+import { getDeal } from "@lib/db/deals";
+import { getCurrentUTCDateString } from "@utils/Function";
 
 export async function POST(req: Request) {
-  const { deal, completionTime } = await req.json();
+  const completionTime = await req.json();
 
-  const [allCompletions, slowerOrEqualCompletions] = await Promise.all([
-    filterCompletionsByDeal(deal.id),
-    filterCompletionsByTime(0, completionTime),
+  const deal = await getDeal(getCurrentUTCDateString());
+  const [total, slowerOrEqual] = await Promise.all([
+    countCompletionsByDeal(deal.id),
+    countCompletionsByTime(0, completionTime),
   ]);
-
-  const total = allCompletions.length;
-  const slowerOrEqual = slowerOrEqualCompletions.length;
 
   if (total === 0) {
     return Response.json(null);

@@ -5,16 +5,7 @@ import SaveController from "@utils/save/SaveController";
 import { Meta } from "@phaser/meta/Meta";
 import { Session } from "@phaser/session/Session";
 import styles from "@styles/ui/StatsPage.module.css";
-
-const formatTime = (ms: number): string => {
-  const min = Math.floor(ms / 60000)
-    .toString()
-    .padStart(2, "0");
-  const sec = Math.floor((ms % 60000) / 1000)
-    .toString()
-    .padStart(2, "0");
-  return `${min}:${sec}`;
-};
+import { formatTime } from "@utils/Function";
 
 const emojiForPercentile = (p: number): string => {
   if (p < 5) return "🪦";
@@ -51,7 +42,7 @@ const ShareButton = () => {
         const res = await fetch("/api/user/share", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ deal, completionTime }),
+          body: JSON.stringify(completionTime),
         });
 
         const percentile = await res.json();

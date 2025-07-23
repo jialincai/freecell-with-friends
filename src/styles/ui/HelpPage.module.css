@@ -34,8 +34,3 @@
     text-sm text-left
     border-t border-white pt-8;
 }
-
-.link {
-  @apply
-    text-blue
-}

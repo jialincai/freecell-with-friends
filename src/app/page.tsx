@@ -9,11 +9,16 @@ import FreecellGame from "@components/game/FreecellGame";
 import Overlay from "@components/ui/Overlay";
 import MenuBar from "@components/ui/MenuBar";
 import { DealProvider } from "@components/context/DealContext";
+import ErrorPage from "@components/ui/ErrorPage";
 
 const HomePage = () => {
-  const { data: deal } = useSWR("/api/deal/current", fetcher);
+  const { data: deal, error, isLoading } = useSWR("/api/deal/current", fetcher);
 
-  if (!deal) return null; // TODO: Handle database error with error page
+  if (isLoading) return null;
+
+  if (error) {
+    return <ErrorPage />;
+  }
 
   // TODO: Upon intial page load we should sync up local to remote save data.
   // For example, if the database know of completion but local browser doesn't -- hydrate local save.

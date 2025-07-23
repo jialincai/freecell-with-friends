@@ -3,7 +3,7 @@
     h-12
     pl-4
     border-b border-white
-    flex justify-end items-center;
+    flex justify-between items-center;
 }
 
 .menuButton {

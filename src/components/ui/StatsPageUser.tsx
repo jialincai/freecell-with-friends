@@ -3,7 +3,7 @@
 import useSWR from "swr";
 import { signOut } from "next-auth/react";
 import ShareButton from "@components/ui/ShareButton";
-import statStyles from "@styles/ui/StatsPage.module.css";
+import styles from "@styles/ui/StatsPage.module.css";
 import { formatTime } from "@utils/Function";
 
 const fetcher = (url: string) =>
@@ -19,9 +19,9 @@ const StatBlock = ({
   value: string | number;
   label: string;
 }) => (
-  <div className="flex flex-col items-center mx-4">
-    <div className="text-2xl font-bold">{value}</div>
-    <div className="text-xs uppercase tracking-widest">{label}</div>
+  <div className={styles.block}>
+    <div className={styles.blockValue}>{value}</div>
+    <div className={styles.blockLabel}>{label}</div>
   </div>
 );
 
@@ -29,11 +29,11 @@ const UserStatsPage = () => {
   const { data: stats } = useSWR("/api/user/stats", fetcher);
 
   return (
-    <div className={statStyles.container}>
-      <p className={statStyles.heading}>Statistics</p>
+    <div className={styles.container}>
+      <p className={styles.heading}>Statistics</p>
 
       {stats ? (
-        <div className="flex justify-center my-4">
+        <div className={styles.blockContainer}>
           <StatBlock value={stats.played} label="Played" />
           <StatBlock
             value={stats.averageMs ? formatTime(stats.averageMs) : "N/A"}
@@ -45,6 +45,8 @@ const UserStatsPage = () => {
       ) : (
         <p>Loading...</p>
       )}
+
+      <p className={styles.description}>🚧 under construction 🚧</p>
 
       <ShareButton />
       <button className="underline mt-4" onClick={() => signOut()}>

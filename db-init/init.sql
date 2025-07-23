@@ -24,3 +24,10 @@ CREATE TABLE completions (
   moves JSONB NOT NULL,
   PRIMARY KEY(user_id, deal_id)
 );
+
+CREATE TABLE streaks (
+  user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  curr INTEGER NOT NULL DEFAULT 0,
+  max INTEGER NOT NULL DEFAULT 0,
+  last_deal_id INTEGER NOT NULL DEFAULT -1
+);

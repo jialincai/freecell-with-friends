@@ -19,6 +19,12 @@
       h-screen;
   }
 
+  a {
+  @apply
+    text-blue
+    underline
+  }
+
   .scroll-lock {
   @apply
     overflow-hidden;

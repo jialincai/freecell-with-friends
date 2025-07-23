@@ -1,28 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense } from "react";
 import { SessionProvider } from "next-auth/react";
-import { DealProvider } from "@components/context/DealContext";
+import useSWR from "swr";
+import { Toaster } from "sonner";
+import { fetcher } from "@utils/fetcher";
 import FreecellGame from "@components/game/FreecellGame";
 import Overlay from "@components/ui/Overlay";
 import MenuBar from "@components/ui/MenuBar";
-import { Suspense } from "react";
-import { Deal } from "@lib/db/deals";
-import { Toaster } from "sonner";
+import { DealProvider } from "@components/context/DealContext";
+import ErrorPage from "@components/ui/ErrorPage";
 
 const HomePage = () => {
-  const [deal, setDeal] = useState<Deal | null>(null);
+  const { data: deal, error, isLoading } = useSWR("/api/deal/current", fetcher);
 
-  useEffect(() => {
-    const loadDeal = async () => {
-      const res = await fetch("/api/deal/current");
-      const data = await res.json();
-      setDeal(data);
-    };
-    loadDeal();
-  }, []);
+  if (isLoading) return null;
 
-  if (!deal) return null; // TODO: Handle database error with error page
+  if (error) {
+    return <ErrorPage />;
+  }
 
   // TODO: Upon intial page load we should sync up local to remote save data.
   // For example, if the database know of completion but local browser doesn't -- hydrate local save.

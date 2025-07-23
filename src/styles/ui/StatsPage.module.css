@@ -32,6 +32,28 @@
     underline;
 }
 
+.blockContainer {
+  @apply 
+    flex justify-center;
+}
+
+.block {
+  @apply
+    flex flex-col 
+    items-center mx-4;
+}
+
+.blockValue {
+  @apply
+    text-2xl font-bold;
+}
+
+.blockLabel {
+  @apply
+    text-sm uppercase
+    tracking-widest text-center;
+}
+
 .shareIcon {
   @apply
     w-4 h-4;

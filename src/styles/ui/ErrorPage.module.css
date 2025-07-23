@@ -1,0 +1,17 @@
+.container {
+  @apply
+    flex flex-col
+    justify-center items-center
+    min-h-screen;
+}
+
+.heading {
+  @apply 
+    text-xl font-semibold;
+}
+
+.message {
+  @apply 
+    text-gray
+    text-center;
+}

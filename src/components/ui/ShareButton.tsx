@@ -1,20 +1,13 @@
 import { Share2 } from "lucide-react";
 import { toast } from "sonner";
-import { useDailyDeal } from "@components/context/DealContext";
+import useSWR from "swr";
+import { fetcher } from "@utils/fetcher";
+import { formatTime } from "@utils/Function";
 import SaveController from "@utils/save/SaveController";
 import { Meta } from "@phaser/meta/Meta";
 import { Session } from "@phaser/session/Session";
+import { useDailyDeal } from "@components/context/DealContext";
 import styles from "@styles/ui/StatsPage.module.css";
-
-const formatTime = (ms: number): string => {
-  const min = Math.floor(ms / 60000)
-    .toString()
-    .padStart(2, "0");
-  const sec = Math.floor((ms % 60000) / 1000)
-    .toString()
-    .padStart(2, "0");
-  return `${min}:${sec}`;
-};
 
 const emojiForPercentile = (p: number): string => {
   if (p < 5) return "🪦";
@@ -31,6 +24,7 @@ const emojiForPercentile = (p: number): string => {
 
 const ShareButton = () => {
   const deal = useDailyDeal();
+  const { data: stats } = useSWR("/api/user/stats", fetcher);
 
   const handleShare = async () => {
     const localSave = SaveController.getSave();
@@ -51,7 +45,7 @@ const ShareButton = () => {
         const res = await fetch("/api/user/share", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ deal, completionTime }),
+          body: JSON.stringify(completionTime),
         });
 
         const percentile = await res.json();
@@ -60,13 +54,16 @@ const ShareButton = () => {
         }
 
         time = formatTime(completionTime);
-        timeEmoji = percentile != null ? emojiForPercentile(percentile) : "👍";
+        timeEmoji = emojiForPercentile(percentile);
       } catch (err) {
         console.error("Share failed", err);
       }
     }
 
-    const message = `Freecell ${deal.id}\n${time} = ${timeEmoji}`;
+    let message = `Freecell ${deal.id}\n${time} = ${timeEmoji}`;
+    if (stats) {
+      message += `\n${stats.currentStreak}🔥`;
+    }
     await navigator.clipboard.writeText(message);
     toast.dismiss();
     toast.custom(() => <p className={styles.toast}>Copied to clipboard</p>);

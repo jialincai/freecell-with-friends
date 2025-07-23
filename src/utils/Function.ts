@@ -62,17 +62,31 @@ export function dateToSeed(date: Date): number {
   return year * 10000 + month * 100 + day;
 }
 
+// TODO: cleanup
 export function formatTime(ms: number): string {
-  const min = Math.floor(ms / 60000)
+  const totalSeconds = Math.floor(ms / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
     .toString()
     .padStart(2, "0");
-  const sec = Math.floor((ms % 60000) / 1000)
-    .toString()
-    .padStart(2, "0");
-  return `${min}:${sec}`;
+  const seconds = (totalSeconds % 60).toString().padStart(2, "0");
+
+  if (hours > 0) {
+    return `${hours}:${minutes}:${seconds}`; // no padStart on hours
+  }
+
+  return `${minutes}:${seconds}`;
 }
 
 export function getCurrentUTCDateString() {
   const isoString = new Date().toISOString(); // always UTC
   return isoString.slice(0, 10); // 'YYYY-MM-DD'
+}
+
+export function getTimeUntilNextUTCDate(): number {
+  const now = new Date();
+  const nextUTC = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1),
+  );
+  return nextUTC.getTime() - now.getTime();
 }

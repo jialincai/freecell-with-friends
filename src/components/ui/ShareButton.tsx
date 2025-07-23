@@ -60,7 +60,7 @@ const ShareButton = () => {
       }
     }
 
-    let message = `Freecell ${deal.id}\n${time} = ${timeEmoji}`;
+    let message = `Freecell #${deal.id}\n${time} = ${timeEmoji}`;
     if (stats) {
       message += `\n${stats.currentStreak}🔥`;
     }

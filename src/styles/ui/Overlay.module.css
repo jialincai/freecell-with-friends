@@ -10,7 +10,7 @@
     relative
     w-full sm:w-1/2
     flex flex-col
-    h-screen overflow-y-auto
+    h-dvh overflow-y-auto
     max-w-[600px] min-w-[300px]
     bg-darkBlue;
 }

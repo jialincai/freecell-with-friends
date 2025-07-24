@@ -7,8 +7,9 @@ A web Freecell game built with Phasor, Next.js, and PostgreSQL.
 - Node.js
 - Docker
 - Docker Compose
+- psql
 
-## Development Guide
+## Local Development Guide
 
 ### Setting Up Environment Variables
 
@@ -33,7 +34,7 @@ DATABASE_URL=postgres://postgres:insert_password_here@localhost:5432/freecelldb
 POSTGRES_PASSWORD=insert_same_password_matching above
 ```
 
-### Setting Up Local Datbase
+### Setting Up Local Database
 
 #### Fetch File to Seed Daily Deals
 
@@ -72,7 +73,7 @@ POSTGRES_PASSWORD=insert_same_password_matching above
 
    **NOTE:** Optional flags `--rmi all --volumes` to cleanup images and volumes.
 
-### Local Development
+### Run Development Server
 
 1. Navigate to your project directory and install dependencies:
 
@@ -106,6 +107,26 @@ POSTGRES_PASSWORD=insert_same_password_matching above
 
 ## Deployment
 
+### Client
+
 The project is currently deployed with Vercel. Simply update branch `main` and the rest is handled.
 
 If Vercel deployment fails in a branch, DO NOT MERGE THE FAILED BRANCH INTO MAIN.
+
+### Database Setup
+
+This project utilises Neon as the PosgreSQL data provider.
+
+1. Run the contents of `db-init/init.sql` in Neon's SQL editor.
+
+   **IMPORTANT:** Do NOT run the command that is commented.
+
+1.  Start a `psql` connection in your terminal with the connection address specified on the Neon dashboard.
+
+1. Enter the following command to prepopulate the `deals` table. Fill in the CSV file path appropriately.
+
+   ```
+   \copy deals FROM 'absolute_path_to_freecell_deals_shuffled_XXXXXXXX.csv' DELIMITER ',' CSV HEADER
+   ```
+
+   You should see the output `COPY 999992`.

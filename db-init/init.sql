@@ -11,9 +11,13 @@ CREATE TABLE deals (
   date DATE UNIQUE NOT NULL
 );
 
+/*
+This command is for REMOTE DEVELOPMENT ONLY.
+Do not run this command in Neon's SQL editor.
+*/
 COPY deals (seed, date)
-FROM '/docker-entrypoint-initdb.d/freecell_deals_shuffled_20250720.csv'
-WITH (FORMAT csv);
+FROM '/docker-entrypoint-initdb.d/freecell_deals_shuffled_20250723.csv'
+WITH (FORMAT csv, HEADER);
 
 CREATE TABLE completions (
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,

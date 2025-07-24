@@ -23,12 +23,12 @@ def main():
     csv_path = OUTPUT_DIR / f"freecell_deals_shuffled_{date_tag}.csv"
     meta_path = OUTPUT_DIR / f"freecell_deals_shuffled_{date_tag}.json"
 
-    # Write CSV
     with open(csv_path, "w", newline="") as f:
         writer = csv.writer(f)
+        writer.writerow(["id", "seed", "date"])
         for i, seed in enumerate(seeds):
             date_str = (START_DATE + timedelta(days=i)).isoformat()
-            writer.writerow([seed, date_str])
+            writer.writerow([i + 1, seed, date_str])
 
     # Write metadata
     metadata = {

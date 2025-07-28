@@ -70,7 +70,7 @@ const ShareButton = () => {
   }, [deal.id, stats]);
 
   const handleShare = async () => {
-    navigator.clipboard.writeText(message).then(() => {
+    navigator.clipboard.writeText(text).then(() => {
       toast.dismiss();
       toast.custom(() => <p className={styles.toast}>Copied to clipboard</p>);
     });

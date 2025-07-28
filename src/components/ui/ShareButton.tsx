@@ -64,9 +64,10 @@ const ShareButton = () => {
     if (stats) {
       message += `\n${stats.currentStreak}🔥`;
     }
-    navigator.clipboard.writeText(message);
-    toast.dismiss();
-    toast.custom(() => <p className={styles.toast}>Copied to clipboard</p>);
+    navigator.clipboard.writeText(message).then(() => {
+      toast.dismiss();
+      toast.custom(() => <p className={styles.toast}>Copied to clipboard</p>);
+    });
   };
 
   return (

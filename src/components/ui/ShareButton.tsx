@@ -8,6 +8,7 @@ import { Meta } from "@phaser/meta/Meta";
 import { Session } from "@phaser/session/Session";
 import { useDailyDeal } from "@components/context/DealContext";
 import styles from "@styles/ui/StatsPage.module.css";
+import { useEffect, useState } from "react";
 
 const emojiForPercentile = (p: number): string => {
   if (p < 5) return "🪦";
@@ -26,45 +27,50 @@ const ShareButton = () => {
   const deal = useDailyDeal();
   const { data: stats } = useSWR("/api/user/stats", fetcher);
 
-  const handleShare = async () => {
-    const localSave = SaveController.getSave();
-    const localMeta = (localSave?.state.chunks.meta as Meta) ?? null;
-    const localSession = (localSave?.state.chunks.session as Session) ?? null;
+  const [text, setText] = useState<string>(`Freecell #${deal.id}\nXX:XX = 🔮`);
 
-    let time = "XX:XX";
-    let timeEmoji = "🔮";
+  useEffect(() => {
+    const fetchUserPercentile = async () => {
+      const localSave = SaveController.getSave();
+      const localMeta = (localSave?.state.chunks.meta as Meta) ?? null;
+      const localSession = (localSave?.state.chunks.session as Session) ?? null;
 
-    if (
-      localMeta &&
-      localMeta.state.complete &&
-      localSession &&
-      localSession.state.timeElapsedMs
-    ) {
-      try {
-        const completionTime = localSession.state.timeElapsedMs;
-        const res = await fetch("/api/user/share", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(completionTime),
-        });
+      let time = "XX:XX";
+      let timeEmoji = "🔮";
+      if (localMeta?.state.complete && localSession?.state.timeElapsedMs) {
+        try {
+          const completionTime = localSession.state.timeElapsedMs;
+          const res = await fetch("/api/user/share", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(completionTime),
+          });
 
-        const percentile = await res.json();
-        if (!res.ok) {
-          throw new Error("Database error");
+          if (!res.ok) {
+            throw new Error("Database error");
+          }
+
+          const percentile = await res.json();
+          time = formatTime(completionTime);
+          timeEmoji = emojiForPercentile(percentile);
+        } catch (err) {
+          console.error("Share failed", err);
         }
-
-        time = formatTime(completionTime);
-        timeEmoji = emojiForPercentile(percentile);
-      } catch (err) {
-        console.error("Share failed", err);
       }
-    }
 
-    let message = `Freecell #${deal.id}\n${time} = ${timeEmoji}`;
-    if (stats) {
-      message += `\n${stats.currentStreak}🔥`;
-    }
-    navigator.clipboard.writeText(message).then(() => {
+      let message = `Freecell #${deal.id}\n${time} = ${timeEmoji}`;
+      if (stats) {
+        message += `\n${stats.currentStreak}🔥`;
+      }
+
+      setText(message);
+    };
+
+    fetchUserPercentile();
+  }, [deal.id, stats]);
+
+  const handleShare = async () => {
+    navigator.clipboard.writeText(text).then(() =>{
       toast.dismiss();
       toast.custom(() => <p className={styles.toast}>Copied to clipboard</p>);
     });

@@ -1,7 +1,4 @@
-import {
-  countCompletionsByDeal,
-  countCompletionsByTime,
-} from "@lib/db/completions";
+import { countDealCompletionsByFloor } from "@lib/db/completions";
 import { getDeal } from "@lib/db/deals";
 import { getCurrentUTCDateString } from "@utils/Function";
 
@@ -10,12 +7,8 @@ export async function POST(req: Request) {
 
   const deal = await getDeal(getCurrentUTCDateString());
   const [total, slowerOrEqual] = await Promise.all([
-    countCompletionsByDeal(deal.id),
-    countCompletionsByTime({
-      dealId: deal.id,
-      minTimeMs: 0,
-      maxTimeMs: completionTime,
-    }),
+    countDealCompletionsByFloor({ dealId: deal.id, floorMs: 0 }),
+    countDealCompletionsByFloor({ dealId: deal.id, floorMs: completionTime }),
   ]);
 
   if (total === 0) {

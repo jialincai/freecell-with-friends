@@ -10,6 +10,7 @@
     "lint:fix": "next lint --fix"
   },
   "dependencies": {
+    "@vercel/analytics": "^1",
     "lucide-react": "^0.510",
     "next": "^15",
     "next-auth": "^4",

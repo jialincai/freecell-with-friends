@@ -11,7 +11,11 @@ export async function POST(req: Request) {
   const deal = await getDeal(getCurrentUTCDateString());
   const [total, slowerOrEqual] = await Promise.all([
     countCompletionsByDeal(deal.id),
-    countCompletionsByTime(0, completionTime),
+    countCompletionsByTime({
+      dealId: deal.id,
+      minTimeMs: 0,
+      maxTimeMs: completionTime,
+    }),
   ]);
 
   if (total === 0) {

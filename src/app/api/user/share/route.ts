@@ -15,6 +15,6 @@ export async function POST(req: Request) {
     return Response.json(null);
   }
 
-  const percentile = ((total - slowerOrEqual) / total) * 100;
+  const percentile = (slowerOrEqual / total) * 100;
   return Response.json(Math.round(percentile));
 }

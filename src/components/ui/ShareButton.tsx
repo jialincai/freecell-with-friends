@@ -11,16 +11,16 @@ import styles from "@styles/ui/StatsPage.module.css";
 import { useEffect, useState } from "react";
 
 const emojiForPercentile = (p: number): string => {
-  if (p < 0.5) return "🪦";            // 0–0.5
-  if (p < 2.5) return "👨‍🦯";            // 0.5–2.5
-  if (p < 10) return "👨‍🦽";             // 2.5–10
-  if (p < 30) return "🚶‍♂️";             // 10–30
-  if (p < 50) return "🏃";             // 30–50
-  if (p < 70) return "🚴";             // 50–70
-  if (p < 90) return "🚐";             // 70–90
-  if (p < 97.5) return "🏎️";           // 90–97.5
-  if (p < 99.5) return "🚀";           // 97.5–99.5
-  return "🥇";                         // 99.5–100
+  if (p < 0.5) return "🪦"; // 0–0.5
+  if (p < 2.5) return "👨‍🦯"; // 0.5–2.5
+  if (p < 10) return "👨‍🦽"; // 2.5–10
+  if (p < 30) return "🚶‍♂️"; // 10–30
+  if (p < 50) return "🏃"; // 30–50
+  if (p < 70) return "🚴"; // 50–70
+  if (p < 90) return "🚐"; // 70–90
+  if (p < 97.5) return "🏎️"; // 90–97.5
+  if (p < 99.5) return "🚀"; // 97.5–99.5
+  return "🥇"; // 99.5–100
 };
 
 const ShareButton = () => {

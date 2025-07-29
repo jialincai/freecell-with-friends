@@ -1,5 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next"
 import { Inconsolata } from "next/font/google";
 import "@styles/globals.css";
 
@@ -20,7 +21,10 @@ const RootLayout = ({ children }: LayoutProps) => {
       <head>
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className={inconsolata.className}>{children}</body>
+      <body className={inconsolata.className}>
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 };

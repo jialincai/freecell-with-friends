@@ -21,30 +21,18 @@ export async function getCompletion({
   return result[0] ?? null;
 }
 
-export async function countCompletionsByDeal(dealId: number) {
-  const [row] = await sql`
-    SELECT COUNT(*)::int AS count
-    FROM completions
-    WHERE deal_id = ${dealId}
-  `;
-  return row.count;
-}
-
-export async function countCompletionsByTime({
+export async function countDealCompletionsByFloor({
   dealId,
-  minTimeMs,
-  maxTimeMs,
+  floorMs,
 }: {
   dealId: number;
-  minTimeMs: number;
-  maxTimeMs: number;
+  floorMs: number;
 }) {
   const [row] = await sql`
     SELECT COUNT(*)::int AS count
     FROM completions
     WHERE deal_id = ${dealId}
-      AND completion_time_ms >= ${minTimeMs}
-      AND completion_time_ms <= ${maxTimeMs}
+      AND completion_time_ms >= ${floorMs}
   `;
   return row.count;
 }

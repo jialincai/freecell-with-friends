@@ -12,15 +12,13 @@ import { useEffect, useState } from "react";
 
 const emojiForPercentile = (p: number): string => {
   if (p < 5) return "🪦";
-  if (p < 20) return "🐌";
-  if (p < 30) return "🦥";
-  if (p < 40) return "🐢";
-  if (p < 50) return "👍";
-  if (p < 60) return "🐇";
-  if (p < 70) return "🐎";
+  if (p < 20) return "👨‍🦽";
+  if (p < 35) return "🚶‍♂️";
+  if (p < 50) return "🏃";
+  if (p < 65) return "🏇";
   if (p < 80) return "🏎️";
   if (p < 95) return "🚀";
-  return "🦄";
+  return "🥇";
 };
 
 const ShareButton = () => {

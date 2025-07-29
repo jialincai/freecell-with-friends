@@ -30,14 +30,21 @@ export async function countCompletionsByDeal(dealId: number) {
   return row.count;
 }
 
-export async function countCompletionsByTime(
-  minTimeMs: number,
-  maxTimeMs: number,
-) {
+export async function countCompletionsByTime({
+  dealId,
+  minTimeMs,
+  maxTimeMs,
+}: {
+  dealId: number;
+  minTimeMs: number;
+  maxTimeMs: number;
+}) {
   const [row] = await sql`
     SELECT COUNT(*)::int AS count
     FROM completions
-    WHERE completion_time_ms BETWEEN ${minTimeMs} AND ${maxTimeMs}
+    WHERE deal_id = ${dealId}
+      AND completion_time_ms >= ${minTimeMs}
+      AND completion_time_ms <= ${maxTimeMs}
   `;
   return row.count;
 }

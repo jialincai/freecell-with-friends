@@ -74,6 +74,19 @@ const HelpPage = () => {
         />
       </div>
 
+      <p>
+        Learn more about the history of{" "}
+        <a
+          href="https://en.wikipedia.org/wiki/FreeCell"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.link}
+        >
+          FreeCell solitaire
+        </a>{" "}
+        on Wikipedia.
+      </p>
+
       <p className={styles.footer}>
         Copyright © 2025{" "}
         <a href="https://jialincai.com" className={styles.link}>

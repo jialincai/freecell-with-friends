@@ -7,29 +7,12 @@ import "@/styles/globals.css";
 const inconsolata = Inconsolata({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Play FreeCell Solitaire Online - Daily Free Puzzle Game",
-  description:
-    "Play FreeCell solitaire online free. Enjoy a daily puzzle, track stats, and compete with friends.",
-  keywords: [
-    "FreeCell",
-    "FreeCell solitaire",
-    "FreeCell online",
-    "Play FreeCell",
-    "FreeCell card game",
-    "Daily FreeCell",
-    "Solitaire",
-    "Solitaire game",
-    "Play solitaire online",
-    "Solitaire card game",
-    "Daily solitaire puzzle",
-  ],
   metadataBase: new URL("https://freecellwithfriends.com"),
+  alternates: { canonical: "/" },
   openGraph: {
-    title: "Play FreeCell Solitaire Online - Daily Free Puzzle Game",
-    description:
-      "Play FreeCell solitaire online free. Enjoy a daily puzzle, track stats, and compete with friends.",
-    url: "https://freecellwithfriends.com",
     siteName: "FreeCell with Friends",
+    locale: "en_US",
+    type: "website",
     images: [
       {
         url: "/og.png",
@@ -38,14 +21,9 @@ export const metadata: Metadata = {
         alt: "FreeCell with Friends daily challenge preview",
       },
     ],
-    locale: "en_US",
-    type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Play FreeCell Solitaire Online - Daily Free Puzzle Game",
-    description:
-      "Play FreeCell solitaire online free. Enjoy a daily puzzle, track stats, and compete with friends.",
     images: ["/og.png"],
   },
   authors: [
@@ -60,12 +38,12 @@ type LayoutProps = {
   children: React.ReactNode;
 };
 
-const RootLayout = ({ children }: LayoutProps) => {
+export default function RootLayout({ children }: LayoutProps) {
   return (
     <html lang="en">
       <head>
         <link rel="icon" href="/favicon.ico" />
-        <link rel="canonical" href="https://freecellwithfriends.com" />
+        <meta name="theme-color" content="#ffffff" />
       </head>
       <body className={inconsolata.className}>
         {children}
@@ -73,6 +51,4 @@ const RootLayout = ({ children }: LayoutProps) => {
       </body>
     </html>
   );
-};
-
-export default RootLayout;
+}

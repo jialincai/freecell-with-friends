@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import { signIn } from "next-auth/react";
-import statStyles from "@styles/ui/StatsPage.module.css";
-import styles from "@styles/ui/LoginPage.module.css";
+import statStyles from "@/styles/ui/StatsPage.module.css";
+import styles from "@/styles/ui/LoginPage.module.css";
 
 type LoginPageProps = {
   loginFailed: boolean;

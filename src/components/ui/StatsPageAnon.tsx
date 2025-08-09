@@ -1,8 +1,8 @@
 "use client";
 
-import { useOverlayRouter } from "@hooks/overlay";
-import ShareButton from "@components/ui/ShareButton";
-import styles from "@styles/ui/StatsPage.module.css";
+import { useOverlayRouter } from "@/hooks/overlay";
+import ShareButton from "@/components/ui/ShareButton";
+import styles from "@/styles/ui/StatsPage.module.css";
 
 const AnonStatsPage = () => {
   const overlayRouter = useOverlayRouter();

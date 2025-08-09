@@ -1,4 +1,4 @@
-import sql from "@lib/db";
+import sql from "@/lib/db";
 
 export type Streak = {
   user_id: string;

@@ -1,14 +1,14 @@
 import * as Phaser from "phaser";
-import { PILE_POSITIONS, TABLEAU_PILES } from "@phaser/constants/table";
-import { Pile } from "@phaser/pile/state/Pile";
+import { PILE_POSITIONS, TABLEAU_PILES } from "@/phaser/constants/table";
+import { Pile } from "@/phaser/pile/state/Pile";
 import {
   CARD_DIMENSIONS,
   RECT_CORNER_RADIUS,
   PILE_LINE_WIDTH,
   PILE_SCALE,
   STACK_OFFSET,
-} from "@phaser/constants/dimensions";
-import { BORDER_COLOR } from "@phaser/constants/colors";
+} from "@/phaser/constants/dimensions";
+import { BORDER_COLOR } from "@/phaser/constants/colors";
 
 export class PileView extends Phaser.GameObjects.Graphics {
   constructor(scene: Phaser.Scene, model: Pile) {

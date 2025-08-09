@@ -1,6 +1,6 @@
-import { countDealCompletionsByFloor } from "@lib/db/completions";
-import { getDeal } from "@lib/db/deals";
-import { getCurrentUTCDateString } from "@utils/Function";
+import { countDealCompletionsByFloor } from "@/lib/db/completions";
+import { getDeal } from "@/lib/db/deals";
+import { getCurrentUTCDateString } from "@/utils/Function";
 
 export async function POST(req: Request) {
   const completionTime = await req.json();

@@ -1,4 +1,4 @@
-import { Rank, Suit } from "@phaser/constants/deck";
+import { Rank, Suit } from "@/phaser/constants/deck";
 
 export type CardId = `${Suit}_${Rank}`;
 

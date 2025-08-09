@@ -4,12 +4,12 @@ import { Suspense } from "react";
 import { SessionProvider } from "next-auth/react";
 import useSWR from "swr";
 import { Toaster } from "sonner";
-import { fetcher } from "@utils/fetcher";
-import FreecellGame from "@components/game/FreecellGame";
-import Overlay from "@components/ui/Overlay";
-import MenuBar from "@components/ui/MenuBar";
-import { DealProvider } from "@components/context/DealContext";
-import ErrorPage from "@components/ui/ErrorPage";
+import { fetcher } from "@/utils/fetcher";
+import FreecellGame from "@/components/game/FreecellGame";
+import Overlay from "@/components/ui/Overlay";
+import MenuBar from "@/components/ui/MenuBar";
+import { DealProvider } from "@/components/context/DealContext";
+import ErrorPage from "@/components/ui/ErrorPage";
 
 const HomePage = () => {
   const { data: deal, error, isLoading } = useSWR("/api/deal/current", fetcher);

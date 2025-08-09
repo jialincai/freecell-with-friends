@@ -1,4 +1,4 @@
-import { CardMove } from "@phaser/move/CardMove";
+import { CardMove } from "@/phaser/move/CardMove";
 
 export type CardMoveSequence = {
   steps: CardMove[];

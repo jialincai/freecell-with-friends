@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
-import Preloader from "@phaser/scenes/Preloader";
-import Game from "@phaser/scenes/Game";
-import Boot from "@phaser/scenes/Boot";
+import Preloader from "@/phaser/scenes/Preloader";
+import Game from "@/phaser/scenes/Game";
+import Boot from "@/phaser/scenes/Boot";
 import { SCREEN_DIMENSIONS } from "phaser/constants/dimensions";
 import { BACKGROUND_COLOR } from "phaser/constants/colors";
 

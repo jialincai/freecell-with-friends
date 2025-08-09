@@ -1,9 +1,9 @@
-import { Card } from "@phaser/card/state/Card";
-import { Deck } from "@phaser/deck/state/Deck";
-import { PileId, TABLEAU_PILES } from "@phaser/constants/table";
-import { withFaceUp, withPilePosition } from "@phaser/card/domain/CardLogic";
-import { CardMoveSequence } from "@phaser/move/CardMoveSequence";
-import { Rank, Suit } from "@phaser/constants/deck";
+import { Card } from "@/phaser/card/state/Card";
+import { Deck } from "@/phaser/deck/state/Deck";
+import { PileId, TABLEAU_PILES } from "@/phaser/constants/table";
+import { withFaceUp, withPilePosition } from "@/phaser/card/domain/CardLogic";
+import { CardMoveSequence } from "@/phaser/move/CardMoveSequence";
+import { Rank, Suit } from "@/phaser/constants/deck";
 
 export function applyCardMoves(deck: Deck, cardMoves: CardMoveSequence): Deck {
   const updatedCards = cardMoves.steps.reduce((cards, move) => {

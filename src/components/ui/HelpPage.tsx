@@ -1,10 +1,10 @@
 import Image from "next/image";
-import styles from "@styles/ui/HelpPage.module.css";
+import styles from "@/styles/ui/HelpPage.module.css";
 
 const HelpPage = () => {
   return (
     <div className={styles.container}>
-      <p className={styles.heading}>How To Play</p>
+      <h1 className={styles.heading}>How To Play</h1>
 
       <div className={styles.sectionColumn}>
         <p>

@@ -1,6 +1,6 @@
-import { Session } from "@phaser/session/Session";
-import { SessionView } from "@phaser/session/SessionView";
-import { withTimeElapsedMs } from "@phaser/session/domain/SessionLogic";
+import { Session } from "@/phaser/session/Session";
+import { SessionView } from "@/phaser/session/SessionView";
+import { withTimeElapsedMs } from "@/phaser/session/domain/SessionLogic";
 
 export class SessionController {
   public model: Session;

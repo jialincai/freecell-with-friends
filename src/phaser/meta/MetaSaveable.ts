@@ -1,5 +1,5 @@
-import { ISaveable } from "@utils/save/ISaveable";
-import { Meta } from "@phaser/meta/Meta";
+import { ISaveable } from "@/utils/save/ISaveable";
+import { Meta } from "@/phaser/meta/Meta";
 
 class MetaSaveable implements ISaveable<Meta> {
   public id = "meta";

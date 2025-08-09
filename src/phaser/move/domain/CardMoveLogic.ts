@@ -1,9 +1,9 @@
-import { Deck } from "@phaser/deck/state/Deck";
-import { CardMove, createCardMove } from "@phaser/move/CardMove";
-import { PileId } from "@phaser/constants/table";
-import { getCardsInPile } from "@phaser/deck/domain/DeckLogic";
-import { filterValidDropPiles } from "@phaser/game/domain/FreecellRules";
-import { Card } from "@phaser/card/state/Card";
+import { Deck } from "@/phaser/deck/state/Deck";
+import { CardMove, createCardMove } from "@/phaser/move/CardMove";
+import { PileId } from "@/phaser/constants/table";
+import { getCardsInPile } from "@/phaser/deck/domain/DeckLogic";
+import { filterValidDropPiles } from "@/phaser/game/domain/FreecellRules";
+import { Card } from "@/phaser/card/state/Card";
 
 export function getSingleCardMoves(
   deck: Deck,

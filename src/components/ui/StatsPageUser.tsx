@@ -2,10 +2,10 @@
 
 import useSWR from "swr";
 import { signOut } from "next-auth/react";
-import ShareButton from "@components/ui/ShareButton";
-import styles from "@styles/ui/StatsPage.module.css";
-import { formatTime } from "@utils/Function";
-import { fetcher } from "@utils/fetcher";
+import ShareButton from "@/components/ui/ShareButton";
+import styles from "@/styles/ui/StatsPage.module.css";
+import { formatTime } from "@/utils/Function";
+import { fetcher } from "@/utils/fetcher";
 
 const StatBlock = ({
   value,

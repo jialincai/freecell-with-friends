@@ -1,6 +1,6 @@
-import { Rank } from "@phaser/constants/deck";
-import { Card, createCard } from "@phaser/card/state/Card";
-import { Suit } from "@phaser/constants/deck";
+import { Rank } from "@/phaser/constants/deck";
+import { Card, createCard } from "@/phaser/card/state/Card";
+import { Suit } from "@/phaser/constants/deck";
 
 export type Deck = {
   cards: Card[];

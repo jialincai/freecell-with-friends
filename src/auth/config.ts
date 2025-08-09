@@ -1,9 +1,9 @@
 import GoogleProvider from "next-auth/providers/google";
 import DiscordProvider from "next-auth/providers/discord";
-import { computeUserId } from "@auth/ids";
+import { computeUserId } from "@/auth/ids";
 import { Account, Session, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
-import { upsertNewUser } from "@lib/db/transactions";
+import { upsertNewUser } from "@/lib/db/transactions";
 
 const authOptions = {
   providers: [

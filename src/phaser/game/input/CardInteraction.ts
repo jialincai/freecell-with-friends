@@ -1,20 +1,20 @@
-import { PubSubStack } from "@utils/Function";
-import { FOUNDATION_PILES, PileId } from "@phaser/constants/table";
-import { CardController } from "@phaser/card/CardController";
-import { DeckController } from "@phaser/deck/DeckController";
-import { PileView } from "@phaser/pile/PileView";
+import { PubSubStack } from "@/utils/Function";
+import { FOUNDATION_PILES, PileId } from "@/phaser/constants/table";
+import { CardController } from "@/phaser/card/CardController";
+import { DeckController } from "@/phaser/deck/DeckController";
+import { PileView } from "@/phaser/pile/PileView";
 import {
   canMoveCard,
   filterValidDropPiles,
-} from "@phaser/game/domain/FreecellRules";
-import { createCardMove } from "@phaser/move/CardMove";
+} from "@/phaser/game/domain/FreecellRules";
+import { createCardMove } from "@/phaser/move/CardMove";
 import {
   CardMoveSequence,
   createCardMoveSequence,
-} from "@phaser/move/CardMoveSequence";
-import { getNextCardPositionsInPile } from "@phaser/deck/domain/DeckLogic";
-import { STACK_DRAG_OFFSET } from "@phaser/constants/dimensions";
-import { expand, withTween } from "@phaser/move/domain/CardMoveSequenceLogic";
+} from "@/phaser/move/CardMoveSequence";
+import { getNextCardPositionsInPile } from "@/phaser/deck/domain/DeckLogic";
+import { STACK_DRAG_OFFSET } from "@/phaser/constants/dimensions";
+import { expand, withTween } from "@/phaser/move/domain/CardMoveSequenceLogic";
 
 export function setupCardInteraction(
   deckController: DeckController,

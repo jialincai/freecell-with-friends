@@ -1,4 +1,4 @@
-import { Suit } from "@phaser/constants/deck";
+import { Suit } from "@/phaser/constants/deck";
 import { CardId } from "./domain/CardId";
 
 export type CardData = {

@@ -1,4 +1,4 @@
-import styles from "@styles/ui/ErrorPage.module.css";
+import styles from "@/styles/ui/ErrorPage.module.css";
 
 const ErrorPage = () => {
   return (

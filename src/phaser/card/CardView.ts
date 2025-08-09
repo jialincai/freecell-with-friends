@@ -1,12 +1,12 @@
 import * as Phaser from "phaser";
 
-import { CARD_BACK_INDEX } from "@phaser/constants/deck";
-import { Card } from "@phaser/card/state/Card";
+import { CARD_BACK_INDEX } from "@/phaser/constants/deck";
+import { Card } from "@/phaser/card/state/Card";
 import {
   getCardWorldPosition,
   getSpriteIndex,
-} from "@phaser/card/domain/CardViewLogic";
-import { CARD_DIMENSIONS } from "@phaser/constants/dimensions";
+} from "@/phaser/card/domain/CardViewLogic";
+import { CARD_DIMENSIONS } from "@/phaser/constants/dimensions";
 
 export class CardView extends Phaser.GameObjects.Image {
   constructor(scene: Phaser.Scene, model: Card) {

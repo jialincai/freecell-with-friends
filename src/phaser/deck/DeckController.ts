@@ -1,18 +1,18 @@
-import { CardController } from "@phaser/card/CardController";
-import { PileId } from "@phaser/constants/table";
-import { Deck } from "@phaser/deck/state/Deck";
+import { CardController } from "@/phaser/card/CardController";
+import { PileId } from "@/phaser/constants/table";
+import { Deck } from "@/phaser/deck/state/Deck";
 import {
   applyCardMoves,
   dealCards,
   shuffleCards,
-} from "@phaser/deck/domain/DeckLogic";
+} from "@/phaser/deck/domain/DeckLogic";
 import {
   CardMoveSequence,
   createCardMoveSequence,
-} from "@phaser/move/CardMoveSequence";
-import { CardId } from "@phaser/card/domain/CardId";
-import { getCardWorldPosition } from "@phaser/card/domain/CardViewLogic";
-import { TWEEN_DURATION } from "@phaser/constants/tweens";
+} from "@/phaser/move/CardMoveSequence";
+import { CardId } from "@/phaser/card/domain/CardId";
+import { getCardWorldPosition } from "@/phaser/card/domain/CardViewLogic";
+import { TWEEN_DURATION } from "@/phaser/constants/tweens";
 
 export class DeckController {
   public model: Deck;

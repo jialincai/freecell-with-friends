@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useDailyDeal } from "@components/context/DealContext";
-import { formatTime, getTimeUntilNextUTCDate } from "@utils/Function";
+import { useDailyDeal } from "@/components/context/DealContext";
+import { formatTime, getTimeUntilNextUTCDate } from "@/utils/Function";
 
 const WARNING_THRESHOLD_MS = 5 * 60 * 1000; // 30 minutes
 const RELOAD_THRESHOLD_MS = 1;

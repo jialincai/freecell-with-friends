@@ -1,9 +1,9 @@
 "use client";
 
 import { HelpCircle, Trophy } from "lucide-react";
-import { useOverlayRouter } from "@hooks/overlay";
-import styles from "@styles/ui/MenuBar.module.css";
-import DealCountdown from "@components/ui/Countdown";
+import { useOverlayRouter } from "@/hooks/overlay";
+import styles from "@/styles/ui/MenuBar.module.css";
+import DealCountdown from "@/components/ui/Countdown";
 
 const MenuBar = () => {
   const overlayRouter = useOverlayRouter();

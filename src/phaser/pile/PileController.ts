@@ -1,5 +1,5 @@
-import { PileView } from "@phaser/pile/PileView";
-import { Pile } from "@phaser/pile/state/Pile";
+import { PileView } from "@/phaser/pile/PileView";
+import { Pile } from "@/phaser/pile/state/Pile";
 
 export class PileController {
   public readonly model: Pile;

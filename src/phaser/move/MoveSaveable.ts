@@ -1,8 +1,8 @@
-import { ISaveable } from "@utils/save/ISaveable";
+import { ISaveable } from "@/utils/save/ISaveable";
 import {
   CardMoveSequence,
   createCardMoveSequence,
-} from "@phaser/move/CardMoveSequence";
+} from "@/phaser/move/CardMoveSequence";
 
 class MoveSaveable implements ISaveable<CardMoveSequence[]> {
   public id = "move";

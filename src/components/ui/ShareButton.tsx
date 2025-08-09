@@ -1,13 +1,13 @@
 import { Share2 } from "lucide-react";
 import { toast } from "sonner";
 import useSWR from "swr";
-import { fetcher } from "@utils/fetcher";
-import { formatTime } from "@utils/Function";
-import SaveController from "@utils/save/SaveController";
-import { Meta } from "@phaser/meta/Meta";
-import { Session } from "@phaser/session/Session";
-import { useDailyDeal } from "@components/context/DealContext";
-import styles from "@styles/ui/StatsPage.module.css";
+import { fetcher } from "@/utils/fetcher";
+import { formatTime } from "@/utils/Function";
+import SaveController from "@/utils/save/SaveController";
+import { Meta } from "@/phaser/meta/Meta";
+import { Session } from "@/phaser/session/Session";
+import { useDailyDeal } from "@/components/context/DealContext";
+import styles from "@/styles/ui/StatsPage.module.css";
 import { useEffect, useState } from "react";
 
 const emojiForPercentile = (p: number): string => {

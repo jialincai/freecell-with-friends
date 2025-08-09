@@ -1,10 +1,10 @@
 import Image from "next/image";
-import styles from "@styles/ui/HelpPage.module.css";
+import styles from "@/styles/ui/HelpPage.module.css";
 
 const HelpPage = () => {
   return (
     <div className={styles.container}>
-      <p className={styles.heading}>How To Play</p>
+      <h1 className={styles.heading}>How To Play</h1>
 
       <div className={styles.sectionColumn}>
         <p>
@@ -73,6 +73,19 @@ const HelpPage = () => {
           height={40}
         />
       </div>
+
+      <p>
+        Learn more about the history of{" "}
+        <a
+          href="https://en.wikipedia.org/wiki/FreeCell"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.link}
+        >
+          FreeCell solitaire
+        </a>{" "}
+        on Wikipedia.
+      </p>
 
       <p className={styles.footer}>
         Copyright © 2025{" "}

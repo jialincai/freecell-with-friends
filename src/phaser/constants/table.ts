@@ -4,7 +4,7 @@ import {
   CARD_DIMENSIONS,
   PILE_OFFSET,
   TOP_PILE_Y,
-} from "@phaser/constants/dimensions";
+} from "@/phaser/constants/dimensions";
 
 /**
  * Define the constants for the table.

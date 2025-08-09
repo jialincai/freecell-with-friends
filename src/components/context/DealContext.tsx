@@ -1,6 +1,6 @@
 "use client";
 
-import { Deal } from "@lib/db/deals";
+import { Deal } from "@/lib/db/deals";
 import React, { createContext, useContext } from "react";
 
 const DealContext = createContext<Deal | null>(null);

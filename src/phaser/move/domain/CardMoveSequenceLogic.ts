@@ -3,25 +3,25 @@ import {
   FOUNDATION_PILES,
   PileId,
   TABLEAU_PILES,
-} from "@phaser/constants/table";
+} from "@/phaser/constants/table";
 import {
   filterEmptyPiles,
   getCardsInPile,
   applyCardMoves,
   filterNonEmptyPiles,
-} from "@phaser/deck/domain/DeckLogic";
-import { Deck } from "@phaser/deck/state/Deck";
+} from "@/phaser/deck/domain/DeckLogic";
+import { Deck } from "@/phaser/deck/state/Deck";
 import {
   CardMoveSequence,
   createCardMoveSequence,
-} from "@phaser/move/CardMoveSequence";
-import { CardMove, createCardMove } from "@phaser/move/CardMove";
+} from "@/phaser/move/CardMoveSequence";
+import { CardMove, createCardMove } from "@/phaser/move/CardMove";
 import {
   areFoundationsFull,
   calculateMaxMoveSize,
   calculateMinTempTableaus,
   filterValidDropPiles,
-} from "@phaser/game/domain/FreecellRules";
+} from "@/phaser/game/domain/FreecellRules";
 
 /**
  * Expands a simplified move sequence into intermediate steps using free cells

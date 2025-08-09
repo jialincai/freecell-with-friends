@@ -1,52 +1,52 @@
 import * as Phaser from "phaser";
 
-import { getHexColorString, PubSubStack, AsyncQueue } from "@utils/Function";
+import { getHexColorString, PubSubStack, AsyncQueue } from "@/utils/Function";
 import {
   CELL_PILES,
   FOUNDATION_PILES,
   PileId,
   TABLEAU_PILES,
-} from "@phaser/constants/table";
-import { setupCardInteraction } from "@phaser/game/input/CardInteraction";
-import { setupHoverHighlight } from "@phaser/game/input/HoverHighlight";
-import { DeckController } from "@phaser/deck/DeckController";
-import { createDeck } from "@phaser/deck/state/Deck";
-import { PileController } from "@phaser/pile/PileController";
-import { createPile } from "@phaser/pile/state/Pile";
+} from "@/phaser/constants/table";
+import { setupCardInteraction } from "@/phaser/game/input/CardInteraction";
+import { setupHoverHighlight } from "@/phaser/game/input/HoverHighlight";
+import { DeckController } from "@/phaser/deck/DeckController";
+import { createDeck } from "@/phaser/deck/state/Deck";
+import { PileController } from "@/phaser/pile/PileController";
+import { createPile } from "@/phaser/pile/state/Pile";
 import {
   CardMoveSequence,
   createCardMoveSequence,
-} from "@phaser/move/CardMoveSequence";
+} from "@/phaser/move/CardMoveSequence";
 import {
   invertCardMoveSequence,
   createAutocompleteCardMoveSequence,
   withTween,
-} from "@phaser/move/domain/CardMoveSequenceLogic";
-import { areAllTableausOrdered } from "@phaser/game/domain/FreecellRules";
+} from "@/phaser/move/domain/CardMoveSequenceLogic";
+import { areAllTableausOrdered } from "@/phaser/game/domain/FreecellRules";
 import {
   BORDER_PAD_DIMENSIONS,
   BUTTON_DIMENSIONS,
   BUTTON_MARGIN,
   RECT_CORNER_RADIUS,
-} from "@phaser/constants/dimensions";
+} from "@/phaser/constants/dimensions";
 import {
   BUTTON_COLOR,
   BUTTON_TEXT_COLOR,
   HIGHLIGHT_COLOR,
   RED,
-} from "@phaser/constants/colors";
-import { FONT_FAMILY, FONT_SIZE } from "@phaser/constants/fonts";
-import { getSingleCardMoves } from "@phaser/move/domain/CardMoveLogic";
-import { SessionController } from "@phaser/session/SessionController";
-import { createSession, Session } from "@phaser/session/Session";
-import SaveController from "@utils/save/SaveController";
-import { createSave, SAVE_VERSION } from "@utils/save/Save";
-import MoveSavable from "@phaser/move/MoveSaveable";
-import SessionSaveable from "@phaser/session/SessionSaveable";
-import { createMeta, Meta } from "@phaser/meta/Meta";
-import MetaSaveable from "@phaser/meta/MetaSaveable";
-import { withComplete } from "@phaser/meta/domain/MetaLogic";
-import { EventBus } from "@phaser/EventBus";
+} from "@/phaser/constants/colors";
+import { FONT_FAMILY, FONT_SIZE } from "@/phaser/constants/fonts";
+import { getSingleCardMoves } from "@/phaser/move/domain/CardMoveLogic";
+import { SessionController } from "@/phaser/session/SessionController";
+import { createSession, Session } from "@/phaser/session/Session";
+import SaveController from "@/utils/save/SaveController";
+import { createSave, SAVE_VERSION } from "@/utils/save/Save";
+import MoveSavable from "@/phaser/move/MoveSaveable";
+import SessionSaveable from "@/phaser/session/SessionSaveable";
+import { createMeta, Meta } from "@/phaser/meta/Meta";
+import MetaSaveable from "@/phaser/meta/MetaSaveable";
+import { withComplete } from "@/phaser/meta/domain/MetaLogic";
+import { EventBus } from "@/phaser/EventBus";
 
 export default class Game extends Phaser.Scene {
   private save!: SaveController;

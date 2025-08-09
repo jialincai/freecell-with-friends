@@ -1,5 +1,5 @@
-import { getDeal } from "@lib/db/deals";
-import { getCurrentUTCDateString } from "@utils/Function";
+import { getDeal } from "@/lib/db/deals";
+import { getCurrentUTCDateString } from "@/utils/Function";
 
 export async function GET() {
   const deal = await getDeal(getCurrentUTCDateString());

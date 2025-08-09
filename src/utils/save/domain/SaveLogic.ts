@@ -1,5 +1,5 @@
-import { Save, SaveState, SAVE_VERSION } from "@utils/save/Save";
-import { SaveableRegistry, ISaveable } from "@utils/save/ISaveable";
+import { Save, SaveState, SAVE_VERSION } from "@/utils/save/Save";
+import { SaveableRegistry, ISaveable } from "@/utils/save/ISaveable";
 
 export function withSaveable(
   registry: SaveableRegistry,

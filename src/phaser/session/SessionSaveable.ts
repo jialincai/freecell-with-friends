@@ -1,5 +1,5 @@
-import { ISaveable } from "@utils/save/ISaveable";
-import { Session } from "@phaser/session/Session";
+import { ISaveable } from "@/utils/save/ISaveable";
+import { Session } from "@/phaser/session/Session";
 
 class SessionSaveable implements ISaveable<Session> {
   public id = "session";

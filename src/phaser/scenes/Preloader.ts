@@ -1,8 +1,8 @@
 import * as Phaser from "phaser";
 
 // Card images
-import { spritesheets } from "@phaser/constants/assets";
-import { SCREEN_DIMENSIONS } from "@phaser/constants/dimensions";
+import { spritesheets } from "@/phaser/constants/assets";
+import { SCREEN_DIMENSIONS } from "@/phaser/constants/dimensions";
 
 export default class Preloader extends Phaser.Scene {
   public constructor() {

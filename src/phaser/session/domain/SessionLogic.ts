@@ -1,4 +1,4 @@
-import { SessionState } from "@phaser/session/Session";
+import { SessionState } from "@/phaser/session/Session";
 
 export function withTimeElapsedMs(
   state: SessionState,

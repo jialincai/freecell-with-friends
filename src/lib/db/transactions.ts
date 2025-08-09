@@ -1,4 +1,4 @@
-import sql from "@lib/db";
+import sql from "@/lib/db";
 import { Streak } from "./streaks";
 
 export async function upsertNewUser({

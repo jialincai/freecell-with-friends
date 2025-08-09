@@ -1,5 +1,5 @@
-import { PileId } from "@phaser/constants/table";
-import { CardId } from "@phaser/card/domain/CardId";
+import { PileId } from "@/phaser/constants/table";
+import { CardId } from "@/phaser/card/domain/CardId";
 
 export type CardMove = {
   card: CardId;

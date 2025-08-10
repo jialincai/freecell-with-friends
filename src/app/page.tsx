@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Freecell with Friends - Daily Freecell Solitaire Game",
   description:
     "Play FreeCell solitaire online with a new puzzle everyday, stat tracking, and shareable results.",
+  alternates: { canonical: "/" },
 };
 
 export default function HomePage() {

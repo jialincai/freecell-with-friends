@@ -8,7 +8,6 @@ const inconsolata = Inconsolata({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://freecellwithfriends.com"),
-  alternates: { canonical: "/" },
   openGraph: {
     siteName: "FreeCell with Friends",
     locale: "en_US",

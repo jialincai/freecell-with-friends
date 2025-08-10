@@ -4,7 +4,7 @@ import HelpPage from "@/components/ui/HelpPage";
 export const metadata: Metadata = {
   title: "How to Play FreeCell",
   description: "Learn how to play FreeCell solitaire.",
-  metadataBase: new URL("https://freecellwithfriends.com"),
+  metadataBase: new URL("https://www.freecellwithfriends.com"),
   alternates: { canonical: "/help" },
 };
 

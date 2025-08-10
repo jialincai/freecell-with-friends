@@ -7,7 +7,7 @@ import "@/styles/globals.css";
 const inconsolata = Inconsolata({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://freecellwithfriends.com"),
+  metadataBase: new URL("https://www.freecellwithfriends.com"),
   openGraph: {
     siteName: "FreeCell with Friends",
     locale: "en_US",

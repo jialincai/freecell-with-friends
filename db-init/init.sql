@@ -15,7 +15,7 @@ CREATE TABLE deals (
 This command is for REMOTE DEVELOPMENT ONLY.
 Do not run this command in Neon's SQL editor.
 */
-COPY deals (id, seed, date)
+COPY deals (seed, date)
 FROM '/docker-entrypoint-initdb.d/freecell_deals_shuffled_20250723.csv'
 WITH (FORMAT csv, HEADER);
 

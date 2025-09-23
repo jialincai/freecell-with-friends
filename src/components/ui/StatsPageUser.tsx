@@ -44,7 +44,11 @@ const UserStatsPage = () => {
       )}
 
       <p className={styles.description}>🎉 Happy Birthday Ms. Cammie!! 🎉</p>
-      <img src="https://media0.giphy.com/media/v1.Y2lkPTZjMDliOTUyY3Flc3cybHkyYnRmeXVrczhiNDlscDlweDFwaWdscHE5YzZhczYzNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/MqCJLsOjz04wK4HiYh/giphy.gif" alt="" />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="https://media0.giphy.com/media/v1.Y2lkPTZjMDliOTUyY3Flc3cybHkyYnRmeXVrczhiNDlscDlweDFwaWdscHE5YzZhczYzNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/MqCJLsOjz04wK4HiYh/giphy.gif"
+        alt=""
+      />
 
       <ShareButton />
       <button className="underline mt-4" onClick={() => signOut()}>

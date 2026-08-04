@@ -1,13 +1,14 @@
 import sql from "@/lib/db";
 
-export type Completion = {
+export type Game = {
   user_id: string;
   deal_id: number;
-  completion_time_ms: number;
+  elapsed_time_ms: number;
   moves: unknown;
+  completed: boolean;
 };
 
-export async function getCompletion({
+export async function getGame({
   userId,
   dealId,
 }: {
@@ -15,7 +16,7 @@ export async function getCompletion({
   dealId: number;
 }) {
   const result = await sql`
-    SELECT * FROM completions
+    SELECT * FROM games
     WHERE user_id = ${userId} AND deal_id = ${dealId}
   `;
   return result[0] ?? null;
@@ -30,9 +31,10 @@ export async function countDealCompletionsByFloor({
 }) {
   const [row] = await sql`
     SELECT COUNT(*)::int AS count
-    FROM completions
+    FROM games
     WHERE deal_id = ${dealId}
-      AND completion_time_ms >= ${floorMs}
+      AND completed = true
+      AND elapsed_time_ms >= ${floorMs}
   `;
   return row.count;
 }
@@ -41,9 +43,10 @@ export async function getUserCompletionStats(userId: string) {
   const [row] = await sql`
     SELECT
       COUNT(*)::int AS count,
-      AVG(completion_time_ms)::int as average
-    FROM completions
+      AVG(elapsed_time_ms)::int as average
+    FROM games
     WHERE user_id = ${userId}
+      AND completed = true
   `;
   return { count: row.count, average: row.average };
 }

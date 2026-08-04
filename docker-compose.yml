@@ -1,12 +1,15 @@
 services:
+  # Not currently used — app is deployed on Vercel, so it runs locally via
+  # `npm run dev` against the dockerized db below rather than in its own
+  # container. See Dockerfile for context.
   # app:
-  #   image: freecell-phaser
+  #   image: freecell-app
   #   build:
   #     context: ./
   #     dockerfile: Dockerfile
   #     target: dev
   #   volumes:
-  #     - .:/freecell-phaser
+  #     - .:/app
   #   ports:
   #     - "3000:3000"
   #   depends_on:

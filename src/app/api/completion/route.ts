@@ -16,7 +16,7 @@ export async function POST(req: Request) {
   await updateStreakOnCompletion({
     userId: session.user.id,
     dealId: deal.id,
-    completionTimeMs,
+    elapsedTimeMs: completionTimeMs,
     moves: JSON.stringify(moveArray),
   });
 

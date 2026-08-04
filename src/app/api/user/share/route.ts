@@ -1,4 +1,4 @@
-import { countDealCompletionsByFloor } from "@/lib/db/completions";
+import { countDealCompletionsByFloor } from "@/lib/db/games";
 import { getDeal } from "@/lib/db/deals";
 import { getCurrentUTCDateString } from "@/utils/Function";
 

@@ -16,7 +16,7 @@ This command is for REMOTE DEVELOPMENT ONLY.
 Do not run this command in Neon's SQL editor.
 */
 COPY deals (seed, date)
-FROM '/docker-entrypoint-initdb.d/freecell_deals_shuffled_20250723.csv'
+FROM '/docker-entrypoint-initdb.d/freecell_deals_shuffled_20260809.csv'
 WITH (FORMAT csv, HEADER);
 
 CREATE TABLE games (

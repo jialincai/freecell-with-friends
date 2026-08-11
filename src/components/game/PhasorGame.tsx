@@ -1,6 +1,11 @@
 "use client";
 
-import { forwardRef, useEffect, useLayoutEffect, useRef } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+} from "react";
 import { CardMoveSequence } from "@/phaser/move/CardMoveSequence";
 import { useDailyDeal } from "@/components/context/DealContext";
 import "@/styles/game/PhasorGame.module.css";
@@ -16,9 +21,10 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
     const containerId = "game-container";
     const containerRef = useRef<HTMLDivElement | null>(null);
     const gameRef = useRef<Phaser.Game | null>(null);
+    const sessionStatusRef = useRef<ReturnType<typeof useSession>["status"]>();
 
-    const { status: sessionStatus } = useSession();
     const deal = useDailyDeal();
+    sessionStatusRef.current = useSession().status;
 
     useLayoutEffect(() => {
       if (gameRef.current === null) {
@@ -44,34 +50,37 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
     }, [ref, deal]);
 
     useEffect(() => {
-      const loadEventBus = async () => {
-        const { EventBus } = await import("@/phaser/EventBus");
+      let cleanup = () => {};
 
-        EventBus.on(
-          "game-completed",
-          async (completionTimeMs: number, moveArray: CardMoveSequence[]) => {
-            if (sessionStatus !== "authenticated") return;
+      import("@/phaser/EventBus").then(({ EventBus }) => {
+        const handler = async (
+          completionTimeMs: number,
+          moveArray: CardMoveSequence[],
+        ) => {
+          if (sessionStatusRef.current !== "authenticated") return;
 
-            try {
-              const res = await fetch("/api/completion", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  completionTimeMs,
-                  moveArray,
-                }),
-              });
+          try {
+            const res = await fetch("/api/completion", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                completionTimeMs,
+                moveArray,
+              }),
+            });
 
-              if (!res.ok) throw new Error(await res.text());
-            } catch (err) {
-              console.error("Failed to submit completion:", err);
-            }
-          },
-        );
-      };
+            if (!res.ok) throw new Error(await res.text());
+          } catch (err) {
+            console.error("Failed to submit completion:", err);
+          }
+        };
 
-      loadEventBus();
-    }, [sessionStatus, deal]);
+        EventBus.on("game-completed", handler);
+        cleanup = () => EventBus.off("game-completed", handler);
+      });
+
+      return () => cleanup();
+    }, [deal]);
 
     return <div id={containerId} ref={containerRef}></div>;
   },

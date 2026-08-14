@@ -69,6 +69,11 @@ export default class Game extends Phaser.Scene {
   // TODO: This function is getting to long.
   // Consider breaking into smaller function that implement State pattern for different solitaire games.
   public create(): void {
+    console.log("Game: create start", {
+      time: new Date().toISOString(),
+      textureKeys: this.textures.getTextureKeys(),
+    });
+
     // Setup UI
     this.createButtons();
 
@@ -159,6 +164,12 @@ export default class Game extends Phaser.Scene {
         },
       });
     }
+
+    console.log("Game: create complete, game is now interactive", {
+      time: new Date().toISOString(),
+      pileCount: this.piles.length,
+      cardCount: this.deck.model.cards.length,
+    });
   }
 
   private createCommandListeners(): void {

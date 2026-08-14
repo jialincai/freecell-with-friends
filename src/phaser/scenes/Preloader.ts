@@ -10,6 +10,10 @@ export default class Preloader extends Phaser.Scene {
   }
 
   public preload(): void {
+    console.log("Preloader: preload start", {
+      spritesheets: spritesheets.map(({ key, file }) => ({ key, file })),
+    });
+
     // Background
     this.add
       .image(
@@ -35,6 +39,7 @@ export default class Preloader extends Phaser.Scene {
 
     // Progress update
     this.load.on("progress", (value: number) => {
+      console.log("Preloader: load progress", value);
       progressBar.clear();
       progressBar.fillStyle(0xffffff, 1);
       progressBar.fillRect(
@@ -45,7 +50,22 @@ export default class Preloader extends Phaser.Scene {
       );
     });
 
+    this.load.on("filecomplete", (key: string, type: string) => {
+      console.log("Preloader: file loaded", { key, type });
+    });
+
+    this.load.on("loaderror", (file: Phaser.Loader.File) => {
+      console.error("Preloader: loaderror", {
+        key: file.key,
+        url: file.url,
+        type: file.type,
+      });
+    });
+
     this.load.on("complete", () => {
+      console.log("Preloader: load complete", {
+        textureKeys: this.textures.getTextureKeys(),
+      });
       progressBar.destroy();
       progressBox.destroy();
     });
@@ -57,6 +77,7 @@ export default class Preloader extends Phaser.Scene {
   }
 
   public create(): void {
+    console.log("Preloader: create, transitioning to Game scene");
     this.scene.start("Game");
   }
 }

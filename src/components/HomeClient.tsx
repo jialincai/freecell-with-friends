@@ -12,9 +12,25 @@ import { DealProvider } from "@/components/context/DealContext";
 import { fetcher } from "@/utils/fetcher";
 
 export default function HomeClient() {
-  const { data: deal, error, isLoading } = useSWR("/api/deal/current", fetcher);
+  const {
+    data: deal,
+    error,
+    isLoading,
+  } = useSWR("/api/deal/current", fetcher, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
 
-  if (error) return <ErrorPage />;
+  console.log("HomeClient: render", {
+    hasDeal: deal !== undefined,
+    error: error ? String(error) : null,
+    isLoading,
+  });
+
+  if (error) {
+    console.error("HomeClient: /api/deal/current failed", error);
+    return <ErrorPage />;
+  }
   if (isLoading) return <div aria-busy="true" aria-live="polite" />;
 
   return (

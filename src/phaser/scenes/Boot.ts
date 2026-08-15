@@ -2,18 +2,32 @@ import * as Phaser from "phaser";
 import { dlog, derror } from "@/utils/debugLog";
 
 export default class Boot extends Phaser.Scene {
+  private heartbeatId!: number;
+
   public constructor() {
     super("Boot");
   }
 
   public preload(): void {
+    // Heartbeat: setInterval only needs the JS event loop alive, not the
+    // network, to fire. If this stops printing, the page/JS thread itself
+    // died (crash or OOM kill) rather than a request hanging.
+    const heartbeatStart = performance.now();
+    this.heartbeatId = window.setInterval(() => {
+      dlog("Boot: heartbeat", {
+        elapsedMs: Math.round(performance.now() - heartbeatStart),
+      });
+    }, 500);
+
+    dlog("Boot: preload entered");
+
     // Phaser's load.baseURL/load.path are "" by default (expected) — with
     // both empty, "img/loading.png" is resolved as a *relative* URL against
     // document.baseURI, not against the site root. If the page URL isn't
     // exactly "/" (trailing slash, query string, or an in-app browser like
     // Instagram/Facebook rewriting the URL), this resolves to the wrong path.
     const resolvedImageUrl = new URL("img/loading.png", document.baseURI).href;
-    dlog("Boot: preload start, loading img/loading.png", {
+    dlog("Boot: resolved image URL computed", {
       href: window.location.href,
       pathname: window.location.pathname,
       search: window.location.search,
@@ -23,6 +37,8 @@ export default class Boot extends Phaser.Scene {
       loaderBaseURL: this.load.baseURL,
       loaderPath: this.load.path,
     });
+
+    dlog("Boot: registering loader listeners");
 
     this.load.on("filestart", (file: Phaser.Loader.File) => {
       dlog("Boot: filestart", { key: file.key, url: file.url });
@@ -51,6 +67,7 @@ export default class Boot extends Phaser.Scene {
       });
       controller.abort();
     }, 8000);
+    dlog("Boot: starting diagnostic fetch");
     fetch(diagnosticUrl, { signal: controller.signal })
       .then((res) => {
         window.clearTimeout(timeoutId);
@@ -72,10 +89,13 @@ export default class Boot extends Phaser.Scene {
         });
       });
 
+    dlog("Boot: calling this.load.image", { key: "img_load" });
     this.load.image("img_load", "img/loading.png");
+    dlog("Boot: this.load.image call returned");
   }
 
   public create(): void {
+    window.clearInterval(this.heartbeatId);
     dlog("Boot: create, transitioning to Preloader scene");
     this.scene.start("Preloader");
   }

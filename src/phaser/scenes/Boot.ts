@@ -21,6 +21,33 @@ export default class Boot extends Phaser.Scene {
 
     dlog("Boot: preload entered");
 
+    const rendererTypeNames: Record<number, string> = {
+      [Phaser.CANVAS]: "CANVAS",
+      [Phaser.WEBGL]: "WEBGL",
+      [Phaser.HEADLESS]: "HEADLESS",
+    };
+    dlog("Boot: renderer/canvas info", {
+      rendererType:
+        rendererTypeNames[this.game.renderer.type] ?? this.game.renderer.type,
+      canvasWidth: this.game.canvas?.width,
+      canvasHeight: this.game.canvas?.height,
+      canvasStyleWidth: this.game.canvas?.style.width,
+      canvasStyleHeight: this.game.canvas?.style.height,
+      scaleWidth: this.scale.width,
+      scaleHeight: this.scale.height,
+      devicePixelRatio: window.devicePixelRatio,
+    });
+
+    if (this.game.renderer.type === Phaser.WEBGL) {
+      const canvas = this.game.canvas;
+      canvas.addEventListener("webglcontextlost", (event) => {
+        derror("Boot: webglcontextlost", { type: event.type });
+      });
+      canvas.addEventListener("webglcontextrestored", () => {
+        dlog("Boot: webglcontextrestored");
+      });
+    }
+
     // Phaser's load.baseURL/load.path are "" by default (expected) — with
     // both empty, "img/loading.png" is resolved as a *relative* URL against
     // document.baseURI, not against the site root. If the page URL isn't
@@ -39,6 +66,10 @@ export default class Boot extends Phaser.Scene {
     });
 
     dlog("Boot: registering loader listeners");
+
+    this.load.on("start", () => {
+      dlog("Boot: loader start event (actual network/decode begins now)");
+    });
 
     this.load.on("filestart", (file: Phaser.Loader.File) => {
       dlog("Boot: filestart", { key: file.key, url: file.url });

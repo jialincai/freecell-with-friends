@@ -16,9 +16,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
     const containerId = "game-container";
     const containerRef = useRef<HTMLDivElement | null>(null);
     const gameRef = useRef<Phaser.Game | null>(null);
-    const sessionStatusRef = useRef<ReturnType<typeof useSession>["status"]>(
-      undefined,
-    );
+    const sessionStatusRef = useRef<ReturnType<typeof useSession>["status"]>();
 
     const deal = useDailyDeal();
     sessionStatusRef.current = useSession().status;

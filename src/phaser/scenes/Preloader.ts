@@ -2,7 +2,7 @@ import * as Phaser from "phaser";
 
 // Card images
 import { spritesheets } from "@/phaser/constants/assets";
-import { SCREEN_DIMENSIONS } from "@/phaser/constants/dimensions";
+import { GAME_SCALE, SCREEN_DIMENSIONS } from "@/phaser/constants/dimensions";
 import { dlog, derror } from "@/utils/debugLog";
 
 export default class Preloader extends Phaser.Scene {
@@ -22,15 +22,15 @@ export default class Preloader extends Phaser.Scene {
         SCREEN_DIMENSIONS.height / 4,
         "img_load",
       )
-      .setScale(2);
+      .setScale(2 * GAME_SCALE);
 
     const { width, height } = this.cameras.main;
 
     // Progress box (background of the progress bar)
     const progressBox = this.add.graphics();
     progressBox.fillStyle(0xaaaaaa, 0.8);
-    const barWidth = 600;
-    const barHeight = 100;
+    const barWidth = 600 * GAME_SCALE;
+    const barHeight = 100 * GAME_SCALE;
     const barX = (width - barWidth) / 2;
     const barY = height / 2;
     progressBox.fillRect(barX, barY, barWidth, barHeight);

@@ -47,6 +47,7 @@ import { createMeta, Meta } from "@/phaser/meta/Meta";
 import MetaSaveable from "@/phaser/meta/MetaSaveable";
 import { withComplete } from "@/phaser/meta/domain/MetaLogic";
 import { EventBus } from "@/phaser/EventBus";
+import { dlog } from "@/utils/debugLog";
 
 export default class Game extends Phaser.Scene {
   private save!: SaveController;
@@ -69,7 +70,7 @@ export default class Game extends Phaser.Scene {
   // TODO: This function is getting to long.
   // Consider breaking into smaller function that implement State pattern for different solitaire games.
   public create(): void {
-    console.log("Game: create start", {
+    dlog("Game: create start", {
       time: new Date().toISOString(),
       textureKeys: this.textures.getTextureKeys(),
     });
@@ -165,7 +166,7 @@ export default class Game extends Phaser.Scene {
       });
     }
 
-    console.log("Game: create complete, game is now interactive", {
+    dlog("Game: create complete, game is now interactive", {
       time: new Date().toISOString(),
       pileCount: this.piles.length,
       cardCount: this.deck.model.cards.length,

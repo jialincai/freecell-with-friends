@@ -5,6 +5,7 @@ import { CardMoveSequence } from "@/phaser/move/CardMoveSequence";
 import { useDailyDeal } from "@/components/context/DealContext";
 import "@/styles/game/PhasorGame.module.css";
 import { useSession } from "next-auth/react";
+import { dlog, derror } from "@/utils/debugLog";
 
 export interface IRefPhaserGame {
   game: Phaser.Game | null;
@@ -23,7 +24,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
     sessionStatusRef.current = useSession().status;
 
     useLayoutEffect(() => {
-      console.log("PhaserGame: useLayoutEffect fired", {
+      dlog("PhaserGame: useLayoutEffect fired", {
         hasExistingGame: gameRef.current !== null,
         seed: deal.seed,
         userAgent: navigator.userAgent,
@@ -31,7 +32,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
 
       if (gameRef.current === null) {
         const loadGame = async () => {
-          console.log("PhaserGame: (re)creating Phaser.Game instance", {
+          dlog("PhaserGame: (re)creating Phaser.Game instance", {
             seed: deal.seed,
             time: new Date().toISOString(),
           });
@@ -39,22 +40,16 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
           try {
             const { default: StartGame } = await import("@/phaser/main");
             gameRef.current = StartGame(containerId, deal.seed);
-            console.log(
-              "PhaserGame: Phaser.Game instance created successfully",
-              {
-                hasGame: gameRef.current !== null,
-              },
-            );
+            dlog("PhaserGame: Phaser.Game instance created successfully", {
+              hasGame: gameRef.current !== null,
+            });
           } catch (err) {
-            console.error(
-              "PhaserGame: failed to create Phaser.Game instance",
-              err,
-            );
+            derror("PhaserGame: failed to create Phaser.Game instance", err);
             throw err;
           }
         };
         loadGame().catch((err) => {
-          console.error("PhaserGame: loadGame() rejected", err);
+          derror("PhaserGame: loadGame() rejected", err);
         });
 
         if (typeof ref === "function") {
@@ -65,7 +60,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
       }
 
       return () => {
-        console.log("PhaserGame: useLayoutEffect cleanup", {
+        dlog("PhaserGame: useLayoutEffect cleanup", {
           hasGame: gameRef.current !== null,
         });
         if (gameRef.current) {
@@ -80,14 +75,14 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
 
       import("@/phaser/EventBus")
         .then(({ EventBus }) => {
-          console.log(
+          dlog(
             "PhaserGame: EventBus loaded, registering game-completed handler",
           );
           const handler = async (
             completionTimeMs: number,
             moveArray: CardMoveSequence[],
           ) => {
-            console.log("PhaserGame: game-completed event received", {
+            dlog("PhaserGame: game-completed event received", {
               completionTimeMs,
               sessionStatus: sessionStatusRef.current,
             });
@@ -105,9 +100,9 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
               });
 
               if (!res.ok) throw new Error(await res.text());
-              console.log("PhaserGame: completion submitted successfully");
+              dlog("PhaserGame: completion submitted successfully");
             } catch (err) {
-              console.error("Failed to submit completion:", err);
+              derror("Failed to submit completion:", err);
             }
           };
 
@@ -115,7 +110,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
           cleanup = () => EventBus.off("game-completed", handler);
         })
         .catch((err) => {
-          console.error("PhaserGame: failed to load EventBus module", err);
+          derror("PhaserGame: failed to load EventBus module", err);
         });
 
       return () => cleanup();

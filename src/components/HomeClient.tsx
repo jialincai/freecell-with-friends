@@ -10,6 +10,7 @@ import FreecellGame from "@/components/game/FreecellGame";
 import ErrorPage from "@/components/ui/ErrorPage";
 import { DealProvider } from "@/components/context/DealContext";
 import { fetcher } from "@/utils/fetcher";
+import { dlog, derror } from "@/utils/debugLog";
 
 export default function HomeClient() {
   const {
@@ -21,14 +22,14 @@ export default function HomeClient() {
     revalidateOnReconnect: false,
   });
 
-  console.log("HomeClient: render", {
+  dlog("HomeClient: render", {
     hasDeal: deal !== undefined,
     error: error ? String(error) : null,
     isLoading,
   });
 
   if (error) {
-    console.error("HomeClient: /api/deal/current failed", error);
+    derror("HomeClient: /api/deal/current failed", error);
     return <ErrorPage />;
   }
   if (isLoading) return <div aria-busy="true" aria-live="polite" />;

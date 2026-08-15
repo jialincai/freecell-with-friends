@@ -3,6 +3,7 @@ import * as Phaser from "phaser";
 // Card images
 import { spritesheets } from "@/phaser/constants/assets";
 import { SCREEN_DIMENSIONS } from "@/phaser/constants/dimensions";
+import { dlog, derror } from "@/utils/debugLog";
 
 export default class Preloader extends Phaser.Scene {
   public constructor() {
@@ -10,7 +11,7 @@ export default class Preloader extends Phaser.Scene {
   }
 
   public preload(): void {
-    console.log("Preloader: preload start", {
+    dlog("Preloader: preload start", {
       spritesheets: spritesheets.map(({ key, file }) => ({ key, file })),
     });
 
@@ -39,7 +40,7 @@ export default class Preloader extends Phaser.Scene {
 
     // Progress update
     this.load.on("progress", (value: number) => {
-      console.log("Preloader: load progress", value);
+      dlog("Preloader: load progress", value);
       progressBar.clear();
       progressBar.fillStyle(0xffffff, 1);
       progressBar.fillRect(
@@ -51,11 +52,11 @@ export default class Preloader extends Phaser.Scene {
     });
 
     this.load.on("filecomplete", (key: string, type: string) => {
-      console.log("Preloader: file loaded", { key, type });
+      dlog("Preloader: file loaded", { key, type });
     });
 
     this.load.on("loaderror", (file: Phaser.Loader.File) => {
-      console.error("Preloader: loaderror", {
+      derror("Preloader: loaderror", {
         key: file.key,
         url: file.url,
         type: file.type,
@@ -63,7 +64,7 @@ export default class Preloader extends Phaser.Scene {
     });
 
     this.load.on("complete", () => {
-      console.log("Preloader: load complete", {
+      dlog("Preloader: load complete", {
         textureKeys: this.textures.getTextureKeys(),
       });
       progressBar.destroy();
@@ -77,7 +78,7 @@ export default class Preloader extends Phaser.Scene {
   }
 
   public create(): void {
-    console.log("Preloader: create, transitioning to Game scene");
+    dlog("Preloader: create, transitioning to Game scene");
     this.scene.start("Game");
   }
 }

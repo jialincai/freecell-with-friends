@@ -1,3 +1,5 @@
+import { dlog, derror } from "@/utils/debugLog";
+
 export async function fetcher(
   url: string,
   options?: {
@@ -5,17 +7,17 @@ export async function fetcher(
     init?: RequestInit;
   },
 ) {
-  console.log("fetcher: requesting", url);
+  dlog("fetcher: requesting", url);
 
   let res: Response;
   try {
     res = await fetch(url, options?.init);
   } catch (err) {
-    console.error("fetcher: network error for", url, err);
+    derror("fetcher: network error", { url, err });
     throw err;
   }
 
-  console.log("fetcher: response", url, res.status);
+  dlog("fetcher: response", { url, status: res.status });
 
   if (options?.silentCodes?.includes(res.status)) {
     return null;
@@ -23,7 +25,7 @@ export async function fetcher(
 
   if (!res.ok) {
     const message = await res.text();
-    console.error("fetcher: non-ok response", url, res.status, message);
+    derror("fetcher: non-ok response", { url, status: res.status, message });
     throw new Error(`Fetch failed: ${res.status} ${message}`);
   }
 

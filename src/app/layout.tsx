@@ -46,19 +46,32 @@ export default function RootLayout({ children }: LayoutProps) {
         <meta name="theme-color" content="#ffffff" />
         <Script id="global-error-logger" strategy="beforeInteractive">
           {`
+            function safeStringify(data) {
+              try {
+                return JSON.stringify(data, function (key, value) {
+                  if (value instanceof Error) {
+                    return { name: value.name, message: value.message, stack: value.stack };
+                  }
+                  return value;
+                }, 2);
+              } catch (e) {
+                return String(data);
+              }
+            }
             window.addEventListener("error", function (event) {
-              console.error("[global-error]", event.message, {
+              console.error("[global-error] " + event.message + " " + safeStringify({
                 filename: event.filename,
                 lineno: event.lineno,
                 colno: event.colno,
                 stack: event.error && event.error.stack,
                 userAgent: navigator.userAgent,
-              });
+              }));
             });
             window.addEventListener("unhandledrejection", function (event) {
-              console.error("[unhandled-rejection]", event.reason, {
+              console.error("[unhandled-rejection] " + safeStringify({
+                reason: event.reason,
                 userAgent: navigator.userAgent,
-              });
+              }));
             });
           `}
         </Script>

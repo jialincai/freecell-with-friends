@@ -1,4 +1,5 @@
 import * as Phaser from "phaser";
+import { dlog, derror } from "@/utils/debugLog";
 
 export default class Boot extends Phaser.Scene {
   public constructor() {
@@ -12,7 +13,7 @@ export default class Boot extends Phaser.Scene {
     // exactly "/" (trailing slash, query string, or an in-app browser like
     // Instagram/Facebook rewriting the URL), this resolves to the wrong path.
     const resolvedImageUrl = new URL("img/loading.png", document.baseURI).href;
-    console.log("Boot: preload start, loading img/loading.png", {
+    dlog("Boot: preload start, loading img/loading.png", {
       href: window.location.href,
       pathname: window.location.pathname,
       search: window.location.search,
@@ -24,15 +25,15 @@ export default class Boot extends Phaser.Scene {
     });
 
     this.load.on("filestart", (file: Phaser.Loader.File) => {
-      console.log("Boot: filestart", { key: file.key, url: file.url });
+      dlog("Boot: filestart", { key: file.key, url: file.url });
     });
 
     this.load.on("filecomplete", (key: string, type: string) => {
-      console.log("Boot: filecomplete", { key, type });
+      dlog("Boot: filecomplete", { key, type });
     });
 
     this.load.on("loaderror", (file: Phaser.Loader.File) => {
-      console.error("Boot: loaderror", {
+      derror("Boot: loaderror", {
         key: file.key,
         url: file.url,
         type: file.type,
@@ -45,7 +46,7 @@ export default class Boot extends Phaser.Scene {
     const diagnosticStart = performance.now();
     const controller = new AbortController();
     const timeoutId = window.setTimeout(() => {
-      console.error("Boot: diagnostic fetch timed out after 8000ms", {
+      derror("Boot: diagnostic fetch timed out after 8000ms", {
         url: diagnosticUrl,
       });
       controller.abort();
@@ -53,7 +54,7 @@ export default class Boot extends Phaser.Scene {
     fetch(diagnosticUrl, { signal: controller.signal })
       .then((res) => {
         window.clearTimeout(timeoutId);
-        console.log("Boot: diagnostic fetch resolved", {
+        dlog("Boot: diagnostic fetch resolved", {
           url: diagnosticUrl,
           status: res.status,
           ok: res.ok,
@@ -64,7 +65,7 @@ export default class Boot extends Phaser.Scene {
       })
       .catch((err) => {
         window.clearTimeout(timeoutId);
-        console.error("Boot: diagnostic fetch failed", {
+        derror("Boot: diagnostic fetch failed", {
           url: diagnosticUrl,
           err,
           durationMs: Math.round(performance.now() - diagnosticStart),
@@ -75,7 +76,7 @@ export default class Boot extends Phaser.Scene {
   }
 
   public create(): void {
-    console.log("Boot: create, transitioning to Preloader scene");
+    dlog("Boot: create, transitioning to Preloader scene");
     this.scene.start("Preloader");
   }
 }

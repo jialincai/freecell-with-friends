@@ -1,6 +1,11 @@
 "use client";
 
-import { forwardRef, useEffect, useLayoutEffect, useRef } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+} from "react";
 import { CardMoveSequence } from "@/phaser/move/CardMoveSequence";
 import { useDailyDeal } from "@/components/context/DealContext";
 import "@/styles/game/PhasorGame.module.css";

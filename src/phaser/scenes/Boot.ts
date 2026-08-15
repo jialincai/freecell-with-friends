@@ -6,11 +6,21 @@ export default class Boot extends Phaser.Scene {
   }
 
   public preload(): void {
+    // Phaser's load.baseURL/load.path are "" by default (expected) — with
+    // both empty, "img/loading.png" is resolved as a *relative* URL against
+    // document.baseURI, not against the site root. If the page URL isn't
+    // exactly "/" (trailing slash, query string, or an in-app browser like
+    // Instagram/Facebook rewriting the URL), this resolves to the wrong path.
+    const resolvedImageUrl = new URL("img/loading.png", document.baseURI).href;
     console.log("Boot: preload start, loading img/loading.png", {
       href: window.location.href,
+      pathname: window.location.pathname,
+      search: window.location.search,
       protocol: window.location.protocol,
-      baseURL: this.load.baseURL,
-      path: this.load.path,
+      documentBaseURI: document.baseURI,
+      resolvedImageUrl,
+      loaderBaseURL: this.load.baseURL,
+      loaderPath: this.load.path,
     });
 
     this.load.on("filestart", (file: Phaser.Loader.File) => {
@@ -31,7 +41,7 @@ export default class Boot extends Phaser.Scene {
 
     // Diagnostic: fetch the same asset directly (outside Phaser's XHR loader)
     // to tell whether a hang is in Phaser's loader or the network request itself.
-    const diagnosticUrl = "img/loading.png";
+    const diagnosticUrl = resolvedImageUrl;
     const diagnosticStart = performance.now();
     const controller = new AbortController();
     const timeoutId = window.setTimeout(() => {

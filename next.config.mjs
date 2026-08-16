@@ -10,12 +10,6 @@ const nextConfig = {
         destination: 'https://www.freecellwithfriends.com/:path*',
         permanent: true,
       },
-      {
-        source: '/:path*',
-        has: [{ type: 'host', value: 'www.freecellwithfriends.com' }],
-        destination: 'https://www.freecellwithfriends.com/:path*',
-        permanent: true,
-      },
     ];
   }
 };

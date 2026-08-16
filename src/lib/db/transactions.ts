@@ -1,6 +1,8 @@
 import sql from "@/lib/db";
 import { Streak } from "./streaks";
 
+type Sql = typeof sql;
+
 export async function upsertNewUser({
   userId,
   email,
@@ -22,15 +24,44 @@ export async function upsertNewUser({
   });
 }
 
+export async function upsertGame(
+  {
+    userId,
+    dealId,
+    elapsedTimeMs,
+    moves,
+    completed,
+  }: {
+    userId: string;
+    dealId: number;
+    elapsedTimeMs: number;
+    moves: string;
+    completed: boolean;
+  },
+  tx: Sql = sql,
+) {
+  // Once a game is marked completed, the server's state is authoritative:
+  // further upserts (e.g. late progress syncs from the client) are no-ops.
+  await tx`
+    INSERT INTO games (user_id, deal_id, elapsed_time_ms, moves, completed)
+    VALUES (${userId}, ${dealId}, ${elapsedTimeMs}, ${moves}::jsonb, ${completed})
+    ON CONFLICT (user_id, deal_id) DO UPDATE
+    SET elapsed_time_ms = EXCLUDED.elapsed_time_ms,
+        moves = EXCLUDED.moves,
+        completed = games.completed OR EXCLUDED.completed
+    WHERE games.completed = false
+  `;
+}
+
 export async function updateStreakOnCompletion({
   userId,
   dealId,
-  completionTimeMs,
+  elapsedTimeMs,
   moves,
 }: {
   userId: string;
   dealId: number;
-  completionTimeMs: number;
+  elapsedTimeMs: number;
   moves: string;
 }) {
   const [streak] = await sql<Streak[]>`
@@ -45,13 +76,12 @@ export async function updateStreakOnCompletion({
   const max = Math.max(streak.max, curr);
   const lastDealId = dealId;
 
-  await sql.begin(async (sql) => {
-    await sql`
-      INSERT INTO completions (user_id, deal_id, completion_time_ms, moves)
-      VALUES (${userId}, ${dealId}, ${completionTimeMs}, ${moves}::jsonb)
-      ON CONFLICT (user_id, deal_id) DO NOTHING
-    `;
-    await sql`
+  await sql.begin(async (tx) => {
+    await upsertGame(
+      { userId, dealId, elapsedTimeMs, moves, completed: true },
+      tx,
+    );
+    await tx`
       UPDATE streaks
       SET curr = ${curr},
           max = ${max},

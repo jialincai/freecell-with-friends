@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import authOptions from "@/auth/config";
-import { getUserCompletionStats } from "@/lib/db/completions";
+import { getUserCompletionStats } from "@/lib/db/games";
 import { getStreak, resetStreak } from "@/lib/db/streaks";
 import { getDeal } from "@/lib/db/deals";
 import { getCurrentUTCDateString } from "@/utils/Function";

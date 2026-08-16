@@ -25,10 +25,10 @@ def main():
 
     with open(csv_path, "w", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(["id", "seed", "date"])
+        writer.writerow(["seed", "date"])
         for i, seed in enumerate(seeds):
             date_str = (START_DATE + timedelta(days=i)).isoformat()
-            writer.writerow([i + 1, seed, date_str])
+            writer.writerow([seed, date_str])
 
     # Write metadata
     metadata = {

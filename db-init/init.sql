@@ -16,16 +16,17 @@ This command is for REMOTE DEVELOPMENT ONLY.
 Do not run this command in Neon's SQL editor.
 */
 COPY deals (seed, date)
-FROM '/docker-entrypoint-initdb.d/freecell_deals_shuffled_20250723.csv'
+FROM '/docker-entrypoint-initdb.d/freecell_deals_shuffled_20260809.csv'
 WITH (FORMAT csv, HEADER);
 
-CREATE TABLE completions (
+CREATE TABLE games (
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   deal_id INTEGER REFERENCES deals(id) ON DELETE CASCADE,
-  completion_time_ms INTEGER NOT NULL CHECK (
-    completion_time_ms >= 0 AND completion_time_ms <= 86400000
+  elapsed_time_ms INTEGER NOT NULL CHECK (
+    elapsed_time_ms >= 0 AND elapsed_time_ms <= 86400000
   ),
   moves JSONB NOT NULL,
+  completed BOOLEAN NOT NULL DEFAULT FALSE,
   PRIMARY KEY(user_id, deal_id)
 );
 

@@ -2,6 +2,7 @@
 
 import { forwardRef, useEffect, useLayoutEffect, useRef } from "react";
 import { CardMoveSequence } from "@/phaser/move/CardMoveSequence";
+import type Game from "@/phaser/scenes/Game";
 import { useDailyDeal } from "@/components/context/DealContext";
 import "@/styles/game/PhasorGame.module.css";
 import { useSession } from "next-auth/react";
@@ -10,6 +11,10 @@ export interface IRefPhaserGame {
   game: Phaser.Game | null;
   scene: Phaser.Scene | null;
 }
+
+// Server sync runs on its own cadence, independent of the local autosave
+// cadence in Game.ts.
+const SERVER_SYNC_INTERVAL_MS = 30_000;
 
 export const PhaserGame = forwardRef<IRefPhaserGame>(
   function PhaserGame(_, ref) {
@@ -53,7 +58,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
             if (sessionStatus !== "authenticated") return;
 
             try {
-              const res = await fetch("/api/completion", {
+              const res = await fetch("/api/game/completion", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -71,6 +76,36 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
       };
 
       loadEventBus();
+    }, [sessionStatus, deal]);
+
+    useEffect(() => {
+      if (sessionStatus !== "authenticated") return;
+
+      const intervalId = setInterval(async () => {
+        const scene = gameRef.current?.scene.getScene("Game") as
+          | Game
+          | undefined;
+        if (!scene) return;
+
+        const { elapsedTimeMs, moveArray } = scene.getProgress();
+
+        try {
+          const res = await fetch("/api/game/save", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              elapsedTimeMs,
+              moveArray,
+            }),
+          });
+
+          if (!res.ok) throw new Error(await res.text());
+        } catch (err) {
+          console.error("Failed to sync game progress:", err);
+        }
+      }, SERVER_SYNC_INTERVAL_MS);
+
+      return () => clearInterval(intervalId);
     }, [sessionStatus, deal]);
 
     return <div id={containerId} ref={containerRef}></div>;

@@ -281,6 +281,17 @@ export default class Game extends Phaser.Scene {
     this.input.enabled = true;
   }
 
+  /** Current elapsed time and move history, for syncing progress to the server. */
+  public getProgress(): {
+    elapsedTimeMs: number;
+    moveArray: CardMoveSequence[];
+  } {
+    return {
+      elapsedTimeMs: this.session.model.state.timeElapsedMs,
+      moveArray: this.moveHistory.toArray(),
+    };
+  }
+
   public update(): void {
     if (this.meta.state.complete) return;
 

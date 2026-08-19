@@ -39,9 +39,9 @@ The `Dockerfile` and the `app` service in `docker-compose.yml` are intentionally
 
 React (`src/app`, `src/components`) owns everything *around* the game: auth, routing, overlays (login/stats/help), daily-deal fetching. Phaser (`src/phaser`) owns the game itself and runs independently once mounted — it does not receive props/state updates from React after boot.
 
-- `src/components/game/PhasorGame.tsx` dynamically imports `@/phaser/main` in `useLayoutEffect` (Phaser must not be SSR'd/bundled server-side), calls `StartGame(containerId, seed)` with the seed from `useDailyDeal()` (`src/components/context/DealContext.tsx`, populated via SWR from `/api/deal/current`).
-- The **only** channel back from Phaser to React is `src/phaser/EventBus.ts`, a shared `Phaser.Events.EventEmitter`. On win, `src/phaser/scenes/Game.ts` emits `"game-completed"`; `PhasorGame.tsx` listens and `POST`s to `/api/completion`.
-- In-progress game state is *not* shared with React or the server at all — it lives only in `localStorage` (see Save system below). Only a finished game's summary gets sent to the backend.
+- `src/components/game/PhasorGame.tsx` dynamically imports `@/phaser/main` in `useLayoutEffect` (Phaser must not be SSR'd/bundled server-side), calls `StartGame(containerId, seed)` with the seed from `useDailyDeal()` (`src/components/context/DealContext.tsx`, populated via SWR from `/api/game/deal`).
+- The **only** channel back from Phaser to React is `src/phaser/EventBus.ts`, a shared `Phaser.Events.EventEmitter`. On win, `src/phaser/scenes/Game.ts` emits `"game-completed"`; `PhasorGame.tsx` listens and `POST`s to `/api/game/completion`.
+- In-progress game state lives primarily in `localStorage` (see Save system below). For authenticated users, `PhasorGame.tsx` also polls the running `Game` scene's `getProgress()` every 30s and posts elapsed time + move history to `/api/game/progress`, so play can resume across devices; a finished game's summary goes to `/api/game/completion` instead.
 
 ### Phaser engine: domain/state/Controller/View pattern
 
@@ -88,10 +88,11 @@ Schema (`db-init/init.sql`): `users(id UUID PK, email)`, `deals(id, seed UNIQUE,
 
 ### API routes (`src/app/api`)
 
-Thin — auth check (where required) + delegate to `src/lib/db`:
+Thin — auth check (where required) + delegate to `src/lib/db`. Grouped by domain: `game/*` (deal, in-progress save, completion) and `user/*` (stats, share).
 
-- `GET /api/deal/current` — today's deal, unauthenticated.
-- `POST /api/completion` — records a completed game + updates streak; requires session.
+- `GET /api/game/deal` — today's deal, unauthenticated.
+- `POST /api/game/progress` — periodic in-progress sync (elapsed time + move history) for authenticated users; upserts via `upsertGame` with `completed: false`, guarded so it can never overwrite an already-completed game.
+- `POST /api/game/completion` — records a completed game + updates streak via `updateStreakAndCompleteGame`; requires session.
 - `GET /api/user/stats` — played count, avg time, current/max streak; requires session. Also self-heals a stale streak (resets `curr` to 0 if the user's last completed deal is more than one deal behind today).
 - `POST /api/user/share` — completion-time percentile vs. other players of today's deal; no auth required.
 

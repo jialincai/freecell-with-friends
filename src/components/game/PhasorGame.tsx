@@ -90,7 +90,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
         const { elapsedTimeMs, moveArray } = scene.getProgress();
 
         try {
-          const res = await fetch("/api/game/save", {
+          const res = await fetch("/api/game/progress", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

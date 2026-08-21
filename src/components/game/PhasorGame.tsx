@@ -1,6 +1,12 @@
 "use client";
 
-import { forwardRef, useEffect, useLayoutEffect, useRef } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { CardMoveSequence } from "@/phaser/move/CardMoveSequence";
 import type Game from "@/phaser/scenes/Game";
 import { useDailyDeal } from "@/components/context/DealContext";
@@ -22,6 +28,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
     const containerRef = useRef<HTMLDivElement | null>(null);
     const gameRef = useRef<Phaser.Game | null>(null);
 
+    const [gameLoaded, setGameLoaded] = useState(false);
     const { status: sessionStatus } = useSession();
     const deal = useDailyDeal();
 
@@ -30,6 +37,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
         const loadGame = async () => {
           const { default: StartGame } = await import("@/phaser/main");
           gameRef.current = StartGame(containerId, deal.seed);
+          setGameLoaded(true);
         };
         loadGame();
 
@@ -44,51 +52,79 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
         if (gameRef.current) {
           gameRef.current.destroy(true);
           gameRef.current = null;
+          setGameLoaded(false);
         }
       };
     }, [ref, deal]);
 
+    // Syncs a completion to the server. Two triggers:
+    // 1. The live "game-completed" event, fired the moment the game is won.
+    // 2. Immediately on mount/login, in case the local save was already
+    //    completed anonymously and never made it to the server.
     useEffect(() => {
-      const loadEventBus = async () => {
-        const { EventBus } = await import("@/phaser/EventBus");
+      let registeredCompletionEvent = false;
 
-        EventBus.on(
-          "game-completed",
-          async (completionTimeMs: number, moveArray: CardMoveSequence[]) => {
-            if (sessionStatus !== "authenticated") return;
+      const postCompletion = async (
+        completionTimeMs: number,
+        moveArray: CardMoveSequence[],
+      ) => {
+        if (sessionStatus !== "authenticated") return;
 
-            try {
-              const res = await fetch("/api/game/completion", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  completionTimeMs,
-                  moveArray,
-                }),
-              });
+        try {
+          const res = await fetch("/api/game/completion", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ completionTimeMs, moveArray }),
+          });
 
-              if (!res.ok) throw new Error(await res.text());
-            } catch (err) {
-              console.error("Failed to submit completion:", err);
-            }
-          },
-        );
+          if (!res.ok) throw new Error(await res.text());
+        } catch (err) {
+          console.error("Failed to sync completion:", err);
+        }
       };
 
-      loadEventBus();
-    }, [sessionStatus, deal]);
-
-    useEffect(() => {
-      if (sessionStatus !== "authenticated") return;
-
-      const intervalId = setInterval(async () => {
+      // Trigger 1: game already complete locally (e.g. an anonymous
+      // completion) at the moment we're mounted/authenticated.
+      const syncCompletionOnLogin = () => {
         const scene = gameRef.current?.scene.getScene("Game") as
           | Game
           | undefined;
-        if (!scene) return;
+        if (!scene || !scene.isComplete()) return;
 
         const { elapsedTimeMs, moveArray } = scene.getProgress();
+        postCompletion(elapsedTimeMs, moveArray);
+      };
+      syncCompletionOnLogin();
 
+      // Trigger 2: game completes live, during this session.
+      const loadEventBus = async () => {
+        const { EventBus } = await import("@/phaser/EventBus");
+        if (registeredCompletionEvent) return;
+        EventBus.on("game-completed", postCompletion);
+      };
+      loadEventBus();
+
+      return () => {
+        import("@/phaser/EventBus").then(({ EventBus }) => {
+          EventBus.off("game-completed", postCompletion);
+        });
+        registeredCompletionEvent = false;
+      };
+    }, [sessionStatus, deal, gameLoaded]);
+
+    // Periodically syncs local game progress to server.
+    // See SERVER_SYNC_INTERVAL_MS.
+    // Stops polling once the game is complete.
+    useEffect(() => {
+      if (sessionStatus !== "authenticated") return;
+
+      const sync = async () => {
+        const scene = gameRef.current?.scene.getScene("Game") as
+          | Game
+          | undefined;
+        if (!scene || scene.isComplete()) return;
+
+        const { elapsedTimeMs, moveArray } = scene.getProgress();
         try {
           const res = await fetch("/api/game/progress", {
             method: "POST",
@@ -103,8 +139,9 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
         } catch (err) {
           console.error("Failed to sync game progress:", err);
         }
-      }, SERVER_SYNC_INTERVAL_MS);
+      };
 
+      const intervalId = setInterval(sync, SERVER_SYNC_INTERVAL_MS);
       return () => clearInterval(intervalId);
     }, [sessionStatus, deal]);
 

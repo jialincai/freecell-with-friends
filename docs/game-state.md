@@ -16,18 +16,20 @@ flowchart LR
 
     localStorage -- local progress --> reactComponent
     reactComponent -- consolidated progress --> phaserScene
-    phaserScene -- periodic sync --> localStorage
+    phaserScene -- periodic autosave --> localStorage
+    reactComponent -- periodically requests progress --> phaserScene
   end
 
   remoteDb -- server progress --> reactComponent
-  phaserScene -- periodic sync --> remoteDb
+  reactComponent -- periodic sync --> remoteDb
 ```
 
 `reactComponent` (`PhasorGame.tsx`) reads local progress from `localStorage`
 and fetches server progress from `remoteDb`, consolidates the two into one
 starting point, and pipes it into `phaserScene` (`Game.ts`) via the Phaser
-registry (below). From there, `phaserScene` periodically pushes updated
-progress back out to both `localStorage` and `remoteDb`.
+registry (below). From there, `phaserScene` autosaves to `localStorage` on its
+own 1s timer; `reactComponent` separately polls `phaserScene` for progress
+and sends it on to `remoteDb`.
 
 ## Phaser registry
 

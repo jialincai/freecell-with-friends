@@ -142,8 +142,17 @@ export default class Game extends Phaser.Scene {
     setupCardInteraction(this.deck, this.moveHistory);
     setupHoverHighlight(this.deck, this.piles);
 
-    // Final persistant data to registered saveables
-    this.save.loadFromStorage();
+    // Caller (PhasorGame.tsx) already resolved local vs. server progress
+    // into a single authoritative starting point.
+    const initElapsedTimeMs = this.registry.get("initElapsedTimeMs") as number;
+    const initMoveArray = this.registry.get(
+      "initMoveArray",
+    ) as CardMoveSequence[];
+    initMoveArray.forEach((moveSequence) => {
+      this.moveHistory.push(createCardMoveSequence(moveSequence.steps));
+    });
+    this.session.setTimeElapsedMs(initElapsedTimeMs);
+    this.save.saveToStorage();
 
     // Start timed events or load complete state
     if (this.meta.state.complete) {

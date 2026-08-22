@@ -9,6 +9,9 @@ import {
 } from "react";
 import { CardMoveSequence } from "@/phaser/move/CardMoveSequence";
 import type Game from "@/phaser/scenes/Game";
+import type { Meta } from "@/phaser/meta/Meta";
+import type { Session } from "@/phaser/session/Session";
+import SaveController from "@/utils/save/SaveController";
 import { useDailyDeal } from "@/components/context/DealContext";
 import "@/styles/game/PhasorGame.module.css";
 import { useSession } from "next-auth/react";
@@ -33,10 +36,65 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
     const deal = useDailyDeal();
 
     useLayoutEffect(() => {
+      if (sessionStatus === "loading") return;
+
       if (gameRef.current === null) {
         const loadGame = async () => {
           const { default: StartGame } = await import("@/phaser/main");
-          gameRef.current = StartGame(containerId, deal.seed);
+
+          // Step 1: read local save directly (bypassing Game.ts/SaveController's
+          // Phaser-side loading, since no scene exists yet to own it). A seed
+          // mismatch means the save is for a previous day's deal, so
+          // `activeLocalSave` is false and every field below falls back to
+          // its fresh-game default.
+          const localSave = SaveController.getSave();
+          const localMeta = localSave?.state.chunks.meta as Meta | undefined;
+          const activeLocalSave = localMeta?.data.seed === deal.seed;
+
+          let elapsedTimeMs = activeLocalSave
+            ? ((localSave?.state.chunks.session as Session | undefined)?.state
+                .timeElapsedMs ?? 0)
+            : 0;
+          let moveArray = activeLocalSave
+            ? ((localSave?.state.chunks.move as
+                | CardMoveSequence[]
+                | undefined) ?? [])
+            : [];
+          const localCompleted = activeLocalSave
+            ? (localMeta?.state.complete ?? false)
+            : false;
+
+          // Step 2: for authenticated users, the server is normally
+          // authoritative (it may hold progress from another device). The one
+          // exception is a local completion the server doesn't know about yet
+          // (e.g. completed anonymously, then just logged in) — favor local
+          // there so the completion-sync effect below can push it up, rather
+          // than starting the scene from the server's stale/empty progress.
+          if (sessionStatus === "authenticated") {
+            try {
+              const res = await fetch("/api/game/progress");
+              if (res.ok) {
+                const server = await res.json();
+                const preferLocal = localCompleted && !server.completed;
+                if (server.started && !preferLocal) {
+                  elapsedTimeMs = server.elapsedTimeMs;
+                  moveArray = server.moveArray;
+                }
+              }
+            } catch (err) {
+              console.error("Failed to fetch game progress:", err);
+            }
+          }
+
+          // Step 3: hand the scene a single resolved starting point — Game.ts
+          // applies it unconditionally, with no server-vs-local branching of
+          // its own.
+          gameRef.current = StartGame(
+            containerId,
+            deal.seed,
+            elapsedTimeMs,
+            moveArray,
+          );
           setGameLoaded(true);
         };
         loadGame();
@@ -55,7 +113,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
           setGameLoaded(false);
         }
       };
-    }, [ref, deal]);
+    }, [ref, deal, sessionStatus]);
 
     // Syncs a completion to the server. Two triggers:
     // 1. The live "game-completed" event, fired the moment the game is won.

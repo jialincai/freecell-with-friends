@@ -4,6 +4,7 @@ import Game from "@/phaser/scenes/Game";
 import Boot from "@/phaser/scenes/Boot";
 import { SCREEN_DIMENSIONS } from "phaser/constants/dimensions";
 import { BACKGROUND_COLOR } from "phaser/constants/colors";
+import { CardMoveSequence } from "@/phaser/move/CardMoveSequence";
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -17,9 +18,16 @@ const config: Phaser.Types.Core.GameConfig = {
   },
 };
 
-const StartGame = (parent: string, seed: number) => {
+const StartGame = (
+  parent: string,
+  seed: number,
+  initElapsedTimeMs: number,
+  initMoveArray: CardMoveSequence[],
+) => {
   const game = new Phaser.Game({ ...config, parent });
   game.registry.set("seed", seed);
+  game.registry.set("initElapsedTimeMs", initElapsedTimeMs);
+  game.registry.set("initMoveArray", initMoveArray);
   return game;
 };
 

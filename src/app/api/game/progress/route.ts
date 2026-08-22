@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import authOptions from "@/auth/config";
-import { updateStreakOnCompletion } from "@/lib/db/transactions";
+import { upsertGame } from "@/lib/db/transactions";
 import { getCurrentUTCDateString } from "@/utils/Function";
 import { getDeal } from "@/lib/db/deals";
 
@@ -11,13 +11,16 @@ export async function POST(req: Request) {
   }
 
   const deal = await getDeal(getCurrentUTCDateString());
-  const { completionTimeMs, moveArray } = await req.json();
+  const { elapsedTimeMs, moveArray } = await req.json();
 
-  await updateStreakOnCompletion({
+  // upsertGame's `WHERE games.completed = false` guard ensures a periodic
+  // in-progress sync can never overwrite an already-completed game.
+  await upsertGame({
     userId: session.user.id,
     dealId: deal.id,
-    elapsedTimeMs: completionTimeMs,
+    elapsedTimeMs,
     moves: JSON.stringify(moveArray),
+    completed: false,
   });
 
   return new Response(null, { status: 204 });

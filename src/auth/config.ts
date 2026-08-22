@@ -1,3 +1,4 @@
+import "server-only";
 import GoogleProvider from "next-auth/providers/google";
 import DiscordProvider from "next-auth/providers/discord";
 import { computeUserId } from "@/auth/ids";

@@ -281,6 +281,28 @@ export default class Game extends Phaser.Scene {
     this.input.enabled = true;
   }
 
+  /**
+   * Safe to call before create() has finished or when no local save exists yet.
+   * Both cases fall back to false.
+   */
+  public isComplete(): boolean {
+    return this.meta?.state.complete ?? false;
+  }
+
+  /**
+   * Safe to call before create() has finished or when no local save exists yet.
+   * Both cases fall back to zero/empty.
+   */
+  public getProgress(): {
+    elapsedTimeMs: number;
+    moveArray: CardMoveSequence[];
+  } {
+    return {
+      elapsedTimeMs: this.session?.model.state.timeElapsedMs ?? 0,
+      moveArray: this.moveHistory?.toArray() ?? [],
+    };
+  }
+
   public update(): void {
     if (this.meta.state.complete) return;
 

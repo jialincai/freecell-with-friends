@@ -3,6 +3,9 @@
 Two separate key/value stores, easy to confuse. Quick reference for what's
 in each.
 
+Arrows are colored by whether data is flowing **into** `phaserScene` (blue)
+or **out of** `phaserScene` (orange):
+
 ```mermaid
 flowchart LR
   subgraph Server
@@ -17,11 +20,14 @@ flowchart LR
     localStorage -- local progress --> reactComponent
     reactComponent -- consolidated progress --> phaserScene
     phaserScene -- periodic autosave --> localStorage
-    reactComponent -- periodically requests progress --> phaserScene
+    phaserScene -- periodic progress fetch --> reactComponent
   end
 
   remoteDb -- server progress --> reactComponent
   reactComponent -- periodic sync --> remoteDb
+
+  linkStyle 0,1,4 stroke:#3b82f6,color:#3b82f6
+  linkStyle 2,3,5 stroke:#f97316,color:#f97316
 ```
 
 `reactComponent` (`PhasorGame.tsx`) reads local progress from `localStorage`

@@ -62,7 +62,7 @@ Key: `freecellwithfriends_save`. Managed by `SaveController`
 { data: { version }, state: { chunks: { meta, session, move } } }
 ```
 
-| Chunk      | Type                    | Shape                                                          |
+| Key        | Type                    | Shape                                                          |
 | ----------- | ------------------------- | ------------------------------------------------------------------ |
 | `meta`       | `Meta`                     | `{ data: { version, seed }, state: { complete } }`               |
 | `session`    | `Session`                  | `{ data: {}, state: { timeElapsedMs } }`                          |

@@ -78,7 +78,13 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
                 const preferLocal = localCompleted && !server.completed;
                 if (server.started && !preferLocal) {
                   elapsedTimeMs = server.elapsedTimeMs;
-                  moveArray = server.moveArray;
+                  // `moves` is stored as JSONB but has been observed coming
+                  // back over the wire as a raw JSON string — parse
+                  // defensively so Phaser always receives a real array.
+                  moveArray =
+                    typeof server.moveArray === "string"
+                      ? JSON.parse(server.moveArray)
+                      : server.moveArray;
                 }
               }
             } catch (err) {

@@ -12,7 +12,7 @@ import { DealProvider } from "@/components/context/DealContext";
 import { fetcher } from "@/utils/fetcher";
 
 export default function HomeClient() {
-  const { data: deal, error, isLoading } = useSWR("/api/deal/current", fetcher);
+  const { data: deal, error, isLoading } = useSWR("/api/game/deal", fetcher);
 
   if (error) return <ErrorPage />;
   if (isLoading) return <div aria-busy="true" aria-live="polite" />;

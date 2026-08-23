@@ -19,4 +19,9 @@ export class SessionController {
     );
     this.view.updateTimerText(this.model.state.timeElapsedMs);
   }
+
+  public setTimeElapsedMs(timeElapsedMs: number): void {
+    this.model.state = withTimeElapsedMs(this.model.state, timeElapsedMs);
+    this.view.updateTimerText(this.model.state.timeElapsedMs);
+  }
 }

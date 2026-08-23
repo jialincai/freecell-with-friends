@@ -53,7 +53,7 @@ export async function upsertGame(
   `;
 }
 
-export async function updateStreakOnCompletion({
+export async function updateStreakAndCompleteGame({
   userId,
   dealId,
   elapsedTimeMs,

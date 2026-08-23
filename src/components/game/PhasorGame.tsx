@@ -23,7 +23,7 @@ export interface IRefPhaserGame {
 
 // Server sync runs on its own cadence, independent of the local autosave
 // cadence in Game.ts.
-const SERVER_SYNC_INTERVAL_MS = 30_000;
+const SERVER_SYNC_INTERVAL_MS = 5_000;
 
 export const PhaserGame = forwardRef<IRefPhaserGame>(
   function PhaserGame(_, ref) {

@@ -8,7 +8,6 @@ import {
   useState,
 } from "react";
 import { CardMoveSequence } from "@/phaser/move/CardMoveSequence";
-import type Game from "@/phaser/scenes/Game";
 import type { Meta } from "@/phaser/meta/Meta";
 import type { Session } from "@/phaser/session/Session";
 import SaveController from "@/utils/save/SaveController";
@@ -23,7 +22,7 @@ export interface IRefPhaserGame {
 
 // Server sync runs on its own cadence, independent of the local autosave
 // cadence in Game.ts.
-const SERVER_SYNC_INTERVAL_MS = 5_000;
+const SERVER_SYNC_INTERVAL_MS = 30_000;
 
 export const PhaserGame = forwardRef<IRefPhaserGame>(
   function PhaserGame(_, ref) {
@@ -150,12 +149,17 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
       // Trigger 1: game already complete locally (e.g. an anonymous
       // completion) at the moment we're mounted/authenticated.
       const syncCompletionOnLogin = () => {
-        const scene = gameRef.current?.scene.getScene("Game") as
-          | Game
-          | undefined;
-        if (!scene || !scene.isComplete()) return;
+        const localSave = SaveController.getSave();
+        const localMeta = localSave?.state.chunks.meta as Meta | undefined;
+        if (localMeta?.data.seed !== deal.seed || !localMeta.state.complete)
+          return;
 
-        const { elapsedTimeMs, moveArray } = scene.getProgress();
+        const elapsedTimeMs =
+          (localSave?.state.chunks.session as Session | undefined)?.state
+            .timeElapsedMs ?? 0;
+        const moveArray =
+          (localSave?.state.chunks.move as CardMoveSequence[] | undefined) ??
+          [];
         postCompletion(elapsedTimeMs, moveArray);
       };
       syncCompletionOnLogin();
@@ -183,12 +187,17 @@ export const PhaserGame = forwardRef<IRefPhaserGame>(
       if (sessionStatus !== "authenticated") return;
 
       const sync = async () => {
-        const scene = gameRef.current?.scene.getScene("Game") as
-          | Game
-          | undefined;
-        if (!scene || scene.isComplete()) return;
+        const localSave = SaveController.getSave();
+        const localMeta = localSave?.state.chunks.meta as Meta | undefined;
+        if (localMeta?.data.seed !== deal.seed || localMeta.state.complete)
+          return;
 
-        const { elapsedTimeMs, moveArray } = scene.getProgress();
+        const elapsedTimeMs =
+          (localSave?.state.chunks.session as Session | undefined)?.state
+            .timeElapsedMs ?? 0;
+        const moveArray =
+          (localSave?.state.chunks.move as CardMoveSequence[] | undefined) ??
+          [];
         try {
           const res = await fetch("/api/game/progress", {
             method: "POST",

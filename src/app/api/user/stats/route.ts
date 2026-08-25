@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import authOptions from "@/auth/config";
 import { getUserCompletionStats } from "@/lib/db/games";
 import { getStreak, resetStreak } from "@/lib/db/streaks";
+import { healStreak } from "@/lib/db/transactions";
 import { getDeal } from "@/lib/db/deals";
 import { getCurrentUTCDateString } from "@/utils/Function";
 
@@ -10,6 +11,10 @@ export async function GET() {
   if (!session?.user?.id) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  // Catches up `streaks` in case a prior completion crashed between
+  // upserting the game and healing the streak.
+  await healStreak(session.user.id);
 
   const { count, average } = await getUserCompletionStats(session.user.id);
   const streak = await getStreak(session.user.id);

@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import authOptions from "@/auth/config";
-import { updateStreakAndCompleteGame } from "@/lib/db/transactions";
+import { healStreak, upsertGame } from "@/lib/db/transactions";
 import { getCurrentUTCDateString } from "@/utils/Function";
 import { getDeal } from "@/lib/db/deals";
 
@@ -13,12 +13,14 @@ export async function POST(req: Request) {
   const deal = await getDeal(getCurrentUTCDateString());
   const { completionTimeMs, moveArray } = await req.json();
 
-  await updateStreakAndCompleteGame({
+  await upsertGame({
     userId: session.user.id,
     dealId: deal.id,
     elapsedTimeMs: completionTimeMs,
     moves: JSON.stringify(moveArray),
+    completed: true,
   });
+  await healStreak(session.user.id);
 
   return new Response(null, { status: 204 });
 }

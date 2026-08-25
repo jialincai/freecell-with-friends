@@ -40,52 +40,48 @@ export async function upsertGame(
   },
   tx: Sql = sql,
 ) {
-  // Once a game is marked completed, the server's state is authoritative:
-  // further upserts (e.g. late progress syncs from the client) are no-ops.
+  // Unconditional overwrite — caller is responsible for not clobbering an
+  // already-completed game (check first, in the same transaction).
   await tx`
     INSERT INTO games (user_id, deal_id, elapsed_time_ms, moves, completed)
     VALUES (${userId}, ${dealId}, ${elapsedTimeMs}, ${moves}::jsonb, ${completed})
     ON CONFLICT (user_id, deal_id) DO UPDATE
     SET elapsed_time_ms = EXCLUDED.elapsed_time_ms,
         moves = EXCLUDED.moves,
-        completed = games.completed OR EXCLUDED.completed
-    WHERE games.completed = false
+        completed = EXCLUDED.completed
   `;
 }
 
-export async function updateStreakAndCompleteGame({
-  userId,
-  dealId,
-  elapsedTimeMs,
-  moves,
-}: {
-  userId: string;
-  dealId: number;
-  elapsedTimeMs: number;
-  moves: string;
-}) {
-  const [streak] = await sql<Streak[]>`
-    SELECT * FROM streaks
-    WHERE user_id = ${userId}
-  `;
-  if (!streak) {
-    throw new Error(`Missing streak for user ${userId}`);
-  }
-
-  const curr = streak.last_deal_id === dealId - 1 ? streak.curr + 1 : 1;
-  const max = Math.max(streak.max, curr);
-  const lastDealId = dealId;
-
+// Idempotent: reconciles `streaks` against the latest completed deal in
+// `games` (the source of truth). Safe to call redundantly from anywhere
+// (after a completion, from a stats fetch, ...) — a no-op if already healed.
+export async function healStreak(userId: string) {
   await sql.begin(async (tx) => {
-    await upsertGame(
-      { userId, dealId, elapsedTimeMs, moves, completed: true },
-      tx,
-    );
+    const [streak] = await tx<Streak[]>`
+      SELECT * FROM streaks
+      WHERE user_id = ${userId}
+      FOR UPDATE
+    `;
+
+    const [latest] = await tx`
+      SELECT deal_id FROM games
+      WHERE user_id = ${userId} AND completed = true
+      ORDER BY deal_id DESC
+      LIMIT 1
+    `;
+    if (!latest || latest.deal_id === streak.last_deal_id) {
+      return;
+    }
+
+    const curr =
+      streak.last_deal_id === latest.deal_id - 1 ? streak.curr + 1 : 1;
+    const max = Math.max(streak.max, curr);
+
     await tx`
       UPDATE streaks
       SET curr = ${curr},
           max = ${max},
-          last_deal_id = ${lastDealId}
+          last_deal_id = ${latest.deal_id}
       WHERE user_id = ${userId}
     `;
   });

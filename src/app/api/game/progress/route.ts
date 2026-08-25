@@ -31,8 +31,12 @@ export async function POST(req: Request) {
   const deal = await getDeal(getCurrentUTCDateString());
   const { elapsedTimeMs, moveArray } = await req.json();
 
-  // upsertGame's `WHERE games.completed = false` guard ensures a periodic
-  // in-progress sync can never overwrite an already-completed game.
+  // A stale periodic sync must never clobber an already-completed game.
+  const game = await getGame({ userId: session.user.id, dealId: deal.id });
+  if (game?.completed) {
+    return new Response(null, { status: 204 });
+  }
+
   await upsertGame({
     userId: session.user.id,
     dealId: deal.id,

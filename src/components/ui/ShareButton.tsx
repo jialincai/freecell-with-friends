@@ -35,30 +35,27 @@ const ShareButton = () => {
       const localMeta = (localSave?.state.chunks.meta as Meta) ?? null;
       const localSession = (localSave?.state.chunks.session as Session) ?? null;
 
-      let time = "XX:XX";
-      let timeEmoji = "🔮";
+      let result = "XX:XX = 🔮";
       if (localMeta?.state.complete && localSession?.state.timeElapsedMs) {
+        result = formatTime(localSession.state.timeElapsedMs);
+
+        // Percentiles are only computed from server-recorded completions, so
+        // anonymous players (401) and not-yet-synced completions (404) share
+        // their time without an emoji.
         try {
-          const completionTime = localSession.state.timeElapsedMs;
-          const res = await fetch("/api/user/share", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(completionTime),
-          });
-
-          if (!res.ok) {
-            throw new Error("Database error");
+          const res = await fetch("/api/user/share");
+          if (res.ok) {
+            const percentile = await res.json();
+            result += ` = ${emojiForPercentile(percentile)}`;
+          } else if (res.status !== 401 && res.status !== 404) {
+            throw new Error(await res.text());
           }
-
-          const percentile = await res.json();
-          time = formatTime(completionTime);
-          timeEmoji = emojiForPercentile(percentile);
         } catch (err) {
-          console.error("Share failed", err);
+          console.error("Failed to fetch share percentile:", err);
         }
       }
 
-      let message = `Freecell #${deal.id}\n${time} = ${timeEmoji}`;
+      let message = `Freecell #${deal.id}\n${result}`;
       if (stats) {
         message += `\n${stats.currentStreak}🔥`;
       }

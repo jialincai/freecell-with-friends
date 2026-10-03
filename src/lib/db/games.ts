@@ -22,19 +22,19 @@ export async function getGame({
   return result[0] ?? null;
 }
 
-export async function countDealCompletionsByFloor({
+export async function countDealCompletions({
   dealId,
-  floorMs,
+  lowerBoundMs = 0,
 }: {
   dealId: number;
-  floorMs: number;
+  lowerBoundMs?: number;
 }) {
   const [row] = await sql`
     SELECT COUNT(*)::int AS count
     FROM games
     WHERE deal_id = ${dealId}
       AND completed = true
-      AND elapsed_time_ms >= ${floorMs}
+      AND elapsed_time_ms >= ${lowerBoundMs}
   `;
   return row.count;
 }

@@ -1,0 +1,68 @@
+/* Styles for TrendPlot's SVG: axes, lines, markers and the hover area. */
+
+/* Spans all of TrendChart's grid columns (see TrendChart.module.css). */
+.plot {
+  @apply
+    w-full;
+  grid-column: 1 / -1;
+}
+
+/* The player's line and markers use --trend-color, set by one of these on
+   the SVG (the window's trend) and overridden on the hovered segment and
+   marker (the hovered point's change). Same Tailwind colors as TrendHeader
+   and TimeframeSelector. */
+.slower {
+  --trend-color: theme("colors.red");
+}
+
+.faster {
+  --trend-color: theme("colors.green.600");
+}
+
+/* SVG units: sizes here are in viewBox units and scale with the chart. */
+.axisLabel {
+  fill: currentColor;
+  fill-opacity: 0.7;
+  font-size: 12px;
+}
+
+.axisLine {
+  stroke: currentColor;
+  stroke-opacity: 0.3;
+}
+
+.line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.playerLine {
+  stroke: var(--trend-color);
+}
+
+.medianLine {
+  @apply
+    stroke-blue;
+  stroke-dasharray: 6 4;
+}
+
+.marker {
+  stroke: var(--trend-color);
+  stroke-width: 1.5;
+}
+
+.markerSolid {
+  fill: var(--trend-color);
+}
+
+.markerHollow {
+  @apply
+    fill-darkBlue;
+}
+
+.scrubArea {
+  fill: transparent;
+  touch-action: pan-y;
+}

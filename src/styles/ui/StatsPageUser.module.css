@@ -17,3 +17,25 @@
     text-sm uppercase
     tracking-widest text-center;
 }
+
+/* Status text (loading, not enough data). Composed by TrendChart. */
+.message {
+  @apply
+    text-center;
+}
+
+/*
+ * Grid shared by the StatsPageUser and TrendChart. The stat row sits in the
+ * centre `auto` column, so that column's left edge is the row's left edge;
+ * TrendChart spans all three columns and subgrids them to line its header
+ * up with the row.
+ */
+.statsGrid {
+  @apply
+    grid w-full gap-y-12;
+  grid-template-columns: 1fr auto 1fr;
+}
+
+.statsGridCenter {
+  grid-column: 2;
+}

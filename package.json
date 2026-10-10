@@ -11,6 +11,11 @@
   },
   "dependencies": {
     "@vercel/analytics": "^1",
+    "@visx/axis": "^4",
+    "@visx/event": "^4",
+    "@visx/group": "^4",
+    "@visx/scale": "^4",
+    "@visx/shape": "^4",
     "lucide-react": "^0.510",
     "next": "^15",
     "next-auth": "^4",

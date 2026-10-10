@@ -50,3 +50,45 @@ export async function getUserCompletionStats(userId: string) {
   `;
   return { count: row.count, average: row.average };
 }
+
+/**
+ * One completed game.
+ * - date: string, the deal's date as YYYY-MM-DD (UTC).
+ * - elapsed_time_ms: number, the completion time in milliseconds.
+ */
+export type UserCompletionTime = {
+  date: string;
+  elapsed_time_ms: number;
+};
+
+/**
+ * A player's completed games, oldest first. In-progress games are excluded.
+ *
+ * @param userId - string: the player's UUID (session.user.id).
+ * @param startDate - string, optional: YYYY-MM-DD; only deals on or after it.
+ * @param endDate - string, optional: YYYY-MM-DD; only deals on or before it.
+ * @returns Promise<UserCompletionTime[]>: one row per completed deal, sorted
+ *   by date ascending.
+ */
+export async function getUserCompletionTimes({
+  userId,
+  startDate,
+  endDate,
+}: {
+  userId: string;
+  startDate?: string;
+  endDate?: string;
+}) {
+  return sql<UserCompletionTime[]>`
+    SELECT
+      to_char(deals.date, 'YYYY-MM-DD') AS date,
+      games.elapsed_time_ms
+    FROM games
+    JOIN deals ON deals.id = games.deal_id
+    WHERE games.user_id = ${userId}
+      AND games.completed = true
+      ${startDate ? sql`AND deals.date >= ${startDate}` : sql``}
+      ${endDate ? sql`AND deals.date <= ${endDate}` : sql``}
+    ORDER BY deals.date ASC
+  `;
+}

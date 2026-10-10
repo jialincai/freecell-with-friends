@@ -1,0 +1,19 @@
+/* Stats overlay styles seen only by signed-in players (StatsPageUser). */
+
+
+.stat {
+  @apply
+    flex flex-col 
+    items-center mx-4;
+}
+
+.statValue {
+  @apply
+    text-2xl font-bold;
+}
+
+.statLabel {
+  @apply
+    text-sm uppercase
+    tracking-widest text-center;
+}

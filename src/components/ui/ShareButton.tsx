@@ -7,7 +7,7 @@ import SaveController from "@/utils/save/SaveController";
 import { Meta } from "@/phaser/meta/Meta";
 import { Session } from "@/phaser/session/Session";
 import { useDailyDeal } from "@/components/context/DealContext";
-import styles from "@/styles/ui/StatsPage.module.css";
+import styles from "@/styles/ui/Stats.module.css";
 import { useEffect, useState } from "react";
 
 const emojiForPercentile = (p: number): string => {

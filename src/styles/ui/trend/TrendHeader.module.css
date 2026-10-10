@@ -1,0 +1,51 @@
+/* Styles for TrendHeader: title, value, change line and global label. */
+
+/* Sits in TrendChart's centre grid column, lining up with the stat row. */
+.header {
+  @apply
+    flex flex-col
+    items-start
+    gap-1;
+  /* Same as the stat blocks' mx-4, so the text starts where "PLAYED" does. */
+  margin-left: 1rem;
+  grid-column: 2;
+  /* Zero width so the header's text can't widen the centre column and
+     shift the stat row; the text overflows to the right instead. */
+  width: 0;
+  white-space: nowrap;
+}
+
+/* Title and value share the stat blocks' styles so they stay in sync. */
+.title {
+  composes: statLabel from "../StatsPageUser.module.css";
+}
+
+.value {
+  composes: statValue from "../StatsPageUser.module.css";
+}
+
+.change {
+  @apply
+    text-xs;
+}
+
+/* Trend colors; same Tailwind colors as TrendPlot and TimeframeSelector. */
+.slower {
+  @apply
+    text-red;
+}
+
+.faster {
+  @apply
+    text-green-600;
+}
+
+.period {
+  @apply
+    text-gray;
+}
+
+.globalLabel {
+  @apply
+    text-xs text-blue;
+}

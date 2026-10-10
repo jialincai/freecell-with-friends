@@ -78,6 +78,9 @@ export function formatTime(ms: number): string {
   return `${minutes}:${seconds}`;
 }
 
+/** number: milliseconds in one day. */
+export const DAY_MS = 24 * 60 * 60 * 1000;
+
 export function getCurrentUTCDateString() {
   const isoString = new Date().toISOString(); // always UTC
   return isoString.slice(0, 10); // 'YYYY-MM-DD'

@@ -1,0 +1,16 @@
+/*
+ * TrendChart sits in StatsPageUser.module.css `.statsGrid` (1fr auto 1fr).
+ * Everything spans all three columns except the header, which sits in the
+ * centre column to line up with the stat row there.
+ */
+.message {
+  composes: message from "../StatsPageUser.module.css";
+  grid-column: 1 / -1;
+}
+
+.figure {
+  @apply
+    grid gap-y-4;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+}

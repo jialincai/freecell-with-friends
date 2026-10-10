@@ -1,0 +1,33 @@
+/* Styles for TimeframeSelector's row of timeframe buttons. */
+
+/* Inset to the plot area; TrendChart sets the variables from TrendPlot. */
+.timeframeSelector {
+  @apply
+    flex justify-between
+    w-full text-sm;
+    grid-column: 1 / -1;
+    padding-left: var(--plot-inset-left);
+    padding-right: var(--plot-inset-right);
+}
+
+.timeframeButton {
+  @apply
+    px-2 py-0.5
+    rounded-md
+    border border-transparent;
+}
+
+.timeframeButtonSelected {
+  @apply
+    font-semibold;
+}
+
+.timeframeButtonSlower {
+  @apply
+    bg-red border-red;
+}
+
+.timeframeButtonFaster {
+  @apply
+    bg-green-600 border-green-600;
+}

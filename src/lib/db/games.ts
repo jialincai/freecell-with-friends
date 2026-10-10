@@ -92,3 +92,37 @@ export async function getUserCompletionTimes({
     ORDER BY deals.date ASC
   `;
 }
+
+/**
+ * One day of the global median line.
+ * - date: string, the deal's date as YYYY-MM-DD (UTC).
+ * - median_ms: number, the median completion time across all players who
+ *   completed that day's deal, in milliseconds.
+ */
+export type GlobalDailyMedian = {
+  date: string;
+  median_ms: number;
+};
+
+/**
+ * The median completion time across all players, for every day that has at
+ * least one completed game, oldest first. One row per day, so it's fetched
+ * once and binned on the client for any timeframe.
+ *
+ * @returns Promise<GlobalDailyMedian[]>: one row per date with completions,
+ *   sorted by date ascending.
+ */
+export async function getGlobalDailyMedians() {
+  return sql<GlobalDailyMedian[]>`
+    SELECT
+      to_char(deals.date, 'YYYY-MM-DD') AS date,
+      percentile_cont(0.5) WITHIN GROUP (
+        ORDER BY games.elapsed_time_ms
+      )::float8 AS median_ms
+    FROM games
+    JOIN deals ON deals.id = games.deal_id
+    WHERE games.completed = true
+    GROUP BY deals.date
+    ORDER BY deals.date ASC
+  `;
+}
